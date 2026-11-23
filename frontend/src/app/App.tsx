@@ -2,6 +2,7 @@ import {
   AlertCircle,
   Copy,
   FolderOpen,
+  FolderGit2,
   GitBranch,
   HelpCircle,
   LogIn,
@@ -11,6 +12,7 @@ import {
   Pencil,
   Plus,
   RefreshCw,
+  Server,
   Settings2,
   Sparkles,
 } from "lucide-react";
@@ -24,6 +26,7 @@ import { ConfirmDialog } from "../components/ConfirmDialog";
 import { DialogDock } from "../components/DialogDock";
 import { EmptyState } from "../components/EmptyState";
 import { ExtensionStatusRail } from "../components/ExtensionStatusRail";
+import { MCPDialog } from "../components/MCPDialog";
 import { ModelPickerDialog } from "../components/ModelPickerDialog";
 import { RenameDialog } from "../components/RenameDialog";
 import { RightPanel } from "../components/RightPanel";
@@ -32,6 +35,7 @@ import { SessionTranscript } from "../components/SessionTranscript";
 import { SessionTreeDialog } from "../components/SessionTreeDialog";
 import { SettingsDialog } from "../components/SettingsDialog";
 import { TrustDialog } from "../components/TrustDialog";
+import { WorktreeDialog } from "../components/WorktreeDialog";
 import { Sidebar } from "../components/Sidebar";
 import { TopBar } from "../components/TopBar";
 import { api, insideShell } from "../lib/api";
@@ -55,6 +59,8 @@ export function App() {
   const [rightOpen, setRightOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mcpOpen, setMCPOpen] = useState(false);
+  const [worktreeOpen, setWorktreeOpen] = useState(false);
   const [treeOpen, setTreeOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
@@ -144,6 +150,29 @@ export function App() {
   useEffect(() => {
     return api.onAgentEvent((ev) => useChat.getState().applyEvent(ev));
   }, []);
+
+  const busySessions = useRef<Record<string, boolean>>({});
+  useEffect(() => {
+    const enabled = Boolean(boot?.settings.notifications);
+    const next: Record<string, boolean> = {};
+    for (const session of Object.values(sessions)) {
+      const busy = session.streaming || session.status === "loading";
+      next[session.key] = busy;
+      const wasBusy = busySessions.current[session.key];
+      if (
+        enabled &&
+        wasBusy &&
+        !busy &&
+        session.status === "ready" &&
+        !document.hasFocus()
+      ) {
+        void api
+          .notify(session.key, session.name || "Pi Mygo", session.error ? "Run failed" : "Run finished")
+          .catch(() => {});
+      }
+    }
+    busySessions.current = next;
+  }, [sessions, boot?.settings.notifications]);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
@@ -314,6 +343,20 @@ export function App() {
       toast.error(err instanceof Error ? err.message : String(err));
     }
   }, [load]);
+
+  const handleOpenPath = useCallback(
+    async (path: string) => {
+      try {
+        const ws = await api.openProject(path);
+        toast.success(`Opened ${ws.name}`);
+        await load();
+        setSelected(ws);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : String(err));
+      }
+    },
+    [load],
+  );
 
   const handleOpenSummary = useCallback(
     async (summary: Summary) => {
@@ -600,6 +643,13 @@ export function App() {
         run: () => void handleOpenProject(),
       },
       {
+        id: "worktrees",
+        label: "Manage worktrees…",
+        group: "Workspace",
+        icon: FolderGit2,
+        run: () => setWorktreeOpen(true),
+      },
+      {
         id: "tree",
         label: "Session tree…",
         group: "Session",
@@ -635,6 +685,13 @@ export function App() {
         group: "Providers",
         icon: LogIn,
         run: () => setLoginOpen(true),
+      },
+      {
+        id: "mcp",
+        label: "Manage MCP servers…",
+        group: "Providers",
+        icon: Server,
+        run: () => setMCPOpen(true),
       },
       {
         id: "model",
@@ -952,7 +1009,13 @@ export function App() {
         </div>
       </main>
 
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} actions={actions} />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        actions={actions}
+        workspace={displayWorkspace?.path}
+        onOpenSession={(summary) => void handleOpenSummary(summary)}
+      />
       <SettingsDialog
         open={settingsOpen}
         onOpenChange={setSettingsOpen}
@@ -960,9 +1023,27 @@ export function App() {
         theme={theme}
         onTheme={(t) => void chooseTheme(t)}
         onReload={() => void load()}
+        onMCP={() => {
+          setSettingsOpen(false);
+          setMCPOpen(true);
+        }}
         onLogin={() => {
           setSettingsOpen(false);
           setLoginOpen(true);
+        }}
+      />
+      <MCPDialog
+        open={mcpOpen}
+        onOpenChange={setMCPOpen}
+        workspace={displayWorkspace?.path}
+      />
+      <WorktreeDialog
+        open={worktreeOpen}
+        onOpenChange={setWorktreeOpen}
+        workspace={displayWorkspace?.path}
+        onOpen={(path) => {
+          setWorktreeOpen(false);
+          void handleOpenPath(path);
         }}
       />
       <Suspense fallback={null}>

@@ -1,22 +1,29 @@
 import {
+  Circle,
+  CircleCheck,
   FileText,
   GitBranch,
+  ListTodo,
   Loader2,
   PanelRightClose,
   RefreshCw,
   Search,
+  Undo2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
+import { extractTodos, type TodoItem } from "../lib/todos";
+import { toast } from "../lib/toast";
 import type { Hit, Status } from "../mygo";
 import type { ChatSession } from "../store/chat";
 import type { Workspace } from "../lib/types";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { DiffDialog } from "./DiffDialog";
 import { FilePreviewDialog } from "./FilePreviewDialog";
 
-type Tab = "changes" | "files";
+type Tab = "changes" | "files" | "plan";
 
 export function RightPanel({
   workspace,
@@ -36,6 +43,7 @@ export function RightPanel({
   const [refresh, setRefresh] = useState(0);
   const [diffPath, setDiffPath] = useState<string | null>(null);
   const [filePath, setFilePath] = useState<string | null>(null);
+  const [revertPath, setRevertPath] = useState<string | null>(null);
 
   useEffect(() => {
     if (!workspace) {
@@ -71,8 +79,10 @@ export function RightPanel({
     if (!q) return files;
     return files.filter((f) => f.path.toLowerCase().includes(q));
   }, [files, query]);
+  const todos = useMemo(() => extractTodos(session?.entries ?? []), [session?.entries]);
 
   const changed = status?.files.length ?? 0;
+  const doneTodos = todos.filter((todo) => todo.done).length;
 
   return (
     <aside className="flex w-[var(--right-width)] shrink-0 flex-col border-l border-border bg-surface/50">
@@ -89,6 +99,15 @@ export function RightPanel({
         <TabButton active={tab === "files"} onClick={() => setTab("files")}>
           <FileText size={12} />
           Files
+        </TabButton>
+        <TabButton active={tab === "plan"} onClick={() => setTab("plan")}>
+          <ListTodo size={12} />
+          Plan
+          {todos.length > 0 ? (
+            <span className="ml-0.5 rounded-full bg-surface-3 px-1 text-[9px] tabular-nums text-subtle">
+              {doneTodos}/{todos.length}
+            </span>
+          ) : null}
         </TabButton>
         <button
           type="button"
@@ -117,7 +136,11 @@ export function RightPanel({
           {status?.ahead ? <span className="text-success">↑{status.ahead}</span> : null}
           {status?.behind ? <span className="text-warning">↓{status.behind}</span> : null}
           <span className="ml-auto truncate text-[10px] text-faint">
-            {tab === "changes" ? `${changed} changed` : `${files.length} files`}
+            {tab === "changes"
+              ? `${changed} changed`
+              : tab === "files"
+                ? `${files.length} files`
+                : `${doneTodos}/${todos.length} steps`}
           </span>
         </div>
       ) : null}
@@ -138,9 +161,11 @@ export function RightPanel({
         {!workspace ? (
           <Empty icon={<GitBranch size={15} />} title="No project" detail="Open a project to see changes." />
         ) : tab === "changes" ? (
-          tabChanges(status, error, loading, setDiffPath)
-        ) : (
+          tabChanges(status, error, loading, setDiffPath, setRevertPath)
+        ) : tab === "files" ? (
           <FileList files={filteredFiles} onOpen={setFilePath} />
+        ) : (
+          <TodoList todos={todos} />
         )}
       </div>
 
@@ -160,6 +185,25 @@ export function RightPanel({
           path={filePath}
         />
       ) : null}
+      <ConfirmDialog
+        open={Boolean(revertPath)}
+        onOpenChange={(next) => !next && setRevertPath(null)}
+        title={`Revert ${revertPath ?? "file"}?`}
+        message="This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo."
+        confirmLabel="Revert file"
+        danger
+        onConfirm={async () => {
+          if (!workspace || !revertPath) return;
+          try {
+            await api.revertFile(workspace.path, revertPath);
+            setRevertPath(null);
+            setRefresh((v) => v + 1);
+            toast.success("File reverted");
+          } catch (err) {
+            toast.error(err instanceof Error ? err.message : String(err));
+          }
+        }}
+      />
     </aside>
   );
 }
@@ -169,6 +213,7 @@ function tabChanges(
   error: string | null,
   loading: boolean,
   onOpenDiff: (path: string) => void,
+  onRevert: (path: string) => void,
 ) {
   if (loading && !status) {
     return <Loading />;
@@ -197,11 +242,14 @@ function tabChanges(
   return (
     <ul className="space-y-0.5">
       {status.files.map((file) => (
-        <li key={file.path}>
+        <li
+          key={file.path}
+          className="group flex items-center gap-1 rounded-md pr-1 transition-colors hover:bg-surface-2"
+        >
           <button
             type="button"
             onClick={() => onOpenDiff(file.path)}
-            className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-surface-2"
+            className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left"
           >
             <span
               className={cn(
@@ -231,6 +279,17 @@ function tabChanges(
               <span className="size-1 rounded-full bg-brand" title="Staged" />
             ) : null}
           </button>
+          {file.status !== "??" ? (
+            <button
+              type="button"
+              onClick={() => onRevert(file.path)}
+              className="flex size-6 shrink-0 items-center justify-center rounded text-faint opacity-0 transition-opacity hover:bg-danger/10 hover:text-danger group-hover:opacity-100"
+              aria-label={`Revert ${file.path}`}
+              title="Revert to HEAD"
+            >
+              <Undo2 size={11} />
+            </button>
+          ) : null}
         </li>
       ))}
     </ul>
@@ -253,6 +312,48 @@ function FileList({ files, onOpen }: { files: Hit[]; onOpen: (path: string) => v
             <FileText size={11} className="shrink-0 text-faint" />
             <span className="truncate font-mono text-[10.5px] text-subtle">{file.path}</span>
           </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function TodoList({ todos }: { todos: TodoItem[] }) {
+  if (todos.length === 0) {
+    return (
+      <Empty
+        icon={<ListTodo size={15} />}
+        title="No plan yet"
+        detail="Plans and todo lists created by pi appear here."
+      />
+    );
+  }
+  return (
+    <ul className="space-y-0.5 p-1">
+      {todos.map((todo) => (
+        <li
+          key={todo.id}
+          className="flex items-start gap-2 rounded-md px-2 py-1.5 text-[11.5px] leading-5"
+        >
+          {todo.done ? (
+            <CircleCheck size={13} className="mt-0.5 shrink-0 text-success" />
+          ) : (
+            <Circle
+              size={13}
+              className={cn("mt-0.5 shrink-0", todo.active ? "text-brand" : "text-faint")}
+            />
+          )}
+          <span
+            className={cn(
+              "min-w-0 flex-1",
+              todo.done ? "text-faint line-through" : todo.active ? "text-fg" : "text-subtle",
+            )}
+          >
+            {todo.text}
+          </span>
+          {todo.active ? (
+            <span className="shrink-0 text-[9px] uppercase tracking-wide text-brand">now</span>
+          ) : null}
         </li>
       ))}
     </ul>

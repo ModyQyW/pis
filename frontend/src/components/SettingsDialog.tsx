@@ -16,6 +16,7 @@ export function SettingsDialog({
   onTheme,
   onReload,
   onLogin,
+  onMCP,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -24,6 +25,7 @@ export function SettingsDialog({
   onTheme: (theme: Theme) => void;
   onReload: () => void;
   onLogin?: () => void;
+  onMCP?: () => void;
 }) {
   const [path, setPath] = useState(boot.settings.piPath ?? boot.pi.path ?? "");
   const [diag, setDiag] = useState<Diagnostics | null>(null);
@@ -165,6 +167,43 @@ export function SettingsDialog({
                   </span>
                 </span>
               </label>
+              <label className="mt-2.5 flex items-start gap-2 text-[11px] leading-4 text-subtle">
+                <input
+                  type="checkbox"
+                  checked={boot.settings.notifications}
+                  onChange={async (e) => {
+                    setBusy(true);
+                    try {
+                      await api.setPreferences({ notifications: e.target.checked });
+                      onReload();
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                  className="mt-0.5 size-3.5 accent-[var(--brand)]"
+                />
+                <span>
+                  Desktop notifications
+                  <span className="block text-[10px] text-faint">
+                    Notify when a background run finishes. The setting is off if
+                    the system does not allow notifications.
+                  </span>
+                </span>
+              </label>
+              <button
+                type="button"
+                disabled={busy || !boot.settings.notifications}
+                onClick={async () => {
+                  try {
+                    await api.notify("test", "Pi Mygo", "Notifications are working.");
+                  } catch (err) {
+                    toast.error(err instanceof Error ? err.message : String(err));
+                  }
+                }}
+                className="mt-2 h-7 rounded-md border border-border px-2.5 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+              >
+                Test notification
+              </button>
             </Section>
 
             <Section
@@ -178,6 +217,14 @@ export function SettingsDialog({
                   className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   Sign in to a provider…
+                </button>
+                <button
+                  type="button"
+                  onClick={onMCP}
+                  disabled={!onMCP}
+                  className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                >
+                  MCP servers…
                 </button>
                 <span className="text-[10.5px] text-faint">
                   {boot.pi.compatible ? "Credentials live in pi's auth store" : "Locate pi first"}

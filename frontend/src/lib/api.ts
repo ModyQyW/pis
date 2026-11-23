@@ -6,19 +6,24 @@ import {
   Desktop,
   Files,
   Git,
+  MCP,
   Sessions,
   events,
+  type AddRequest,
   type Bootstrap,
   type Diagnostics,
   type Event,
   type MenuCommand,
   type PiStatus,
   type PromptRequest,
+  type SearchHit,
+  type Server,
   type SessionInfo,
   type StartRequest,
   type Summary,
   type Transcript,
   type Workspace,
+  type Worktree,
 } from "../mygo";
 import { mockBootstrap, mockDiff, mockGitStatus, mockModels, mockStart, mockSummary, mockTranscript, mockTree } from "./mock";
 
@@ -76,6 +81,10 @@ export const api = {
     if (!insideShell) return;
     await Desktop.setPreferences(p);
   },
+  async notify(id: string, title: string, body: string): Promise<void> {
+    if (!insideShell) return;
+    await Desktop.notify(id, title, body);
+  },
   async setPiPath(path: string): Promise<PiStatus> {
     if (!insideShell) return mockBootstrap().pi;
     return Desktop.setPiPath(path);
@@ -111,6 +120,13 @@ export const api = {
   async listSessions(workspace: string, limit = 50): Promise<Summary[]> {
     if (!insideShell) return [mockSummary()];
     return Sessions.list(workspace, limit);
+  },
+  async searchSessions(workspace: string, query: string, limit = 12): Promise<SearchHit[]> {
+    if (!insideShell) {
+      const hit = mockSummary();
+      return [{ ...hit, snippet: `…${query}…`, role: "assistant" }];
+    }
+    return Sessions.search(workspace, query, limit);
   },
   async readSession(path: string): Promise<Transcript> {
     if (!insideShell) return mockTranscript(path);
@@ -215,6 +231,42 @@ export const api = {
     if (!insideShell) return;
     await Agent.setAutoCompaction(id, enabled);
   },
+  async mcpList(workspace: string): Promise<Server[]> {
+    if (!insideShell) {
+      return [
+        {
+          name: "filesystem",
+          source: "user",
+          kind: "stdio",
+          command: "npx",
+          args: ["-y", "@modelcontextprotocol/server-filesystem", "."],
+          description: "Project files",
+          enabled: true,
+        },
+        {
+          name: "docs",
+          source: "project",
+          kind: "http",
+          url: "https://example.com/mcp",
+          description: "Documentation search",
+          enabled: false,
+        },
+      ];
+    }
+    return MCP.list(workspace);
+  },
+  async mcpSetEnabled(workspace: string, name: string, enabled: boolean, local: boolean): Promise<void> {
+    if (!insideShell) return;
+    await MCP.setEnabled(workspace, name, enabled, local);
+  },
+  async mcpRemove(workspace: string, name: string, local: boolean): Promise<void> {
+    if (!insideShell) return;
+    await MCP.remove(workspace, name, local);
+  },
+  async mcpAdd(workspace: string, req: AddRequest): Promise<void> {
+    if (!insideShell) return;
+    await MCP.add(workspace, req);
+  },
   async gitStatus(workspace: string): Promise<import("../mygo").Status> {
     if (!insideShell) return mockGitStatus();
     return Git.status(workspace);
@@ -222,6 +274,32 @@ export const api = {
   async gitDiff(workspace: string, path: string): Promise<string> {
     if (!insideShell) return mockDiff(path);
     return Git.diff(workspace, path);
+  },
+  async revertFile(workspace: string, path: string): Promise<void> {
+    if (!insideShell) return;
+    await Git.revert(workspace, path);
+  },
+  async worktrees(workspace: string): Promise<Worktree[]> {
+    if (!insideShell) {
+      return [
+        { path: "/Users/you/Projects/atlas", branch: "main", head: "9f3c2a1" },
+        { path: "/Users/you/Projects/atlas-feature", branch: "feature/cache", head: "2b7d9e0" },
+      ];
+    }
+    return Git.worktrees(workspace);
+  },
+  async addWorktree(
+    workspace: string,
+    path: string,
+    branch: string,
+    createBranch: boolean,
+  ): Promise<void> {
+    if (!insideShell) return;
+    await Git.addWorktree(workspace, path, branch, createBranch);
+  },
+  async removeWorktree(workspace: string, path: string, force: boolean): Promise<void> {
+    if (!insideShell) return;
+    await Git.removeWorktree(workspace, path, force);
   },
   async listFiles(workspace: string, limit = 300): Promise<import("../mygo").Hit[]> {
     if (!insideShell) {
