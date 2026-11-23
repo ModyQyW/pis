@@ -163,7 +163,9 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   v8, and action-gh-release v3. GitHub Actions run 45155511397 passed all Go,
   frontend, six cross-build, and macOS package jobs. A later CI run exposed a
   pty output-drain race on Ubuntu; the reader now drains before exit and
-  `go test -count=20 ./internal/auth` passes. The release workflow builds darwin
+  `go test -count=20 ./internal/auth` passes. Rebrand CI run 45214629824 passed
+  all jobs on 477d73b, and a fresh clone of that commit passed
+  `scripts/verify.sh`. The release workflow builds darwin
   arm64+amd64,
   windows amd64+arm64 (NSIS from Ubuntu), and linux amd64+arm64, then uploads
   through mygo to a draft release. A local Ubuntu 24.04 container built all
