@@ -298,20 +298,26 @@ Windows/Linux get a follow-up hardening pass.
 
 ---
 
-## ADR-015 — English UI, i18n-ready
+## ADR-015 — English default, Chinese UI available
 
 **Context.** The product is open source and aims beyond one user; the requester
 writes Chinese. Claude Code/Codex are English-first.
 
-**Decision.** Ship English UI copy. Keep all user-facing strings in one module
-with stable keys so a Chinese locale can be added without touching components.
-Chinese README/quickstart. App name "Pi Mygo" (repo `pi-mygo`).
+**Decision.** Ship English as the default and a Chinese locale (`zh`) selected
+in Settings. Keep the main shell/dialog strings in `lib/i18n.ts`, keyed by the
+English source text, with a `t()` lookup and `{name}` placeholders. The root
+subscribes to locale changes so non-React memoization does not freeze copy.
+Native shell/updater language follows the same setting via
+`mygo.App.SetLocale`. App name "Pi Mygo" (repo `pi-mygo`).
 
-**Consequences.** Clear international default, minimal translation maintenance.
-Chinese UI is a follow-up, not a half-translated v1.
+**Consequences.** Chinese users get a translated shell, settings, onboarding,
+MCP/worktree managers, and extension dialogs. Tool output, server names, model
+names, and code remain as the tool produced them. Native macOS menu labels stay
+English. The dictionary is additive; new English copy falls back safely.
 
 **Alternatives.** Chinese-first (narrower); English-only hardcoded strings (makes
-later i18n expensive).
+later i18n expensive); a full message-catalog build step (overkill for one
+additional locale).
 
 
 ---

@@ -7,8 +7,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 
 - Research and decisions: complete (2026-11-22).
 - Initial implementation: complete enough for user validation on macOS arm64.
-- Release build: `build/darwin-arm64/Pi Mygo.app` (22.7 MB) and
-  `pi-mygo-0.1.0-arm64.dmg` (5.7 MB); production source maps disabled.
+- Release build: `build/darwin-arm64/Pi Mygo.app` (27.0 MB) and
+  `pi-mygo-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff all exercised
   **before** the Base UI/Streamdown UI migration.
@@ -16,8 +16,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
 - Remaining before a wider release: refresh plan/approval/trust screenshots,
-  signed/notarized public builds, an update feed/key, subagent/inline-question
-  polish, and i18n.
+  signed/notarized public builds, an update feed/key, and subagent/inline-question
+  polish.
 
 ### Open validation and performance
 
@@ -50,8 +50,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
    optional signing/notarization, and the updater window are implemented. A
    public update feed/key and an actual signed/notarized build still need
    credentials and a release host.
-4. **P2 localization and assets** — Chinese UI and CJK QA remain; the official
-   Streamdown code/Mermaid lazy chunks are verified within the app budget.
+4. **P2 localization and assets** — complete: English/Chinese UI, CJK QA, and
+   official Streamdown code/Mermaid lazy chunks within the app budget.
 
 Exit criteria and detailed scope are in `02-plan.md` §8.
 
@@ -71,15 +71,16 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 | 7 Changes/files | Done | git status/diff, file list/preview, copy patch, reveal |
 | 8 Auth/onboarding | Done | pty login; missing-pi/no-model banners; provider settings |
 | 9 Polish/package | Done | app/DMG built; performance measured; Markdown lazy; source maps off |
-| 10 Delivery | In progress | P0 done; P1 features and CI done; signing/feed and i18n pending |
+| 10 Delivery | In progress | P0/P1 features, CI, and i18n done; signing/feed and screenshot refresh pending |
 
 ## Evidence log
 
 ### Shell and performance
 
-- Release app (with all frontend assets, without pi): **22.7 MB**, DMG
-  **5.7 MB**. Removing production source maps cut 21 MB from the embedded
-  frontend; the `.app` was 43.8 MB with maps enabled.
+- Release app (with all frontend assets, without pi): **27.0 MB**, DMG
+  **6.8 MB**. Removing production source maps cut 21 MB from the embedded
+  frontend; the `.app` was 43.8 MB with maps enabled before the plugin and
+  feature additions.
 - Warm launch from Finder-like `open`: **0.413 / 0.422 / 0.432 s** (three runs;
   median 0.422 s). One cold run immediately after a rebuild took 0.857 s.
 - Idle physical footprint with no pi session: **42 MB** app process. WebKit
@@ -137,6 +138,14 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - **Notifications**: `Desktop.Notify` respects the setting, groups by session,
   and truncates text. The packaged app's Test notification raised the macOS
   authorization prompt (verified in `docs/images/settings.png` capture session).
+- **Assets**: production build has 400 lazy language/diagram chunks, but a
+  clean session loaded only 15 `/assets/` files on first code/Mermaid render;
+  no console errors. The Markdown chunk stays 1.13 MB lazy (348 KB gzip).
+- **Localization**: `lib/i18n.ts` provides `t()` with English source keys,
+  Chinese copy, placeholders, and a root locale subscription; Settings persists
+  `language`, and `mygo.App.SetLocale` follows it for the native shell. Nine
+  Vitest tests include translation lookup and placeholders; CJK screenshots are
+  in `docs/images/zh-chat.png` and `zh-settings.png`.
 - **Release**: `.github/workflows/ci.yml` runs Go, cross-builds, frontend tests,
   and a packaged macOS build. `release.yml` builds tagged artifacts with optional
   signing/notarization and updater key variables. `mygo.Use(updater.Plugin)` and
@@ -149,7 +158,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - 2026-11-23: `react-virtuoso` replaced with `@tanstack/react-virtual` 3.14.28.
   Dynamic measurement, pinned-end streaming, append follow, scroll-up release,
   and jump-to-latest verified in a 300-row browser harness (16 rows mounted at
-  bottom). Typecheck, 5 Vitest tests, and production build pass.
+  bottom). Typecheck, Vitest tests, and production build pass.
 - Direct dependencies updated to latest (`katex` 0.19.1); lockfile updated.
   Math and GFM table rendering verified after the update; KaTeX CSS 0.19.1
   resolves beside Streamdown's own KaTeX 0.16.47 (recorded in P-055).
@@ -173,7 +182,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 | Streaming frame cost | < 8 ms | median <1 ms, max 1 ms over 60 row updates |
 | Idle footprint excl. pi | < 120 MB | 42 MB app process; WebKit helpers not summed |
 | Idle CPU | ~0% | observed ~0% after settle |
-| Bundle excl. pi | < 30 MB | 25.3 MB `.app`; 6.2 MB DMG |
+| Bundle excl. pi | < 30 MB | 27.0 MB `.app`; 6.8 MB DMG |
 | Cached session switch | < 100 ms | 32 ms cold / 19 ms warm |
 
 ## Corrections

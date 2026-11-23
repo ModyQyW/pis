@@ -7,8 +7,8 @@ native-window visual check, and performance closure.
 ## Artifact
 
 ```text
-build/darwin-arm64/Pi Mygo.app            22.7 MB
-build/darwin-arm64/pi-mygo-0.1.0-arm64.dmg  5.7 MB
+build/darwin-arm64/Pi Mygo.app            27.0 MB
+build/darwin-arm64/pi-mygo-0.1.0-arm64.dmg  6.8 MB
 ```
 
 The build is ad-hoc signed, not notarized. macOS may require
@@ -52,7 +52,7 @@ Screenshots: `docs/images/`.
 ## Evidence
 
 - Go build/vet/tests pass.
-- Frontend typecheck, 7 Vitest tests, production build pass.
+- Frontend typecheck, 9 Vitest tests, production build pass.
 - P1 UI pass: session text search, Plan tab, MCP manager, worktree manager,
   per-file revert confirmation, and notification test button exercised in a
   clean browser.
@@ -61,6 +61,8 @@ Screenshots: `docs/images/`.
   darwin/arm64 pass.
 - The packaged app's Test notification raised the macOS notification
   authorization prompt.
+- English/Chinese UI switch with CJK QA; screenshots in `zh-chat.png` and
+  `zh-settings.png`. Native menu names remain English.
 - Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
 - Screenshots in `docs/images/` were refreshed for chat, session tree, diff, and
   login after the UI migration. `real-pi.png` records the P0 native run.
@@ -73,10 +75,9 @@ Screenshots: `docs/images/`.
    the UI migration.
 3. **Signing and update feed** — provide an Apple Developer ID and notarization
    profile, choose a public release host, and set the updater public key/URL.
-4. **Localization** — Chinese UI and CJK layout QA.
-
 The real-pi UI smoke, native-window check, performance closure, CI, updater
-window, and P1 daily-use features are complete for this build; see `05-qa.md`.
+window, P1 daily-use features, and English/Chinese UI are complete for this
+build; see `05-qa.md`.
 
 The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 
@@ -86,7 +87,7 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 - Unsigned/unnotarized, no auto-update.
 - RPC extension UI subset: no `ctx.ui.custom()` TUI components, custom editors,
   terminal input, or theme switching. Dialogs/status/widgets/notify work.
-- No subagent activity board, inline question composer, or Chinese UI yet.
+- No subagent activity board or inline question composer yet. Native menu names stay English in Chinese mode.
 - Auto-update is wired but has no public feed or signing key; the build is
   ad-hoc signed and not notarized.
 - Approvals and plan mode are product-level guardrails, not a sandbox. Use an

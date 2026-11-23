@@ -16,7 +16,8 @@ V1 is implemented and packaged for macOS arm64 validation. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work; the
 current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs
-signing/notarization, an update feed, and a Chinese locale. See
+signing/notarization and a public update feed. English is the default; Chinese
+is available in Settings. See
 [`docs/03-progress.md`](docs/03-progress.md) for evidence and
 [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 
@@ -50,8 +51,9 @@ signing/notarization, an update feed, and a Chinese locale. See
   worktrees.
 - **Session search and plans**: full-text search across session branches from
   the command palette; a Plan tab reads pi's todo state and progress.
-- **Notifications**: native completion notifications when a background run
-  finishes; a Settings test button.
+- **Notifications and language**: native completion notifications when a
+  background run finishes, a Settings test button, and an English/Chinese UI
+  switch.
 - **Release plumbing**: GitHub CI for Go/frontend/cross-build/package,
   versioned release workflow, optional signing/notarization, and the mygo
   updater window. An update feed needs a public release host.
@@ -63,7 +65,8 @@ signing/notarization, an update feed, and a Chinese locale. See
 More screenshots: [chat](docs/images/chat.png),
 [approval](docs/images/approval.png), [plan mode](docs/images/plan.png),
 [trust](docs/images/trust.png), [session tree](docs/images/session-tree.png),
-[diff](docs/images/diff.png), [login](docs/images/login.png).
+[diff](docs/images/diff.png), [login](docs/images/login.png),
+[Chinese shell](docs/images/zh-chat.png), [Chinese settings](docs/images/zh-settings.png).
 
 ## Requirements
 
@@ -142,7 +145,7 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
   degrade or offer text fallbacks; Pi Mygo does not fake them.
 - Auto-update is wired through mygo's updater, but the repository currently has
   no public release feed or update signing key. Signed/notarized public builds
-  and a Chinese UI remain follow-up work.
+  remain follow-up work.
 - There is no subagent activity board or inline question composer yet. Extension
   dialogs and generic tool cards remain the fallback.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's

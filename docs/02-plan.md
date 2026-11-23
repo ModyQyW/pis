@@ -103,9 +103,9 @@ engine. It must feel like a polished native app, not a web page in a box:
 - Remote access/relay, mobile, cloud sync.
 - Plugin/marketplace for app-level UI (we use pi packages, not a second plugin
   system).
-- Native MCP OAuth UI; worktree manager; full subagent orchestration UI;
-  terminal panel; code editor.
-- Chinese UI locale (strings are i18n-ready).
+- Native MCP OAuth UI; full subagent orchestration UI; terminal panel; code
+  editor.
+- Native menu localization for the Chinese UI.
 
 ## 3. Architecture and file layout
 
@@ -236,9 +236,10 @@ with a known red check.
   permission heuristics, fuzzy file search, settings atomic writes.
 - **Go integration**: fake pi RPC process (scripted events) for process manager
   and UI event mapping; real pi smoke for `get_state`, prompt, abort.
-- **Frontend unit**: current 5 tests cover transcript/tool pairing, orphan tool
-  results, live blocks, and usage normalization. Next: diff parser, fuzzy
-  ranking, command palette, queue state, and a Markdown sanitization smoke.
+- **Frontend unit**: current 9 tests cover transcript/tool pairing, orphan tool
+  results, live blocks, usage normalization, todo extraction, and i18n lookup.
+  Next: diff parser, fuzzy ranking, command palette, queue state, and a Markdown
+  sanitization smoke.
 - **Visual**: browser mock backend with fixture sessions for all states;
   actual app screenshot via macOS. Native-window visual QA after the UI
   migration is still pending; mobile is not applicable.
@@ -285,7 +286,8 @@ the stale plan/approval/trust screenshots. P1 daily-use features are implemented
 subagent/inline-question UI remains. P1 release engineering has CI, cross-builds,
 a versioned release workflow, optional signing, and the updater window; a public
 feed/key and an actual signed/notarized build need credentials and a release
-host. P2 localization is next.
+host. P2 localization is implemented for the English/Chinese shell, with CJK
+layout QA; native menu labels remain English.
 
 | Priority | Milestone | Exit criteria |
 |---|---|---|

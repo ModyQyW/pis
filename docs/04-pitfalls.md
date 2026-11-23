@@ -397,3 +397,12 @@ user entry's command/args/URL/type when the project entry omits them. Only
 replace transport fields the project explicitly sets; `enabled`, `exposure`,
 and `description` may change independently.
 
+### P-059 — Translation must run at render, not in a memo without locale
+**Symptom.** Calling `t()` while building a `useMemo` value (for example a
+palette group) stored English copy; switching language re-rendered the root but
+the memo did not recompute, so part of the UI stayed English. Calling `t()` at
+module scope has the same problem for starter labels.
+**Rule.** Keep source strings as stable data and call `t()` during render, or
+include the locale in the memo dependency. The root subscribes to locale changes
+so plain render-time lookups refresh. Keep duplicate dictionary keys out: TS1117
+catches them, but remove stale ranges rather than renaming one copy.
