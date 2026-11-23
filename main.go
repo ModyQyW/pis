@@ -11,6 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/plugins/updater"
 
 	"pi-mygo/internal/agent"
 	"pi-mygo/internal/app"
@@ -19,13 +20,14 @@ import (
 	"pi-mygo/internal/files"
 	"pi-mygo/internal/gitx"
 	"pi-mygo/internal/guard"
+	"pi-mygo/internal/mcp"
 	"pi-mygo/internal/sessions"
 	"pi-mygo/internal/settings"
 )
 
 func main() {
 	mygo.App.SetName("Pi Mygo")
-	mygo.App.SetVersion("0.1.0")
+	mygo.Use(updater.Plugin)
 
 	dataDir, err := mygo.App.Path(mygo.PathUserData)
 	if err != nil {
@@ -65,6 +67,7 @@ func main() {
 	mygo.BindAs("Sessions", app.NewSessions(mgr))
 	mygo.BindAs("Files", files.New())
 	mygo.BindAs("Git", gitx.New())
+	mygo.BindAs("MCP", mcp.New())
 	authMgr := auth.New(mgr.Executable, func(o auth.Output) { AuthOutput.Broadcast(o) }, func(e auth.Exit) { AuthExit.Broadcast(e) })
 	mygo.BindAs("Auth", authMgr)
 
@@ -215,6 +218,8 @@ func buildMenu() *mygo.Menu {
 		}},
 		{Role: mygo.RoleWindowMenu},
 		{Label: "Help", Submenu: []*mygo.MenuItem{
+			updater.MenuItem(),
+			mygo.Separator(),
 			{Label: "Pi Documentation", Click: func(*mygo.MenuItem, *mygo.Window) {
 				_ = mygo.Shell.OpenExternal("https://pi.dev/docs/latest")
 			}},

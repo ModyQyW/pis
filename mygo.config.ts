@@ -1,9 +1,25 @@
 import { defineConfig } from "mygo-cli";
 
+const signingIdentity = process.env.MACOS_SIGNING_IDENTITY;
+const notaryProfile = process.env.MACOS_NOTARY_PROFILE;
+const updatePublicKey = process.env.PI_MYGO_UPDATE_PUBLIC_KEY;
+const updateURL = process.env.PI_MYGO_UPDATE_URL;
+
 export default defineConfig({
   name: "Pi Mygo",
   identifier: "dev.pimygo.app",
-  version: "0.1.0",
+  version: process.env.PI_MYGO_VERSION ?? "0.1.0",
+  ...(updatePublicKey && updateURL
+    ? { updates: { publicKey: updatePublicKey, url: updateURL } }
+    : {}),
+  ...(signingIdentity
+    ? {
+        macos: {
+          signingIdentity,
+          ...(notaryProfile ? { notarize: { keychainProfile: notaryProfile } } : {}),
+        },
+      }
+    : {}),
   devUrl: "http://localhost:5173",
   devCommand: "bun run dev:web",
   buildCommand: "bun run build:web",
