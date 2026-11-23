@@ -9,8 +9,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Rebrand (2026-11-24): product is **PiS**, binary/slug `pis`, bundle ID
   `dev.pis.app`, env prefix `PIS_`, data directory `PiS`, GitHub repository
   `ModyQyW/pis`. The S stands for strong. Source, tests, docs, release scripts,
-  and workflow identities were updated; the feature screenshots were refreshed
-  for PiS, except the pre-rebrand real-pi P0 capture.
+  and workflow identities were updated, with a new πS icon; the feature
+  screenshots were refreshed for PiS, except the pre-rebrand real-pi P0 capture.
 - Initial implementation: complete enough for user validation on macOS arm64.
 - Release build: `build/darwin-arm64/PiS.app` (27.0 MB) and
   `pis-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
@@ -110,9 +110,9 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   **56 ms**.
 - Real 195-line session rendered Markdown, tool cards, and a diff; a real RPC
   prompt returned `OK` and streamed into the transcript.
-- Tree navigation `/mygo-navigate a2` changed `get_entries.leafId` from the
+- Tree navigation `/pis-navigate a2` changed `get_entries.leafId` from the
   file leaf to `a2`; the bridge command returned `handled`.
-- Plan mode `/mygo-plan on` returned `handled`, set `mygo:plan=plan`, and
+- Plan mode `/pis-plan on` returned `handled`, set `pis:plan=plan`, and
   reduced the model's tool list to read-only tools plus guarded bash.
 - Smart approval: `rm -rf` produced an `Allow bash?` select with the command and
   risk reason; Deny blocked the tool and the assistant reported it.

@@ -291,7 +291,7 @@ on launch speed, native integration, and a calmer, more focused UI.
 │ installed pi (>=1.6 <2), real extensions/packages/skills     │
 │  ├─ models, auth, sessions, compaction, retries, MCP         │
 │  ├─ built-in tools                                           │
-│  └─ bundled `mygo-bridge` extension:                          │
+│  └─ bundled `pis-bridge` extension:                          │
 │       tree navigation, usage bridge, project trust is app-   │
 │       side, smart approvals, plan mode, session status       │
 └─────────────────────────────────────────────────────────────┘

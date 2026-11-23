@@ -36,7 +36,7 @@ See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
 - **Extensions**: existing pi extensions load unchanged; RPC dialogs appear in
   an inline dock; statuses and widgets are shown quietly; extension errors are
   visible. Shipped bridge adds tree navigation, plan mode, and optional smart
-  approvals under `mygo-*` names only.
+  approvals under `pis-*` names only.
 - **Project trust**: explicit dialog before project-local pi resources load;
   pi's own trust store is read, never written.
 - **Approvals**: optional Smart / Ask all / Allow all policy, once/session
@@ -130,7 +130,7 @@ mygo window (Go, system webview)
   ├─ typed IPC services: Desktop, Agent, Sessions, Files, Git, Auth
   ├─ one `pi --mode rpc` process per open session
   ├─ fast session JSONL reader for first paint
-  ├─ bundled `mygo-bridge` pi extension (tree nav, plan, approvals)
+  ├─ bundled `pis-bridge` pi extension (tree nav, plan, approvals)
   └─ React 19 frontend (Vite, Tailwind, Base UI/shadcn,
      Streamdown code/Mermaid plugins, TanStack Virtual)
 ```

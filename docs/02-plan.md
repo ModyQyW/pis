@@ -137,7 +137,7 @@ pis/
 │   ├── bridge/                 embedded bridge extension, write-on-version
 │   └── util/                   paths, login shell, locks, redaction
 ├── extensions/
-│   └── mygo-bridge.ts          tree nav, plan mode, approvals, usage
+│   └── pis-bridge.ts          tree nav, plan mode, approvals, usage
 ├── docs/                       research, decisions, plan, progress, pitfalls, QA
 ├── resources/                  icon, licenses
 └── scripts/                    dev, verify, perf, package helpers
@@ -204,7 +204,7 @@ with a known red check.
 - Bridge extension commands and tests.
 - Extension-conflict detection: existing `todo`/`ask_user_question`/plan
   commands/guard packages are never duplicated or shadowed; bridge commands are
-  `mygo-*`.
+  `pis-*`.
 - Acceptance: untrusted project does not load local extensions; trusted does;
   approval blocks a destructive command; plan mode blocks writes; no auto-deny;
   with `cc-safety-net` installed our guard defaults off and says so.

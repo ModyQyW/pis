@@ -4,7 +4,7 @@
  * Loaded with `-e` for every session. It only fills gaps in the RPC protocol:
  * session-tree navigation, plan mode, and optional smart approvals. It never
  * registers a generic tool or command name that can collide with a user
- * extension. All commands are namespaced `mygo-*`.
+ * extension. All commands are namespaced `pis-*`.
  *
  * Env:
  *   PIS_GUARD      off | smart | ask | allow   (default off)
@@ -16,8 +16,8 @@ import { homedir } from "node:os";
 
 const POLICY = (process.env.PIS_GUARD || "off") as "off" | "smart" | "ask" | "allow";
 const WORKSPACE = process.env.PIS_WORKSPACE || process.cwd();
-const PLAN_STATUS = "mygo:plan";
-const GUARD_STATUS = "mygo:guard";
+const PLAN_STATUS = "pis:plan";
+const GUARD_STATUS = "pis:guard";
 
 const READ_ONLY_TOOLS = new Set([
   "read",
@@ -121,15 +121,15 @@ export default function (pi: ExtensionAPI) {
       ctx.ui.setStatus(PLAN_STATUS, undefined);
       if (notify) ctx.ui.notify("Plan mode off.", "info");
     }
-    pi.appendEntry("mygo-plan", { plan });
+    pi.appendEntry("pis-plan", { plan });
   };
 
-  pi.registerCommand("mygo-navigate", {
+  pi.registerCommand("pis-navigate", {
     description: "Internal: move within the session tree (used by PiS)",
     handler: async (args: string, ctx: any) => {
       const [targetId, mode] = args.trim().split(/\s+/);
       if (!targetId) {
-        ctx.ui.notify("mygo-navigate: missing entry id", "error");
+        ctx.ui.notify("pis-navigate: missing entry id", "error");
         return;
       }
       await ctx.waitForIdle?.();
@@ -138,14 +138,14 @@ export default function (pi: ExtensionAPI) {
     },
   });
 
-  pi.registerCommand("mygo-plan", {
+  pi.registerCommand("pis-plan", {
     description: "Turn read-only plan mode on or off (used by PiS)",
     handler: async (args: string, ctx: any) => {
       const next = args.trim().toLowerCase();
       await ctx.waitForIdle?.();
       if (next === "on") setPlan(true, ctx);
       else if (next === "off") setPlan(false, ctx);
-      else ctx.ui.notify("Usage: /mygo-plan on|off", "error");
+      else ctx.ui.notify("Usage: /pis-plan on|off", "error");
     },
   });
 
@@ -153,7 +153,7 @@ export default function (pi: ExtensionAPI) {
     ctx.ui.setStatus(GUARD_STATUS, POLICY === "off" ? undefined : POLICY);
     const entries = ctx.sessionManager?.getBranch?.() ?? [];
     const last = [...entries].reverse().find(
-      (entry: any) => entry?.type === "custom" && entry?.customType === "mygo-plan",
+      (entry: any) => entry?.type === "custom" && entry?.customType === "pis-plan",
     );
     if (last?.data?.plan) setPlan(true, ctx, false);
   });
@@ -162,10 +162,10 @@ export default function (pi: ExtensionAPI) {
     if (!plan) return;
     const options = event.systemPromptOptions;
     if (options?.sections && typeof options.sections === "object") {
-      options.sections = { ...options.sections, "mygo-plan": PLAN_INSTRUCTIONS };
+      options.sections = { ...options.sections, "pis-plan": PLAN_INSTRUCTIONS };
       return;
     }
-    return { systemPrompt: `${event.systemPrompt}\n\n<mygo-plan>\n${PLAN_INSTRUCTIONS}\n</mygo-plan>` };
+    return { systemPrompt: `${event.systemPrompt}\n\n<pis-plan>\n${PLAN_INSTRUCTIONS}\n</pis-plan>` };
   });
 
   pi.on("tool_call", async (event: any, ctx: any) => {

@@ -996,7 +996,7 @@ export function App() {
                 const key = useChat.getState().activeKey;
                 if (key) useChat.getState().removeAttachment(key, id);
               }}
-              planMode={active?.statuses["mygo:plan"] === "plan"}
+              planMode={active?.statuses["pis:plan"] === "plan"}
               externalPlanCommand={active?.commands.find((c) =>
                 /^plan(-mode)?$/i.test(c.name),
               )?.name}

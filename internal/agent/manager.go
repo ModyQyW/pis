@@ -472,7 +472,7 @@ func (m *Manager) NavigateTree(ctx context.Context, id, entryID string, summariz
 	if entryID == "" {
 		return errors.New("empty entry id")
 	}
-	message := "/mygo-navigate " + entryID
+	message := "/pis-navigate " + entryID
 	if summarize {
 		message += " summarize"
 	}

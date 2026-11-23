@@ -13,18 +13,25 @@ func TestEnsureWritesVersionedExtension(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(path, "mygo-bridge-"+Version+".ts") {
+	if !strings.Contains(path, "pis-bridge-"+Version+".ts") {
 		t.Fatalf("path = %s", path)
 	}
 	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(data), "mygo-navigate") || !strings.Contains(string(data), "mygo-plan") {
+	if !strings.Contains(string(data), "pis-navigate") || !strings.Contains(string(data), "pis-plan") {
 		t.Fatal("bridge source missing commands")
 	}
-	old := filepath.Join(dir, "extensions", "mygo-bridge-0.ts")
+	if strings.Contains(string(data), "mygo-") {
+		t.Fatal("bridge source still uses the old namespace")
+	}
+	old := filepath.Join(dir, "extensions", "pis-bridge-0.ts")
 	if err := os.WriteFile(old, []byte("old"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	legacy := filepath.Join(dir, "extensions", "mygo-bridge-0.ts")
+	if err := os.WriteFile(legacy, []byte("old"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	again, err := Ensure(dir)
@@ -33,6 +40,9 @@ func TestEnsureWritesVersionedExtension(t *testing.T) {
 	}
 	if _, err := os.Stat(old); !os.IsNotExist(err) {
 		t.Fatal("old bridge version was not removed")
+	}
+	if _, err := os.Stat(legacy); !os.IsNotExist(err) {
+		t.Fatal("legacy bridge was not removed")
 	}
 }
 

@@ -564,8 +564,8 @@ export const useChat = create<Store>((set, get) => ({
   async togglePlan(key) {
     const s = get().sessions[key];
     if (!s?.appId) return;
-    const on = s.statuses["mygo:plan"] !== "plan";
-    await api.prompt({ sessionId: s.appId, message: `/mygo-plan ${on ? "on" : "off"}` });
+    const on = s.statuses["pis:plan"] !== "plan";
+    await api.prompt({ sessionId: s.appId, message: `/pis-plan ${on ? "on" : "off"}` });
   },
 
   async setAutoCompaction(key, enabled) {

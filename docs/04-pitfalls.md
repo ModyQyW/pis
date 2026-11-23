@@ -186,7 +186,7 @@ recorded in `03-progress.md`. Inferences are labeled as such in docs and chat.
 **Context.** The user's install includes `todo`, `ask_user_question`, `subagents`,
 skills, and guard/status extensions. Registering our own versions would shadow
 or double-prompt.
-**Rule.** Our bridge only registers `mygo-*` commands and session status. It
+**Rule.** Our bridge only registers `pis-*` commands and session status. It
 never registers `todo`, `ask_user_question`, `plan`, or `subagents`. The UI
 renders installed tool results and asks the installed ask extension through its
 RPC fallback.
@@ -263,7 +263,7 @@ failure.
 **Symptom.** Editing `bridge.ts` without bumping `bridge.Version` leaves pi
 loading the old file from app data.
 **Rule.** Bump `internal/bridge/bridge.go` `Version` whenever the source
-changes; `Ensure` writes a new file and removes older `mygo-bridge-*.ts`.
+changes; `Ensure` writes a new file and removes older `pis-bridge-*.ts`.
 
 ### P-043 — Approval text needs human risk labels
 **Symptom.** The first approval dialog showed a raw regular expression, which
@@ -281,7 +281,7 @@ pass `--approve` only after consent. Never write pi's trust file.
 **Symptom.** Detected `cc-safety-net` would double-prompt with the built-in
 approval guard; a generic `todo`/`ask` registration would shadow user tools.
 **Rule.** Detect known guards and default our guard off unless forced; bridge
-commands are `mygo-*`; never register `todo`, `ask_user_question`, `plan`, or
+commands are `pis-*`; never register `todo`, `ask_user_question`, `plan`, or
 `subagents`; surface an installed plan command instead of claiming it.
 
 ## UI system, Markdown, and packaging

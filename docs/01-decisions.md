@@ -140,9 +140,9 @@ happened); send full snapshots (rejected).
 approval decisions. Loading our logic as a project extension would require trust
 and pollute the user's package list.
 
-**Decision.** Ship a small `mygo-bridge` pi extension embedded in the app binary,
+**Decision.** Ship a small `pis-bridge` pi extension embedded in the app binary,
 written to app data on version change, loaded with `-e` for every pi process.
-It registers namespaced commands (`mygo-navigate`, `mygo-plan`), listens to
+It registers namespaced commands (`pis-navigate`, `pis-plan`), listens to
 `tool_call` for approvals, and publishes usage/status via `setStatus`. It never
 writes pi data. Project trust remains app-owned.
 
@@ -150,7 +150,7 @@ writes pi data. Project trust remains app-owned.
 bridge must track pi's extension API within the supported version range and
 degrade gracefully if a feature is missing.
 
-**Conflict rules (Q6).** Commands are namespaced `mygo-*`; the bridge never
+**Conflict rules (Q6).** Commands are namespaced `pis-*`; the bridge never
 registers a `todo`, `ask_user_question`, `plan`, or `subagents` tool/command.
 It must not remove or rewrite user packages. If an existing plan command is
 detected, the app surfaces it rather than claiming ownership.
@@ -176,7 +176,7 @@ and is reflected in the UI.
 in Plan mode mutating bash commands are denied/asked. Plan mode is not a security
 boundary; approvals and the OS remain the boundary.
 
-**Conflict rules (Q6).** Our command is `mygo-plan`, not `plan`. If `get_commands`
+**Conflict rules (Q6).** Our command is `pis-plan`, not `plan`. If `get_commands`
 shows an installed plan-mode command, the UI offers that instead of pretending
 our toggle controls it. We never disable the other extension.
 
@@ -196,7 +196,7 @@ Smart auto-allows read-only tools and edits/writes inside the workspace; asks
 for destructive/out-of-workspace/privileged bash, sensitive paths, and unknown
 risky tools. Requests stay pending until answered (no auto-deny). Grants can be
 once or for the session. Detect known guard extensions and offer to disable our
-guard for that setup. The policy is enforced by `mygo-bridge` in pi, not by the
+guard for that setup. The policy is enforced by `pis-bridge` in pi, not by the
 renderer.
 
 **Consequences.** Useful safety without constant prompts. Heuristics are not a

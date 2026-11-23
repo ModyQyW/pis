@@ -420,7 +420,7 @@ function mockEmit(ev: Event) {
 
 let mockStream: ReturnType<typeof setInterval> | undefined;
 function mockPrompt(req: PromptRequest, emit: (ev: Event) => void): { disposition: string } {
-  if (req.message === "/mygo-plan on" || req.message === "/mygo-plan off") {
+  if (req.message === "/pis-plan on" || req.message === "/pis-plan off") {
     emit({
       sessionId: req.sessionId,
       kind: "extension-ui",
@@ -428,7 +428,7 @@ function mockPrompt(req: PromptRequest, emit: (ev: Event) => void): { dispositio
         type: "extension_ui_request",
         id: `mock-plan-${Date.now()}`,
         method: "setStatus",
-        statusKey: "mygo:plan",
+        statusKey: "pis:plan",
         statusText: req.message.endsWith("on") ? "plan" : undefined,
       },
     });

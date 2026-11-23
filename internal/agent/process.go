@@ -189,7 +189,7 @@ func (p *process) call(ctx context.Context, command map[string]any) (Response, e
 		timeout = v
 	}
 	delete(command, "_timeout")
-	id := fmt.Sprintf("mygo-%d", p.nextID.Add(1))
+	id := fmt.Sprintf("pis-%d", p.nextID.Add(1))
 	command["id"] = id
 	ch := make(chan Response, 1)
 	p.pendingMu.Lock()

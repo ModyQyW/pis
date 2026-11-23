@@ -87,7 +87,7 @@ path.
 - Do not register another `todo` tool or `ask_user_question` tool. Render the
   installed `todo` results and custom entries; use the installed ask extension.
 - Do not shadow generic commands such as `plan`, `todos`, or `subagents`.
-  Bridge commands are namespaced `mygo-*`.
+  Bridge commands are namespaced `pis-*`.
 - Detect installed guard extensions (for example `cc-safety-net`) and do not
   double-prompt by default. The app guard can be switched on explicitly.
 - Detect an existing plan-mode command and surface it instead of claiming our

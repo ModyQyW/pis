@@ -11,7 +11,13 @@ import (
 )
 
 // Version changes whenever the extension source changes.
-const Version = "5"
+const Version = "6"
+
+const (
+	extensionPrefix = "pis-bridge-"
+	// Older releases wrote the same extension under the product's former name.
+	legacyExtensionPrefix = "mygo-bridge-"
+)
 
 //go:embed bridge.ts
 var source string
@@ -25,12 +31,12 @@ func Ensure(dir string) (string, error) {
 	if err := os.MkdirAll(extDir, 0o755); err != nil {
 		return "", err
 	}
-	path := filepath.Join(extDir, "mygo-bridge-"+Version+".ts")
+	path := filepath.Join(extDir, extensionPrefix+Version+".ts")
 	if data, err := os.ReadFile(path); err == nil && string(data) == source {
 		cleanupOld(extDir, filepath.Base(path))
 		return path, nil
 	}
-	tmp, err := os.CreateTemp(extDir, ".mygo-bridge-*.ts")
+	tmp, err := os.CreateTemp(extDir, "."+extensionPrefix+"*.ts")
 	if err != nil {
 		return "", err
 	}
@@ -62,8 +68,10 @@ func cleanupOld(dir, keep string) {
 		if entry.Name() == keep || entry.IsDir() {
 			continue
 		}
-		if strings.HasPrefix(entry.Name(), "mygo-bridge-") && strings.HasSuffix(entry.Name(), ".ts") {
-			_ = os.Remove(filepath.Join(dir, entry.Name()))
+		name := entry.Name()
+		if strings.HasSuffix(name, ".ts") &&
+			(strings.HasPrefix(name, extensionPrefix) || strings.HasPrefix(name, legacyExtensionPrefix)) {
+			_ = os.Remove(filepath.Join(dir, name))
 		}
 	}
 }

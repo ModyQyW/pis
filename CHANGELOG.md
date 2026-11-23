@@ -3,6 +3,8 @@
 ## 0.1.0
 
 - Initial macOS arm64 build of PiS.
+- Product identity is PiS (`pis`), with a new πS icon and refreshed desktop
+  screenshots. The S stands for strong.
 - Real pi sessions, streaming transcript, tool cards, approvals, plan mode,
   session tree, changes, and extensions.
 - TanStack Virtual transcript, Streamdown code/Mermaid plugins, and native
