@@ -155,7 +155,9 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
   cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
   Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
-  v8, and action-gh-release v3. The release workflow builds darwin arm64+amd64,
+  v8, and action-gh-release v3. GitHub Actions run 45153414759 passed all Go,
+  frontend, six cross-build, and macOS package jobs. The release workflow builds
+  darwin arm64+amd64,
   windows amd64+arm64 (NSIS from Ubuntu), and linux amd64+arm64, then uploads
   through mygo to a draft release. A local Ubuntu 24.04 container built all
   Linux/Windows targets and both installers successfully; local macOS builds

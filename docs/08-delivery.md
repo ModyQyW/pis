@@ -42,8 +42,9 @@ download-artifact v8, and action-gh-release v3. The Ubuntu jobs use
 `ubuntu-latest`; macOS packaging stays on `macos-latest` because ad-hoc signing
 and DMG creation require macOS. The builds upload the update archives and
 manifests with `-upload`. Review and publish the draft; the updater reads the
-latest published release. A private repository
-cannot serve this feed to users.
+latest published release. A private repository cannot serve this feed to users.
+The CI workflow (checkout/setup-go/upload-artifact majors) passed GitHub Actions
+run 45153414759, including six cross-builds and a macOS package job.
 
 For a local release with optional Apple signing/notarization:
 

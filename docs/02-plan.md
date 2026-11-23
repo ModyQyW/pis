@@ -98,8 +98,9 @@ engine. It must feel like a polished native app, not a web page in a box:
 
 ### Explicitly deferred
 
-- Windows/Linux QA and installers (code kept portable).
-- Apple-signed/notarized macOS releases and a public update feed; ad-hoc macOS releases are supported.
+- Windows/Linux runtime QA (installers and archives are built).
+- Apple-signed/notarized macOS releases and a public update feed; ad-hoc
+  macOS releases and the GitHub Releases workflow are implemented.
 - Remote access/relay, mobile, cloud sync.
 - Plugin/marketplace for app-level UI (we use pi packages, not a second plugin
   system).
