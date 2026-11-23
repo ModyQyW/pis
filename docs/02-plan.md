@@ -279,6 +279,14 @@ Add a `scripts/verify.sh` that runs the narrow set and prints budgets.
 Priority is about release risk, not feature appeal. Do not claim a platform or
 provider support level beyond what has been exercised.
 
+**Status 2026-11-23:** P0 validation and performance are complete except for
+the stale plan/approval/trust screenshots. P1 daily-use features are implemented
+(notifications, MCP, worktrees, session search, per-file revert, Plan tab);
+subagent/inline-question UI remains. P1 release engineering has CI, cross-builds,
+a versioned release workflow, optional signing, and the updater window; a public
+feed/key and an actual signed/notarized build need credentials and a release
+host. P2 localization is next.
+
 | Priority | Milestone | Exit criteria |
 |---|---|---|
 | P0 | Validation hardening | User validation pass; fresh real-pi UI smoke after the Base UI/Streamdown migration (prompt, tool card, diff, plan, approval, trust, login); native title bar/traffic-light/menu screenshot; refresh plan/approval/trust screenshots; fix any blockers found. |
@@ -287,5 +295,7 @@ provider support level beyond what has been exercised.
 | P1 | Daily-use features | Native completion notifications; MCP list/management UI; worktrees; subagent activity panel; session full-text search; per-file revert-to-HEAD; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |
 
-Phase 10 closes when the user has validated the artifact and P0 validation
-hardening is green. P1/P2 work starts only after that gate.
+Phase 10 closes when the user has validated the artifact and the P0
+validation is green. P1/P2 work has started in parallel where it did not
+depend on that gate; the remaining P1 release items need credentials and a
+public release host.

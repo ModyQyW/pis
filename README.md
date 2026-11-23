@@ -13,11 +13,12 @@ pi, replace pi's data, or install a second agent runtime.
 ## Status (2026-11-23)
 
 V1 is implemented and packaged for macOS arm64 validation. Core sessions,
-streaming Markdown, extensions, approvals, plan mode, changes, and the desktop
-shell work; the current artifact is a 22.7 MB app / 5.7 MB DMG. A wider release
-still needs a fresh real-pi UI smoke, native-window visual check, performance
-closure, and release engineering. See [`docs/03-progress.md`](docs/03-progress.md)
-for evidence and [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
+streaming Markdown, extensions, approvals, plan mode, changes, MCP
+configuration, worktrees, session search, and the desktop shell work; the
+current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs
+signing/notarization, an update feed, and a Chinese locale. See
+[`docs/03-progress.md`](docs/03-progress.md) for evidence and
+[`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 
 ## What works
 
@@ -42,7 +43,18 @@ for evidence and [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 - **Plan mode**: read-only exploration and a plan, mutating tools blocked until
   you turn it off.
 - **Changes and files**: Git branch/status, per-file unified diff, copy patch,
-  reveal, file list and read-only preview.
+  per-file revert-to-HEAD with confirmation, reveal, file list and read-only
+  preview.
+- **MCP and worktrees**: manage user/project MCP entries (add, enable, remove;
+  advanced fields stay in `mcp.json`), and list/create/open/remove Git
+  worktrees.
+- **Session search and plans**: full-text search across session branches from
+  the command palette; a Plan tab reads pi's todo state and progress.
+- **Notifications**: native completion notifications when a background run
+  finishes; a Settings test button.
+- **Release plumbing**: GitHub CI for Go/frontend/cross-build/package,
+  versioned release workflow, optional signing/notarization, and the mygo
+  updater window. An update feed needs a public release host.
 - **Providers**: in-app pty terminal running `pi auth login`; no credential
   storage or logging by the app.
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
@@ -61,7 +73,7 @@ More screenshots: [chat](docs/images/chat.png),
   `PI_MYGO_PI`, `PATH`, common install locations, then your login shell.
   Use `pi auth login` (also available in the app) to connect a provider.
 
-Pi is not bundled. The app is 22.7 MB and the initial DMG is 5.7 MB; pi itself
+Pi is not bundled. The app is 27.0 MB and the initial DMG is 6.8 MB; pi itself
 is a separate ~103 MB install.
 
 ## Run from source
@@ -128,9 +140,11 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; Pi Mygo does not fake them.
-- MCP is loaded by pi, but Pi Mygo has no dedicated MCP management UI yet.
-- Worktrees, a subagent activity board, native completion notifications,
-  auto-update, signing/notarization, and a Chinese UI are not in this version.
+- Auto-update is wired through mygo's updater, but the repository currently has
+  no public release feed or update signing key. Signed/notarized public builds
+  and a Chinese UI remain follow-up work.
+- There is no subagent activity board or inline question composer yet. Extension
+  dialogs and generic tool cards remain the fallback.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
   own isolation when you need a real boundary.
 

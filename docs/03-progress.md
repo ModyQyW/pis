@@ -16,8 +16,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
 - Remaining before a wider release: refresh plan/approval/trust screenshots,
-  platform QA, signed/notarized builds, auto-update, native notifications,
-  MCP/worktree/subagent panels, i18n.
+  signed/notarized public builds, an update feed/key, subagent/inline-question
+  polish, and i18n.
 
 ### Open validation and performance
 
@@ -35,19 +35,23 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   streamed row updates had median <1 ms (max 1 ms); 20 rows were mounted.
 - macOS symlink canonicalization now prevents duplicate recents
   (`/tmp` vs `/private/tmp`); unit tests cover the path and dedupe.
-- Production assets are 17 MB / 400 lazy chunks; the 25.3 MB app is within the
-  30 MB budget, so grammar/diagram chunk trimming is not a release blocker.
+- Production assets are 17 MB / 400 lazy chunks; the 27.0 MB app / 6.8 MB DMG
+  is within the 30 MB budget, so grammar/diagram chunk trimming is not a
+  release blocker.
 
 ### Next milestones
 
-1. **P0 validation hardening** — user validation, fresh real-pi UI smoke,
-   native-window visual check, remaining screenshots, fix blockers.
-2. **P0 performance closure** — profile and record the three open budget items.
-3. **P1 release engineering** — Windows/Linux probes, signing/notarization,
-   auto-update, fresh-clone CI.
-4. **P1 daily-use features** — notifications, MCP, worktrees, subagents,
-   search, per-file revert, todo panel.
-5. **P2 localization** — string extraction and Chinese UI.
+1. **P0 validation hardening / performance** — complete on 2026-11-23; refresh
+   remaining screenshots when the UI freezes.
+2. **P1 daily-use features** — complete: notifications, MCP configuration,
+   worktrees, session text search, per-file revert, and the Plan/todo tab.
+   Subagent board and inline questions remain follow-ups.
+3. **P1 release engineering** — CI, cross-builds, versioned release workflow,
+   optional signing/notarization, and the updater window are implemented. A
+   public update feed/key and an actual signed/notarized build still need
+   credentials and a release host.
+4. **P2 localization and assets** — Chinese UI and CJK QA remain; the official
+   Streamdown code/Mermaid lazy chunks are verified within the app budget.
 
 Exit criteria and detailed scope are in `02-plan.md` §8.
 
@@ -67,7 +71,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 | 7 Changes/files | Done | git status/diff, file list/preview, copy patch, reveal |
 | 8 Auth/onboarding | Done | pty login; missing-pi/no-model banners; provider settings |
 | 9 Polish/package | Done | app/DMG built; performance measured; Markdown lazy; source maps off |
-| 10 Delivery | In progress | docs and roadmap refreshed; user validation and P0 hardening pending |
+| 10 Delivery | In progress | P0 done; P1 features and CI done; signing/feed and i18n pending |
 
 ## Evidence log
 
@@ -112,6 +116,33 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - pty unit test: prompt -> input -> echo -> exit 0 passes.
 - Login dialog renders a real xterm terminal; mock mode exercises the UI.
 - Credentials are never logged by the app; the terminal buffer is in memory.
+
+### P1 features and release plumbing
+
+- **Session search**: Go scans the active branch of recent sessions, returns a
+  context snippet, and the command palette debounces queries and opens a hit.
+  `TestSearchFindsActiveBranchText` covers case-insensitive matching and role.
+- **Plan tab**: `extractTodos` reads pi's `rpiv-todo-state` custom entries and
+  todo tool result details; two Vitest cases cover latest-state replacement and
+  details.todos. Progress is shown in the right panel.
+- **MCP**: `internal/mcp` merges user/project `mcp.json`, preserves unknown
+  fields, and supports add/enable/remove with atomic writes. Tests cover merge,
+  override, and local enable. The settings dialog opens a manager.
+- **Worktrees**: `gitx.Worktrees/AddWorktree/RemoveWorktree` parse porcelain
+  output and canonicalize paths. Integration test creates, lists, and removes a
+  linked worktree; the command palette opens the manager.
+- **Per-file revert**: `Git.Revert` restores tracked paths from HEAD and refuses
+  untracked files; integration test verifies a staged change is undone. The
+  changes panel adds a hover action behind a destructive confirmation.
+- **Notifications**: `Desktop.Notify` respects the setting, groups by session,
+  and truncates text. The packaged app's Test notification raised the macOS
+  authorization prompt (verified in `docs/images/settings.png` capture session).
+- **Release**: `.github/workflows/ci.yml` runs Go, cross-builds, frontend tests,
+  and a packaged macOS build. `release.yml` builds tagged artifacts with optional
+  signing/notarization and updater key variables. `mygo.Use(updater.Plugin)` and
+  a Check for Updates menu item are wired; no update feed is configured.
+- **Version**: `mygo.config.ts` reads `PI_MYGO_VERSION`; `main.go` no longer
+  hard-codes 0.1.0. Local builds still default to 0.1.0.
 
 ### Transcript virtualization and dependencies
 

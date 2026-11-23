@@ -380,3 +380,20 @@ with the same name.
 existing recents by canonical path on bootstrap and when adding/removing a
 project. Keep display names from the canonical basename.
 
+### P-057 — `git worktree list` returns canonical paths
+**Symptom.** A worktree created under `/var/...` appeared in
+`git worktree list` as `/private/var/...`, so the integration test compared
+different strings and failed to find it.
+**Rule.** Canonicalize worktree paths from porcelain output with
+`filepath.EvalSymlinks` before returning them. Keep the user-entered path for
+creation; compare and remove by the canonical form.
+
+### P-058 — A project MCP override may carry only `enabled`
+**Symptom.** A valid project `mcp.json` entry such as
+`{"docs": {"enabled": false}}` has no command or URL. Treating it as a new
+server would lose the user-level transport fields.
+**Rule.** Merge project entries over user entries by name, and preserve the
+user entry's command/args/URL/type when the project entry omits them. Only
+replace transport fields the project explicitly sets; `enabled`, `exposure`,
+and `description` may change independently.
+

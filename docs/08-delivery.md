@@ -52,26 +52,18 @@ Screenshots: `docs/images/`.
 ## Evidence
 
 - Go build/vet/tests pass.
-- Frontend typecheck, 5 Vitest tests, production build pass.
-- Production UI pass: Base UI dialogs/menus, AI Elements messages, Streamdown
-  code/table/math, official Mermaid plugin, light/dark themes, external-link
-  routing, and the main shortcuts were exercised in a clean browser; no console
-  errors.
-- Real pi RPC start ~2.06 s; real prompt streamed `OK`.
-- P0 real-pi UI smoke: disposable session rendered Read/Shell/Edit tool cards and
-  streamed output in the native window (`docs/images/real-pi.png`).
-- P0 performance: 1,000-item render 3 ms after parse; session switch 32/19 ms;
-  streamed update max 1 ms; 20 rows mounted.
-- Workspace paths are canonicalized, so `/tmp` and `/private/tmp` sessions share
-  one project entry.
-- Real plan mode, smart approval + deny, trust dialog + local extension load.
-- Real tree navigation changes `get_entries.leafId`.
-- 246-message session in 13 ms; 1,000-message parser in 3.5 ms.
-- Warm window 0.422 s median; idle physical footprint 41–42 MB without pi.
-- pty login unit test passes.
-- Release `.app` 22.7 MB, DMG 5.7 MB; no production source maps.
+- Frontend typecheck, 7 Vitest tests, production build pass.
+- P1 UI pass: session text search, Plan tab, MCP manager, worktree manager,
+  per-file revert confirmation, and notification test button exercised in a
+  clean browser.
+- Go tests cover session search, MCP merge/override, worktree lifecycle, and
+  per-file revert; cross-builds for linux/amd64, linux/arm64, windows/amd64, and
+  darwin/arm64 pass.
+- The packaged app's Test notification raised the macOS notification
+  authorization prompt.
+- Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
 - Screenshots in `docs/images/` were refreshed for chat, session tree, diff, and
-  login after the UI migration.
+  login after the UI migration. `real-pi.png` records the P0 native run.
 
 ## Next before a wider release
 
@@ -79,11 +71,12 @@ Screenshots: `docs/images/`.
    against a real pi account and project.
 2. **Screenshot refresh** — refresh the plan, approval, and trust images after
    the UI migration.
-3. **Release engineering** — Windows/Linux probes, signed/notarized macOS,
-   auto-update, and fresh-clone CI.
+3. **Signing and update feed** — provide an Apple Developer ID and notarization
+   profile, choose a public release host, and set the updater public key/URL.
+4. **Localization** — Chinese UI and CJK layout QA.
 
-The real-pi UI smoke, native-window check, and performance closure are complete
-for this build; see `05-qa.md`.
+The real-pi UI smoke, native-window check, performance closure, CI, updater
+window, and P1 daily-use features are complete for this build; see `05-qa.md`.
 
 The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 
@@ -93,8 +86,9 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 - Unsigned/unnotarized, no auto-update.
 - RPC extension UI subset: no `ctx.ui.custom()` TUI components, custom editors,
   terminal input, or theme switching. Dialogs/status/widgets/notify work.
-- No MCP management UI, worktree manager, subagent activity board, native
-  completion notifications, or Chinese UI yet.
+- No subagent activity board, inline question composer, or Chinese UI yet.
+- Auto-update is wired but has no public feed or signing key; the build is
+  ad-hoc signed and not notarized.
 - Approvals and plan mode are product-level guardrails, not a sandbox. Use an
   OS boundary or container when you need one.
 - The app relies on pi's session files for history display; it never writes
@@ -108,5 +102,4 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 - Did extension dialogs/statuses behave, and were any noisy?
 - Was trust/approval wording clear? Did any guard double-prompt?
 - Did plan mode match your workflow?
-- What is missing for daily use: MCP, worktrees, subagents, notifications,
-  search, terminal, editor?
+- What is missing for daily use: subagents, inline questions, terminal, editor?
