@@ -1,8 +1,9 @@
 # Initial delivery
 
 Status: ready for user validation on macOS arm64 (2026-11-23). A wider release
-is blocked on the P0 items in `02-plan.md` §8: fresh real-pi UI smoke,
-native-window visual check, and performance closure.
+is blocked on signed/notarized builds, a public update feed/key, and the plan/
+approval/trust screenshot refresh. The P0 real-pi, native-window, and
+performance checks are complete.
 
 ## Artifact
 

@@ -10,8 +10,9 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Release build: `build/darwin-arm64/Pi Mygo.app` (27.0 MB) and
   `pi-mygo-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
-  approval + deny, trust dialog, provider login pty, changes/diff all exercised
-  **before** the Base UI/Streamdown UI migration.
+  approval + deny, trust dialog, provider login pty, changes/diff were exercised
+  before the Base UI/Streamdown UI migration; the post-migration native session
+  is recorded under Open validation below.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
