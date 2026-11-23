@@ -347,3 +347,26 @@ text token `--muted` was also shadcn's `--muted` background token.
 **Rule.** App secondary text is `--subtle` / `text-subtle`; shadcn's `--muted`
 maps to `--surface-2`, and `--muted-foreground` maps to `--subtle`. Do not
 reuse a Tailwind color key for two meanings.
+
+### P-054 — Virtualizing replaces scroll ownership, not just the list component
+**Symptom.** Replacing Virtuoso with `useVirtualizer` initially mounted all 300
+rows because the test harness let the scroll container grow to its content
+height. After constraining it, scroll-to-latest and streaming growth needed to
+be reimplemented; Virtuoso's `followOutput` and `atBottomStateChange` do not
+exist in TanStack Virtual.
+**Rule.** A virtualized transcript needs one owner for: constrained scroll
+element, bottom threshold, pinned-end state, append behavior, late row growth,
+and jump-to-latest. Test all five with a throwaway browser harness before
+committing. Keep the scroll element bounded with a flex parent and `min-h-0`;
+a webview test that shows all rows is a layout failure, not a virtualization
+success.
+
+### P-055 — A direct major update can split a transitive dependency
+**Symptom.** `katex` updated from 0.16 to 0.19 as a direct CSS dependency, while
+`@streamdown/math` continued to resolve its own KaTeX 0.16. The lockfile now has
+two versions, so a CSS/markup mismatch is possible.
+**Rule.** When updating a direct dependency that also exists transitively,
+check `bun pm ls <pkg>`, exercise the consuming UI (math, highlighting, icons),
+and record the split. Do not silently assume the highest version is the one the
+renderer uses. Prefer a direct version that matches the consumer when the
+duplicate has no benefit.

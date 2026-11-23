@@ -222,7 +222,8 @@ team-sized codebase.
 **Decision.** React 19 + TypeScript + Vite. Tailwind CSS v4 with design tokens.
 **Base UI** primitives, styled with generated shadcn-style components; AI
 Elements message/trace/attachment/marker components adapted to Base UI. Zustand
-for session/UI state. `react-virtuoso` for the transcript. **Streamdown** for
+for session/UI state. `@tanstack/react-virtual` for the transcript, with dynamic
+row measurement and a pinned-end scroll model. **Streamdown** for
 Markdown with its Shiki code, KaTeX math, CJK, and custom Pele Mermaid renderer.
 `diff` for patch parsing. Lucide icons.
 
@@ -340,3 +341,38 @@ generated at build time.
 **Alternatives.** Keep the bespoke layer (more code, weaker accessibility);
 Radix (a second primitive runtime next to Base UI); replace every component
 including tool cards (would erase product-specific density and behavior).
+
+---
+
+## ADR-017 — TanStack Virtual for the transcript; exact latest dependencies
+
+**Context.** The transcript uses dynamically sized rows: Markdown tables, code
+blocks, tool output, images, and streaming text change height after mount.
+`react-virtuoso` handled this, but the project standardizes on TanStack for
+virtualization and the dependency needed to be removed. The repository pins
+direct dependencies exactly and had no git history.
+
+**Decision.** Use `@tanstack/react-virtual` with `useVirtualizer`:
+`measureElement` for dynamic row heights, `getItemKey` tied to transcript IDs,
+`overscan: 8`, and `paddingStart`/`paddingEnd` for the old header/footer
+spacing. Keep the reader pinned to the end while they have not scrolled away;
+`ResizeObserver` catches late Markdown/Shiki/image growth. Appended rows use
+`followOnAppend: "smooth"`; content growth in the last row scrolls after layout.
+Scrolling up past 100 px releases the pin and shows the jump-to-latest button.
+
+Direct dependencies are pinned to exact versions in `package.json`; the lockfile
+is committed. Updating a direct dependency updates the lockfile and requires a
+typecheck, tests, production build, and the relevant browser surface check.
+KaTeX is a direct dependency only for its CSS, while `@streamdown/math` resolves
+its own KaTeX; the two-version split is accepted because both render correctly,
+and math is part of the browser smoke.
+
+**Consequences.** The transcript renders only the visible window plus overscan
+(300-row harness: 16 mounted rows, bottom distance 0), so long sessions no longer
+mount every row. The app keeps its existing streaming behavior without
+Virtuoso. The package no longer ships `react-virtuoso`.
+
+**Alternatives.** Keep Virtuoso (rejected: requested removal and two
+virtualization stacks); hand-roll windowing (rejected: dynamic measurement and
+scroll anchoring are hard to make reliable); fixed-height rows (breaks Markdown,
+images, and tool output).

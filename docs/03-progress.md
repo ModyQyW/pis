@@ -106,6 +106,16 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - Login dialog renders a real xterm terminal; mock mode exercises the UI.
 - Credentials are never logged by the app; the terminal buffer is in memory.
 
+### Transcript virtualization and dependencies
+
+- 2026-11-23: `react-virtuoso` replaced with `@tanstack/react-virtual` 3.14.28.
+  Dynamic measurement, pinned-end streaming, append follow, scroll-up release,
+  and jump-to-latest verified in a 300-row browser harness (16 rows mounted at
+  bottom). Typecheck, 5 Vitest tests, and production build pass.
+- Direct dependencies updated to latest (`katex` 0.19.1); lockfile updated.
+  Math and GFM table rendering verified after the update; KaTeX CSS 0.19.1
+  resolves beside Streamdown's own KaTeX 0.16.47 (recorded in P-055).
+
 ### Documentation
 
 - 2026-11-23: status snapshot, open validation/performance items, and the
