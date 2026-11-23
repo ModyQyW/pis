@@ -224,7 +224,7 @@ team-sized codebase.
 Elements message/trace/attachment/marker components adapted to Base UI. Zustand
 for session/UI state. `@tanstack/react-virtual` for the transcript, with dynamic
 row measurement and a pinned-end scroll model. **Streamdown** for
-Markdown with its Shiki code, KaTeX math, CJK, and custom Pele Mermaid renderer.
+Markdown with its official code (Shiki), KaTeX math, CJK, and Mermaid plugins.
 `diff` for patch parsing. Lucide icons.
 
 **Consequences.** Fast iteration, accessible primitives, good ecosystem. The
@@ -328,15 +328,15 @@ design systems and duplicate primitives.
 and use AI Elements composition for messages, bubbles, traces, attachments, and
 markers. Keep one token vocabulary: app foreground (`fg`), secondary text
 (`subtle`), tertiary text (`faint`); shadcn's `muted` is a surface, never text.
-Use Streamdown for prose and Pele for Mermaid. Keep custom surfaces only where
-they carry product-specific behavior (tool cards, diff view, approval dock,
-changes panel).
+Use Streamdown for prose with its official code (Shiki), math, CJK, and Mermaid
+plugins. Keep custom surfaces only where they carry product-specific behavior
+(tool cards, diff view, approval dock, changes panel).
 
 **Consequences.** Consistent accessibility and focus behavior; fewer bespoke
 components. The generated registry files are app code and are reviewed like it.
-The Markdown chunk is larger and lazy; Shiki's language chunks ship with the
-app. `components.json` is not used because the components are copied, not
-generated at build time.
+The Markdown chunk and its official plugin dependencies are lazy; Shiki grammar
+chunks load on demand. `components.json` is not used because the components are
+copied, not generated at build time.
 
 **Alternatives.** Keep the bespoke layer (more code, weaker accessibility);
 Radix (a second primitive runtime next to Base UI); replace every component
@@ -376,3 +376,32 @@ Virtuoso. The package no longer ships `react-virtuoso`.
 virtualization stacks); hand-roll windowing (rejected: dynamic measurement and
 scroll anchoring are hard to make reliable); fixed-height rows (breaks Markdown,
 images, and tool output).
+
+---
+
+## ADR-018 — Official Streamdown plugins for code and Mermaid
+
+**Context.** The Markdown surface needs syntax highlighting and Mermaid
+diagrams. Pi Mygo had wrapped Pele for Mermaid and considered a bespoke Shiki
+highlighter to cut language chunks. Streamdown already publishes supported
+`@streamdown/code` and `@streamdown/mermaid` plugins with lazy grammar loading,
+controls, error handling, and a tested integration surface. Maintaining custom
+renderers duplicates that work and drifts on styling and streaming behavior.
+
+**Decision.** Use `@streamdown/code` and `@streamdown/mermaid` directly in the
+Streamdown `plugins` map. Do not import Pele or Shiki into application code and
+do not maintain a custom code-highlighter. Keep only app-level token styling for
+the plugin containers. Use `createMathPlugin({ singleDollarTextMath: true })`
+and `@streamdown/cjk` as before.
+
+**Consequences.** The Markdown dependency is lazy; code grammars are lazy
+chunks fetched only when a language appears, and Mermaid loads its renderer only
+when a diagram appears. The package includes the official plugin assets instead
+of a hand-trimmed grammar set; this is the supported optimization boundary. Do
+not "optimize" by forking the plugin or deleting grammar chunks, because that
+breaks arbitrary code fences. Removing Pele also removes its theme bridge and
+custom error fallback.
+
+**Alternatives.** Keep Pele plus `@streamdown/code` (two diagram/highlighting
+stacks); custom Shiki highlighter (smaller grammar set but unsupported and more
+code); no highlighting (worse readability).

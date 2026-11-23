@@ -90,8 +90,8 @@ engine. It must feel like a polished native app, not a web page in a box:
 - Inline question cards with option previews.
 - Native notifications for background sessions needing input/finishing.
 - Session full-text search.
-- Mermaid/KaTeX rendering in Markdown (done through Streamdown, Pele, and
-  KaTeX).
+- Mermaid/KaTeX rendering in Markdown (done through the official Streamdown
+  Mermaid and math plugins).
 - Per-file revert-to-HEAD with confirmation.
 - Worktree creation/switching.
 - Subagent child-session links and a compact activity panel.
@@ -282,7 +282,7 @@ provider support level beyond what has been exercised.
 | Priority | Milestone | Exit criteria |
 |---|---|---|
 | P0 | Validation hardening | User validation pass; fresh real-pi UI smoke after the Base UI/Streamdown migration (prompt, tool card, diff, plan, approval, trust, login); native title bar/traffic-light/menu screenshot; refresh plan/approval/trust screenshots; fix any blockers found. |
-| P0 | Performance closure | Profile full 1k-message transcript paint, streaming frame cost, and cached session switch; keep the budgets in ADR-013 or record a deliberate exception. Optional: split Pele/lazy Mermaid or trim Shiki languages to reduce the 14 MB asset tree and 314 JS chunks; the 22.7 MB app is already within the 30 MB budget. |
+| P0 | Performance closure | Profile full 1k-message transcript paint, streaming frame cost, and cached session switch; keep the budgets in ADR-013 or record a deliberate exception. Asset work: use the official Streamdown code/Mermaid plugins (done), verify grammar chunks load only on demand, and keep Markdown lazy. The app is within the 30 MB budget. |
 | P1 | Release engineering | Windows/Linux build probes and QA; signed and notarized macOS build; update feed and auto-update; fresh-clone CI build; crash/update diagnostics path. |
 | P1 | Daily-use features | Native completion notifications; MCP list/management UI; worktrees; subagent activity panel; session full-text search; per-file revert-to-HEAD; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |

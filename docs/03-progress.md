@@ -13,7 +13,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   approval + deny, trust dialog, provider login pty, changes/diff all exercised
   **before** the Base UI/Streamdown UI migration.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
-  Streamdown Markdown, Pele Mermaid, light/dark/browser and production-build QA.
+  Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
+  and production-build QA.
 - Remaining before a wider release: fresh real-pi UI smoke, native-window
   visual check, remaining screenshot refresh, performance closure, platform QA,
   signed/notarized builds, auto-update, native notifications,
@@ -74,11 +75,12 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   median 0.422 s). One cold run immediately after a rebuild took 0.857 s.
 - Idle physical footprint with no pi session: **42 MB** app process. WebKit
   helpers add their own footprint; total is within the 120 MB budget.
-- Frontend production bundle: main chunk 634 KB (198 KB gzip), lazy login
-  chunk 338 KB (86 KB gzip), lazy Markdown/Shiki/KaTeX/Pele chunk 1.75 MB
-  (580 KB gzip), CSS 118 KB (24 KB gzip). No source maps in production. A Vite
-  chunk-size warning remains for the lazy Markdown chunk; it does not delay the
-  first paint.
+- Frontend production bundle: main chunk 595 KB (~189 KB gzip), lazy login
+  chunk 338 KB (86 KB gzip), lazy Markdown/official plugin chunk 1.13 MB
+  (348 KB gzip), CSS 118 KB (24 KB gzip). Shiki grammar and Mermaid chunks load
+  on demand; 400 lazy assets total, dist 17 MB. No source maps in production.
+  A Vite chunk-size warning remains for the lazy Markdown chunk; it does not
+  delay the first paint.
 - `go test ./...`, `go vet ./...`, `bun run typecheck`, `bun run test`, and
   `bun run build` pass. Production assets loaded in a clean browser with no
   console errors; code, table, inline math, and Mermaid rendered.
@@ -115,6 +117,10 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - Direct dependencies updated to latest (`katex` 0.19.1); lockfile updated.
   Math and GFM table rendering verified after the update; KaTeX CSS 0.19.1
   resolves beside Streamdown's own KaTeX 0.16.47 (recorded in P-055).
+- 2026-11-23: Markdown now uses the official `@streamdown/code` and
+  `@streamdown/mermaid` plugins. Pele and the bespoke Shiki highlighter were
+  removed; code, table, math, and Mermaid rendered in a clean browser harness
+  with lazy grammar/diagram chunks.
 
 ### Documentation
 
@@ -153,8 +159,9 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - Production source maps were enabled; they inflated the embedded frontend by
   21 MB. Vite now emits none for production.
 - The UI layer was migrated to Base UI/shadcn/AI Elements, and Markdown to
-  Streamdown/Pele. The shadcn `muted` surface token had collided with the app's
-  muted text token; app text now uses `subtle`.
+  Streamdown with its official code/Mermaid plugins. The shadcn `muted` surface
+  token had collided with the app's muted text token; app text now uses
+  `subtle`.
 - Keyboard labels promised actions that were not wired (tree, compact, model)
   and "Esc stops" did not stop. All advertised shortcuts and Esc now work.
 - New chat after an active session showed a blank transcript instead of the

@@ -54,8 +54,9 @@ Screenshots: `docs/images/`.
 - Go build/vet/tests pass.
 - Frontend typecheck, 5 Vitest tests, production build pass.
 - Production UI pass: Base UI dialogs/menus, AI Elements messages, Streamdown
-  code/table/math, Pele Mermaid, light/dark themes, external-link routing, and
-  the main shortcuts were exercised in a clean browser; no console errors.
+  code/table/math, official Mermaid plugin, light/dark themes, external-link
+  routing, and the main shortcuts were exercised in a clean browser; no console
+  errors.
 - Real pi RPC start ~2.06 s; real prompt streamed `OK`.
 - Real plan mode, smart approval + deny, trust dialog + local extension load.
 - Real tree navigation changes `get_entries.leafId`.

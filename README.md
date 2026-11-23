@@ -114,7 +114,7 @@ mygo window (Go, system webview)
   ├─ fast session JSONL reader for first paint
   ├─ bundled `mygo-bridge` pi extension (tree nav, plan, approvals)
   └─ React 19 frontend (Vite, Tailwind, Base UI/shadcn,
-     Streamdown, Pele, TanStack Virtual)
+     Streamdown code/Mermaid plugins, TanStack Virtual)
 ```
 
 Decisions and tradeoffs are in [`docs/01-decisions.md`](docs/01-decisions.md).
