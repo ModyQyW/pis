@@ -53,7 +53,7 @@ Screenshots: `docs/images/`.
 ## Evidence
 
 - Go build/vet/tests pass.
-- Frontend typecheck, 9 Vitest tests, production build pass.
+- Frontend typecheck, 13 Vitest tests, production build pass.
 - P1 UI pass: session text search, Plan tab, MCP manager, worktree manager,
   per-file revert confirmation, and notification test button exercised in a
   clean browser.
@@ -77,7 +77,7 @@ Screenshots: `docs/images/`.
 3. **Signing and update feed** — provide an Apple Developer ID and notarization
    profile, choose a public release host, and set the updater public key/URL.
 The real-pi UI smoke, native-window check, performance closure, CI, updater
-window, P1 daily-use features, and English/Chinese UI are complete for this
+window, P1 daily-use features (including subagent activity and inline questions), and English/Chinese UI are complete for this
 build; see `05-qa.md`.
 
 The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
@@ -88,7 +88,7 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 - Unsigned/unnotarized, no auto-update.
 - RPC extension UI subset: no `ctx.ui.custom()` TUI components, custom editors,
   terminal input, or theme switching. Dialogs/status/widgets/notify work.
-- No subagent activity board or inline question composer yet. Native menu names stay English in Chinese mode.
+- Native menu names stay English in Chinese mode.
 - Auto-update is wired but has no public feed or signing key; the build is
   ad-hoc signed and not notarized.
 - Approvals and plan mode are product-level guardrails, not a sandbox. Use an
@@ -104,4 +104,4 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 - Did extension dialogs/statuses behave, and were any noisy?
 - Was trust/approval wording clear? Did any guard double-prompt?
 - Did plan mode match your workflow?
-- What is missing for daily use: subagents, inline questions, terminal, editor?
+- What is missing for daily use: terminal, editor, richer subagent controls?

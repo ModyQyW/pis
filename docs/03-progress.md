@@ -17,8 +17,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
 - Remaining before a wider release: refresh plan/approval screenshots,
-  signed/notarized public builds, an update feed/key, and subagent/inline-question
-  polish.
+  signed/notarized public builds, and an update feed/key.
 
 ### Open validation and performance
 
@@ -45,8 +44,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 1. **P0 validation hardening / performance** — complete on 2026-11-23; refresh
    remaining screenshots when the UI freezes.
 2. **P1 daily-use features** — complete: notifications, MCP configuration,
-   worktrees, session text search, per-file revert, and the Plan/todo tab.
-   Subagent board and inline questions remain follow-ups.
+   worktrees, session text search, per-file revert, the Plan/todo tab, a
+   subagent activity list, and inline question cards.
 3. **P1 release engineering** — CI, cross-builds, versioned release workflow,
    optional signing/notarization, and the updater window are implemented. A
    public update feed/key and an actual signed/notarized build still need
@@ -136,6 +135,10 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - **Per-file revert**: `Git.Revert` restores tracked paths from HEAD and refuses
   untracked files; integration test verifies a staged change is undone. The
   changes panel adds a hover action behind a destructive confirmation.
+- **Subagents/questions**: `extractSubagents` pairs subagent tool calls with
+  results and live blocks; the right panel has an Agents tab. `parseQuestions`
+  turns `ask_user_question` arguments into an inline card and marks selected
+  answers. Vitest covers both.
 - **Notifications**: `Desktop.Notify` respects the setting, groups by session,
   and truncates text. The packaged app's Test notification raised the macOS
   authorization prompt (verified in `docs/images/settings.png` capture session).
@@ -159,7 +162,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - 2026-11-23: `react-virtuoso` replaced with `@tanstack/react-virtual` 3.14.28.
   Dynamic measurement, pinned-end streaming, append follow, scroll-up release,
   and jump-to-latest verified in a 300-row browser harness (16 rows mounted at
-  bottom). Typecheck, Vitest tests, and production build pass.
+  bottom). Typecheck, 13 Vitest tests, and production build pass.
 - Direct dependencies updated to latest (`katex` 0.19.1); lockfile updated.
   Math and GFM table rendering verified after the update; KaTeX CSS 0.19.1
   resolves beside Streamdown's own KaTeX 0.16.47 (recorded in P-055).

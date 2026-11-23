@@ -282,8 +282,8 @@ provider support level beyond what has been exercised.
 
 **Status 2026-11-23:** P0 validation and performance are complete except for
 the stale plan/approval screenshots. P1 daily-use features are implemented
-(notifications, MCP, worktrees, session search, per-file revert, Plan tab);
-subagent/inline-question UI remains. P1 release engineering has CI, cross-builds,
+(notifications, MCP, worktrees, session search, per-file revert, Plan tab,
+subagent activity, inline question cards). P1 release engineering has CI, cross-builds,
 a versioned release workflow, optional signing, and the updater window; a public
 feed/key and an actual signed/notarized build need credentials and a release
 host. P2 localization is implemented for the English/Chinese shell, with CJK
@@ -294,7 +294,7 @@ layout QA; native menu labels remain English.
 | P0 | Validation hardening | User validation pass; fresh real-pi UI smoke after the Base UI/Streamdown migration (prompt, tool card, diff, plan, approval, trust, login); native title bar/traffic-light/menu screenshot; refresh plan/approval screenshots; fix any blockers found. |
 | P0 | Performance closure | Profile full 1k-message transcript paint, streaming frame cost, and cached session switch; keep the budgets in ADR-013 or record a deliberate exception. Asset work: use the official Streamdown code/Mermaid plugins (done), verify grammar chunks load only on demand, and keep Markdown lazy. The app is within the 30 MB budget. |
 | P1 | Release engineering | Windows/Linux build probes and QA; signed and notarized macOS build; update feed and auto-update; fresh-clone CI build; crash/update diagnostics path. |
-| P1 | Daily-use features | Native completion notifications; MCP list/management UI; worktrees; subagent activity panel; session full-text search; per-file revert-to-HEAD; todo panel; inline question cards. |
+| P1 | Daily-use features | Complete: native completion notifications; MCP management; worktrees; subagent activity; session search; per-file revert; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |
 
 Phase 10 closes when the user has validated the artifact and the P0

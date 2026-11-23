@@ -50,7 +50,9 @@ is available in Settings. See
   advanced fields stay in `mcp.json`), and list/create/open/remove Git
   worktrees.
 - **Session search and plans**: full-text search across session branches from
-  the command palette; a Plan tab reads pi's todo state and progress.
+  the command palette; Plan and Agents tabs read pi's todo state and subagent
+  activity; `ask_user_question` renders as an inline card with the selected
+  answer.
 - **Notifications and language**: native completion notifications when a
   background run finishes, a Settings test button, and an English/Chinese UI
   switch.
@@ -146,8 +148,8 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - Auto-update is wired through mygo's updater, but the repository currently has
   no public release feed or update signing key. Signed/notarized public builds
   remain follow-up work.
-- There is no subagent activity board or inline question composer yet. Extension
-  dialogs and generic tool cards remain the fallback.
+- Extension dialogs and generic tool cards remain the fallback for custom
+  extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
   own isolation when you need a real boundary.
 
