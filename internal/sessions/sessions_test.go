@@ -1,0 +1,98 @@
+package sessions
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+func writeSession(t *testing.T, dir, name string, lines []map[string]any, cwd string) string {
+	t.Helper()
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(dir, name)
+	var b strings.Builder
+	for _, line := range lines {
+		data, err := json.Marshal(line)
+		if err != nil {
+			t.Fatal(err)
+		}
+		b.Write(data)
+		b.WriteByte('\n')
+	}
+	if err := os.WriteFile(path, []byte(b.String()), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+func msg(id, parent, role, text string) map[string]any {
+	return map[string]any{
+		"type": "message", "id": id, "parentId": parent, "timestamp": "2026-01-01T00:00:00Z",
+		"message": map[string]any{"role": role, "content": text, "timestamp": 1},
+	}
+}
+
+func TestReadActiveBranch(t *testing.T) {
+	cwd := t.TempDir()
+	path := writeSession(t, t.TempDir(), "s.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "sess-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		msg("a", "", "user", "hello"),
+		msg("b", "a", "assistant", "hi"),
+		msg("c", "b", "user", "abandoned"),
+		msg("d", "b", "user", "follow this"),
+		{"type": "custom", "id": "e", "parentId": "d", "customType": "rpiv-todo-state", "data": map[string]any{"tasks": []any{}}},
+		msg("f", "e", "assistant", "done"),
+		{"type": "session_info", "id": "g", "parentId": "f", "name": "Named session"},
+	}, cwd)
+	tr, err := Read(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tr.ID != "sess-1" || tr.LeafID != "g" || tr.Name != "Named session" {
+		t.Fatalf("bad header: %+v", tr)
+	}
+	var texts []string
+	for _, e := range tr.Entries {
+		if e.Role == "user" || e.Role == "assistant" {
+			var m struct {
+				Content string `json:"content"`
+			}
+			_ = json.Unmarshal(e.Message, &m)
+			texts = append(texts, m.Content)
+		}
+	}
+	want := []string{"hello", "hi", "follow this", "done"}
+	if strings.Join(texts, "|") != strings.Join(want, "|") {
+		t.Fatalf("entries = %v, want %v", texts, want)
+	}
+}
+
+func TestListExcludesNestedSubagentRuns(t *testing.T) {
+	base := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_SESSION_DIR", base)
+	cwd := t.TempDir()
+	dir := filepath.Join(base, EncodeWorkspace(cwd))
+	writeSession(t, dir, "main.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "main-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		msg("a", "", "user", "main task"),
+	}, cwd)
+	nested := filepath.Join(dir, "main", "run-0")
+	writeSession(t, nested, "session.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "child-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		msg("a", "", "user", "child task"),
+	}, cwd)
+	list, err := List(cwd, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 1 || list[0].ID != "main-1" {
+		t.Fatalf("unexpected list: %+v", list)
+	}
+	if list[0].Title != "main task" {
+		t.Fatalf("title = %q", list[0].Title)
+	}
+}
