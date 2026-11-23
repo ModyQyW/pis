@@ -4,13 +4,19 @@ const signingIdentity = process.env.MACOS_SIGNING_IDENTITY;
 const notaryProfile = process.env.MACOS_NOTARY_PROFILE;
 const updatePublicKey = process.env.PI_MYGO_UPDATE_PUBLIC_KEY;
 const updateURL = process.env.PI_MYGO_UPDATE_URL;
+const updateGithub = process.env.PI_MYGO_UPDATE_GITHUB;
 
 export default defineConfig({
   name: "Pi Mygo",
   identifier: "dev.pimygo.app",
   version: process.env.PI_MYGO_VERSION ?? "0.1.0",
-  ...(updatePublicKey && updateURL
-    ? { updates: { publicKey: updatePublicKey, url: updateURL } }
+  ...(updatePublicKey && (updateURL || updateGithub)
+    ? {
+        updates: {
+          publicKey: updatePublicKey,
+          ...(updateURL ? { url: updateURL } : { github: updateGithub }),
+        },
+      }
     : {}),
   ...(signingIdentity
     ? {

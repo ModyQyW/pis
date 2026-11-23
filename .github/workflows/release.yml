@@ -49,7 +49,8 @@ jobs:
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
           PI_MYGO_UPDATE_PUBLIC_KEY: ${{ vars.PI_MYGO_UPDATE_PUBLIC_KEY }}
           PI_MYGO_UPDATE_URL: ${{ vars.PI_MYGO_UPDATE_URL }}
-        run: bun run build
+          PI_MYGO_UPDATE_GITHUB: ${{ vars.PI_MYGO_UPDATE_GITHUB }}
+        run: ./scripts/release.sh
       - uses: actions/upload-artifact@v4
         with:
           name: pi-mygo-${{ strategy.job-index }}

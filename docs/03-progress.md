@@ -47,9 +47,10 @@ passes/fails, and when a decision changes. Keep entries short and factual.
    worktrees, session text search, per-file revert, the Plan/todo tab, a
    subagent activity list, and inline question cards.
 3. **P1 release engineering** — CI, cross-builds, versioned release workflow,
-   optional signing/notarization, and the updater window are implemented. A
-   public update feed/key and an actual signed/notarized build still need
-   credentials and a release host.
+   optional signing/notarization, the updater window, and
+   `scripts/release.sh`/`update-keygen.sh` are implemented. A public update
+   feed/key and an actual signed/notarized build still need credentials and a
+   release host.
 4. **P2 localization and assets** — complete: English/Chinese UI, CJK QA, and
    official Streamdown code/Mermaid lazy chunks within the app budget.
 
@@ -153,7 +154,11 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - **Release**: `.github/workflows/ci.yml` runs Go, cross-builds, frontend tests,
   and a packaged macOS build. `release.yml` builds tagged artifacts with optional
   signing/notarization and updater key variables. `mygo.Use(updater.Plugin)` and
-  a Check for Updates menu item are wired; no update feed is configured.
+  a Check for Updates menu item are wired; `scripts/release.sh` validates
+  version/feed/signing inputs without printing secrets, and
+  `scripts/update-keygen.sh` generates the Ed25519 pair outside the repo. The
+  no-credential release build and keygen path were exercised; no public feed is
+  configured.
 - **Version**: `mygo.config.ts` reads `PI_MYGO_VERSION`; `main.go` no longer
   hard-codes 0.1.0. Local builds still default to 0.1.0.
 

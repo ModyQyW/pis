@@ -15,6 +15,34 @@ build/darwin-arm64/pi-mygo-0.1.0-arm64.dmg  6.8 MB
 The build is ad-hoc signed, not notarized. macOS may require
 System Settings → Privacy & Security → Open Anyway on first launch.
 
+## Signed release and update feed
+
+The app includes the mygo updater plugin and a Check for Updates menu item.
+To build a distributable release, provide credentials and a public feed:
+
+```sh
+./scripts/update-keygen.sh                 # writes a key pair outside the repo
+export PI_MYGO_VERSION=0.2.0
+export PI_MYGO_UPDATE_PUBLIC_KEY="$(cat "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.pub")"
+export PI_MYGO_UPDATE_GITHUB=owner/pi-mygo # or PI_MYGO_UPDATE_URL=https://…
+export MACOS_SIGNING_IDENTITY="Developer ID Application: …"
+export MACOS_NOTARY_PROFILE=notary
+export MYGO_UPDATER_PRIVATE_KEY_FILE="$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.key"
+./scripts/release.sh
+```
+
+`scripts/release.sh` strips a leading `v` from the version, never prints the
+secret, requires a feed when a public key is set, and refuses a notarization
+profile without a signing identity. The keygen output and `*.key` files are
+ignored by Git. CI exposes the same inputs as repository variables/secrets
+(`PI_MYGO_UPDATE_*`, `MYGO_UPDATER_PRIVATE_KEY`, `MACOS_SIGNING_IDENTITY`,
+`MACOS_NOTARY_PROFILE`).
+
+Without a public repository or update URL, the updater menu reports that the
+build cannot update itself. A signed/notarized build and an installed-update
+round trip have not been exercised on this machine because those credentials
+and the public feed are not present.
+
 ## Requirements on the validation machine
 
 - pi >= 1.6 < 2 installed and authenticated. The app also finds pi through
