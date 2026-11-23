@@ -27,8 +27,11 @@ GitHub Releases can serve updates without an Apple Developer account: mygo
 signs update archives with a generated Ed25519 key, and the installed app
 verifies that signature. macOS code signing is separate; without a Developer
 ID the `.app` is ad-hoc signed and Gatekeeper asks the user to approve it once.
-The release repository or feed must be public: private release assets are not
-readable by an installed app.
+Users can also run `xattr -dr com.apple.quarantine "/Applications/Pi Mygo.app"`
+after moving it from the DMG. The release repository or feed must be public:
+private release assets are not readable by an installed app. Windows builds are
+unsigned, so SmartScreen shows its one-time warning; Linux archives include
+`install.sh`.
 
 To configure the update key in GitHub:
 
@@ -59,7 +62,7 @@ and DMG creation require macOS. The builds upload the update archives and
 manifests with `-upload`. Review and publish the draft; the updater reads the
 latest published release. A private repository cannot serve this feed to users.
 The CI workflow (checkout/setup-go/upload-artifact majors) passed GitHub Actions
-run 45153414759, including six cross-builds and a macOS package job.
+run 45155511397, including six cross-builds and a macOS package job.
 
 For a local release with optional Apple signing/notarization:
 

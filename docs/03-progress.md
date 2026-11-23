@@ -155,7 +155,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
   cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
   Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
-  v8, and action-gh-release v3. GitHub Actions run 45153414759 passed all Go,
+  v8, and action-gh-release v3. GitHub Actions run 45155511397 passed all Go,
   frontend, six cross-build, and macOS package jobs. A later CI run exposed a
   pty output-drain race on Ubuntu; the reader now drains before exit and
   `go test -count=20 ./internal/auth` passes. The release workflow builds darwin
