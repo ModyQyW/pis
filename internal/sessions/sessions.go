@@ -265,6 +265,107 @@ func scanFile(path, cwd string, ent os.DirEntry) (Summary, error) {
 	return sum, nil
 }
 
+// SearchHit is one session whose active branch contains the query.
+type SearchHit struct {
+	Summary
+	Snippet string `json:"snippet"`
+	Role    string `json:"role,omitempty"`
+}
+
+// Search scans recent sessions in cwd for a case-insensitive query. It reads
+// the active branch, so an abandoned fork does not produce a false hit.
+func Search(cwd, query string, limit int) ([]SearchHit, error) {
+	q := strings.TrimSpace(query)
+	if len([]rune(q)) < 2 {
+		return []SearchHit{}, nil
+	}
+	if limit <= 0 || limit > 50 {
+		limit = 12
+	}
+	summaries, err := List(cwd, 150)
+	if err != nil {
+		return nil, err
+	}
+	hits := make([]SearchHit, 0, limit)
+	for _, sum := range summaries {
+		if snippet, ok := searchText(sum.Title, q); ok {
+			hits = append(hits, SearchHit{Summary: sum, Snippet: snippet})
+			if len(hits) >= limit {
+				break
+			}
+			continue
+		}
+		tr, err := Read(sum.Path)
+		if err != nil {
+			continue
+		}
+		for _, entry := range tr.Entries {
+			if entry.Role != "user" && entry.Role != "assistant" {
+				continue
+			}
+			text := textFromMessage(entry.Message)
+			snippet, ok := searchText(text, q)
+			if !ok {
+				continue
+			}
+			hits = append(hits, SearchHit{Summary: sum, Snippet: snippet, Role: entry.Role})
+			break
+		}
+		if len(hits) >= limit {
+			break
+		}
+	}
+	return hits, nil
+}
+
+func searchText(text, query string) (string, bool) {
+	if text == "" {
+		return "", false
+	}
+	runes := []rune(text)
+	lower := []rune(strings.ToLower(text))
+	needle := []rune(strings.ToLower(query))
+	start := indexRunes(lower, needle)
+	if start < 0 {
+		return "", false
+	}
+	from := start - 60
+	if from < 0 {
+		from = 0
+	}
+	to := start + len(needle) + 90
+	if to > len(runes) {
+		to = len(runes)
+	}
+	snippet := string(runes[from:to])
+	if from > 0 {
+		snippet = "…" + snippet
+	}
+	if to < len(runes) {
+		snippet += "…"
+	}
+	return oneLine(snippet, 200), true
+}
+
+func indexRunes(haystack, needle []rune) int {
+	if len(needle) == 0 || len(needle) > len(haystack) {
+		return -1
+	}
+	for i := 0; i <= len(haystack)-len(needle); i++ {
+		match := true
+		for j := range needle {
+			if haystack[i+j] != needle[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return i
+		}
+	}
+	return -1
+}
+
 // Read returns the active branch for display.
 func Read(path string) (Transcript, error) {
 	return ReadAt(path, "")

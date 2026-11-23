@@ -96,3 +96,30 @@ func TestListExcludesNestedSubagentRuns(t *testing.T) {
 		t.Fatalf("title = %q", list[0].Title)
 	}
 }
+
+func TestSearchFindsActiveBranchText(t *testing.T) {
+	base := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_SESSION_DIR", base)
+	cwd := t.TempDir()
+	dir := filepath.Join(base, EncodeWorkspace(cwd))
+	writeSession(t, dir, "main.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "main-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		msg("a", "", "user", "please fix the cache invalidation bug"),
+		msg("b", "a", "assistant", "I found the watcher rename branch."),
+		msg("c", "b", "assistant", "abandoned branch mention"),
+	}, cwd)
+
+	hits, err := Search(cwd, "WATCHER", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(hits) != 1 {
+		t.Fatalf("hits = %d, want 1: %+v", len(hits), hits)
+	}
+	if hits[0].ID != "main-1" || hits[0].Role != "assistant" {
+		t.Fatalf("unexpected hit: %+v", hits[0])
+	}
+	if !strings.Contains(hits[0].Snippet, "watcher rename") {
+		t.Fatalf("snippet = %q", hits[0].Snippet)
+	}
+}

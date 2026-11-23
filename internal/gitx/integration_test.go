@@ -63,3 +63,85 @@ func TestStatusAndDiffRealRepo(t *testing.T) {
 		t.Fatalf("untracked diff: %q %v", diff, err)
 	}
 }
+
+func TestWorktreeLifecycle(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	git(t, dir, "add", "a.txt")
+	git(t, dir, "commit", "-qm", "init")
+
+	linked := filepath.Join(t.TempDir(), "linked")
+	if err := New().AddWorktree(context.Background(), dir, linked, "feature", true); err != nil {
+		t.Fatal(err)
+	}
+	list, err := New().Worktrees(context.Background(), dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 2 {
+		t.Fatalf("worktrees = %#v", list)
+	}
+	linkedCanonical, err := filepath.EvalSymlinks(linked)
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, wt := range list {
+		if wt.Path == linkedCanonical && wt.Branch == "feature" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("linked worktree missing: %#v", list)
+	}
+	if err := New().RemoveWorktree(context.Background(), dir, linked, true); err != nil {
+		t.Fatal(err)
+	}
+	list, err = New().Worktrees(context.Background(), dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(list) != 1 {
+		t.Fatalf("after remove = %#v", list)
+	}
+}
+
+func TestRevertTrackedPath(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	dir := t.TempDir()
+	git(t, dir, "init", "-q")
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	git(t, dir, "add", "a.txt")
+	git(t, dir, "commit", "-qm", "init")
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("changed\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	git(t, dir, "add", "a.txt")
+	if err := New().Revert(context.Background(), dir, "a.txt"); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, "a.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != "one\n" {
+		t.Fatalf("file = %q", data)
+	}
+	status, err := New().Status(context.Background(), dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(status.Files) != 0 {
+		t.Fatalf("status after revert = %#v", status.Files)
+	}
+}

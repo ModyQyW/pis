@@ -343,6 +343,35 @@ func (s *Service) SetPreferences(p Preferences) error {
 	return err
 }
 
+// Notify shows a native completion notification when the user enabled them.
+// id groups notifications by session; title and body are truncated by the
+// platform, but are bounded here so a long session name cannot bloat state.
+func (s *Service) Notify(id, title, body string) error {
+	if !s.store.Snapshot().Notifications {
+		return nil
+	}
+	title = strings.TrimSpace(title)
+	body = strings.TrimSpace(body)
+	if title == "" {
+		title = "Pi Mygo"
+	}
+	if len([]rune(title)) > 120 {
+		title = string([]rune(title)[:119]) + "…"
+	}
+	if len([]rune(body)) > 240 {
+		body = string([]rune(body)[:239]) + "…"
+	}
+	if !mygo.NotificationsSupported() {
+		return errors.New("desktop notifications are not available in this build")
+	}
+	return mygo.NewNotification(mygo.NotificationOptions{
+		ID:    "session:" + strings.TrimSpace(id),
+		Title: title,
+		Body:  body,
+		Group: "Pi Mygo sessions",
+	}).Show()
+}
+
 // Reveal opens a path with the default application. It does not interpret
 // it as a command.
 func (s *Service) Reveal(path string) error {

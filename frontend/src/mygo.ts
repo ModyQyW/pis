@@ -4,6 +4,19 @@ import { bind, event } from "mygo-runtime";
 
 // ---- Types ----
 
+/**
+ * AddRequest creates a simple server entry. Environment, headers, OAuth, and
+ * per-tool exposure remain editable in mcp.json when a server needs them.
+ */
+export interface AddRequest {
+  name: string;
+  command?: string;
+  args?: string[];
+  url?: string;
+  description?: string;
+  local: boolean;
+}
+
 /** Info identifies a running login terminal. */
 export interface AuthInfo {
   id: string;
@@ -214,6 +227,32 @@ export interface Recent {
   lastOpened: string;
 }
 
+export interface SearchHit {
+  path: string;
+  id: string;
+  title: string;
+  cwd: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+  snippet: string;
+  role?: string;
+}
+
+/** Server is one merged MCP entry as the settings UI needs it. */
+export interface Server {
+  name: string;
+  source: string;
+  /** stdio or http */
+  kind: string;
+  command?: string;
+  args?: string[];
+  url?: string;
+  description?: string;
+  exposure?: string;
+  enabled: boolean;
+}
+
 /** SessionInfo is the app's view of one live pi process. */
 export interface SessionInfo {
   id: string;
@@ -338,6 +377,17 @@ export interface Workspace {
   lastOpened: string;
 }
 
+/** Worktree is one entry of `git worktree list --porcelain`. */
+export interface Worktree {
+  path: string;
+  head?: string;
+  branch?: string;
+  bare?: boolean;
+  detached?: boolean;
+  locked?: boolean;
+  prunable?: boolean;
+}
+
 // ---- Services ----
 
 /**
@@ -359,6 +409,12 @@ export const Desktop = {
   chooseProject: bind<[], Workspace>("Desktop.ChooseProject", () => []),
   /** Diagnostics returns paths and versions for a support report. */
   diagnostics: bind<[], Diagnostics>("Desktop.Diagnostics", () => []),
+  /**
+   * Notify shows a native completion notification when the user enabled them.
+   * id groups notifications by session; title and body are truncated by the
+   * platform, but are bounded here so a long session name cannot bloat state.
+   */
+  notify: bind<[string, string, string], void>("Desktop.Notify", (id: string, title: string, body: string) => [id, title, body]),
   /** OpenExternal opens an http(s) URL in the browser. */
   openExternal: bind<[string], void>("Desktop.OpenExternal", (raw: string) => [raw]),
   /** OpenProject validates and records a workspace. */
@@ -479,6 +535,8 @@ export const Sessions = {
   readAt: bind<[string, string], Transcript>("Sessions.ReadAt", (path: string, leafID: string) => [path, leafID]),
   /** Reveal shows a session file in the file manager. */
   reveal: bind<[string], void>("Sessions.Reveal", (path: string) => [path]),
+  /** Search returns session text matches for the command palette. */
+  search: bind<[string, string, number], SearchHit[]>("Sessions.Search", (workspace: string, query: string, limit: number) => [workspace, query, limit]),
   /** Summary returns one session's sidebar metadata. */
   summary: bind<[string], Summary>("Sessions.Summary", (path: string) => [path]),
 } as const;
@@ -495,10 +553,35 @@ export const Files = {
 
 /** Service reads Git state. */
 export const Git = {
+  /**
+   * AddWorktree creates a worktree at path. When createBranch is true, branch is
+   * created from HEAD; otherwise it is checked out.
+   */
+  addWorktree: bind<[string, string, string, boolean], void>("Git.AddWorktree", (workspace: string, path: string, branch: string, createBranch: boolean) => [workspace, path, branch, createBranch]),
   /** Diff returns a unified diff for one path. */
   diff: bind<[string, string], string>("Git.Diff", (workspace: string, path: string) => [workspace, path]),
+  /**
+   * RemoveWorktree removes a linked worktree. The main worktree cannot be
+   * removed by git and is reported as an error.
+   */
+  removeWorktree: bind<[string, string, boolean], void>("Git.RemoveWorktree", (workspace: string, path: string, force: boolean) => [workspace, path, force]),
+  /**
+   * Revert restores one tracked path to HEAD in both the index and worktree.
+   * Untracked paths have no HEAD version and are rejected.
+   */
+  revert: bind<[string, string], void>("Git.Revert", (workspace: string, path: string) => [workspace, path]),
   /** Status returns the working tree summary for workspace. */
   status: bind<[string], Status>("Git.Status", (workspace: string) => [workspace]),
+  /** Worktrees lists the repository's worktrees. */
+  worktrees: bind<[string], Worktree[]>("Git.Worktrees", (workspace: string) => [workspace]),
+} as const;
+
+/** Service is the bound MCP configuration API. */
+export const MCP = {
+  add: bind<[string, AddRequest], void>("MCP.Add", (workspace: string, req: AddRequest) => [workspace, req]),
+  list: bind<[string], Server[]>("MCP.List", (workspace: string) => [workspace]),
+  remove: bind<[string, string, boolean], void>("MCP.Remove", (workspace: string, name: string, local: boolean) => [workspace, name, local]),
+  setEnabled: bind<[string, string, boolean, boolean], void>("MCP.SetEnabled", (workspace: string, name: string, enabled: boolean, local: boolean) => [workspace, name, enabled, local]),
 } as const;
 
 /** Manager owns at most one login terminal at a time. */

@@ -32,6 +32,14 @@ func (s *SessionsService) List(workspace string, limit int) ([]sessions.Summary,
 	return sessions.List(workspace, limit)
 }
 
+// Search returns session text matches for the command palette.
+func (s *SessionsService) Search(workspace, query string, limit int) ([]sessions.SearchHit, error) {
+	if strings.TrimSpace(workspace) == "" {
+		return nil, errors.New("empty workspace")
+	}
+	return sessions.Search(workspace, query, limit)
+}
+
 // Read returns the fast display transcript for a session file.
 func (s *SessionsService) Read(path string) (sessions.Transcript, error) {
 	if !sessions.AllowedPath(path) {

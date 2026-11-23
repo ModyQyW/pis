@@ -243,6 +243,27 @@ func (s *Service) Diff(ctx context.Context, workspace, path string) (string, err
 	return b.String(), nil
 }
 
+// Revert restores one tracked path to HEAD in both the index and worktree.
+// Untracked paths have no HEAD version and are rejected.
+func (s *Service) Revert(ctx context.Context, workspace, path string) error {
+	dir, err := workspaceDir(workspace)
+	if err != nil {
+		return err
+	}
+	if !safeRel(path) {
+		return errors.New("invalid path")
+	}
+	statusOut, err := run(ctx, dir, "status", "--porcelain=v1", "-z", "--", path)
+	if err != nil {
+		return err
+	}
+	if strings.HasPrefix(statusOut, "??") {
+		return errors.New("untracked file has no HEAD version to restore")
+	}
+	_, err = run(ctx, dir, "restore", "--source=HEAD", "--staged", "--worktree", "--", path)
+	return err
+}
+
 func safeRel(path string) bool {
 	if path == "" || filepath.IsAbs(path) {
 		return false
