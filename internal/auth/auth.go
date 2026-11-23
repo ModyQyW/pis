@@ -42,6 +42,7 @@ type session struct {
 	ptmx     *os.File
 	writeMu  sync.Mutex
 	done     chan struct{}
+	readDone chan struct{}
 	once     sync.Once
 }
 
@@ -86,7 +87,10 @@ func (m *Manager) Start(provider string, apiKey bool) (Info, error) {
 		return Info{}, fmt.Errorf("start pi auth: %w", err)
 	}
 	id := fmt.Sprintf("login-%d", time.Now().UnixNano())
-	s := &session{id: id, provider: provider, cmd: cmd, ptmx: ptmx, done: make(chan struct{})}
+	s := &session{
+		id: id, provider: provider, cmd: cmd, ptmx: ptmx,
+		done: make(chan struct{}), readDone: make(chan struct{}),
+	}
 
 	m.mu.Lock()
 	if m.active != nil {
@@ -104,6 +108,7 @@ func (m *Manager) Start(provider string, apiKey bool) (Info, error) {
 }
 
 func (m *Manager) read(s *session) {
+	defer close(s.readDone)
 	buf := make([]byte, 4096)
 	for {
 		n, err := s.ptmx.Read(buf)
@@ -127,6 +132,13 @@ func (m *Manager) wait(s *session) {
 		}
 	}
 	s.once.Do(func() {
+		// The child can exit while the pty still has the final bytes buffered.
+		// Let the reader drain them before closing the descriptor and telling
+		// the UI that the login ended.
+		select {
+		case <-s.readDone:
+		case <-time.After(2 * time.Second):
+		}
 		close(s.done)
 		m.mu.Lock()
 		if m.active == s {

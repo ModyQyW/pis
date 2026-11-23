@@ -416,3 +416,12 @@ hard error instead of a warning. `action-gh-release` v3 runs on Node 24.
 and keep `action-gh-release@v3`'s `draft: true` on re-runs. Build Windows on
 Ubuntu with NSIS and macOS on a macOS runner; a Linux runner cannot ad-hoc sign
 or create a DMG.
+
+### P-061 — PTY exit can race the final output read
+**Symptom.** The pty login test passed locally but failed on Ubuntu CI with
+`missing echo: "Login prompt\r\nhello\r\n"`; the process had exited 0 but the
+reader had not delivered the final `got:hello`.
+**Rule.** Keep a `readDone` channel. After `cmd.Wait`, wait for the reader to
+drain (bounded, in case a child holds the pty) before closing `ptmx` and
+emitting the exit event. A login window must not disappear before its last
+line is visible.
