@@ -82,6 +82,6 @@ jobs:
         run: go tool mygo build -platform "darwin/arm64,darwin/amd64"
       - uses: actions/upload-artifact@v7
         with:
-          name: pi-mygo-macos
+          name: pis-macos
           path: build/**
           if-no-files-found: error

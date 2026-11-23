@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"time"
 
-	"pi-mygo/internal/jsonx"
+	"pis/internal/jsonx"
 )
 
 // RawJSON is a JSON value passed through without decoding.

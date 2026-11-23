@@ -1,20 +1,20 @@
 # Initial delivery
 
-Status: ready for user validation on macOS arm64 (2026-11-23). A wider release
-is blocked on a public update feed/key and the plan/approval screenshot refresh.
-macOS is ad-hoc signed and not notarized; Gatekeeper requires a one-time
-approval. The P0 real-pi, native-window, and performance checks are complete.
+Status: ready for user validation on macOS arm64 (2026-11-24). A wider release
+is blocked on a public update feed/key. macOS is ad-hoc signed and not
+notarized; Gatekeeper requires a one-time approval. The P0 real-pi,
+native-window, and performance checks are complete.
 
 ## Artifact
 
 ```text
-build/darwin-arm64/Pi Mygo.app            27.0 MB
-build/darwin-arm64/pi-mygo-0.1.0-arm64.dmg  6.8 MB
-build/darwin-amd64/pi-mygo-0.1.0-amd64.dmg  7.5 MB
-build/linux-amd64/pi-mygo-0.1.0-linux-amd64.tar.gz
-build/linux-arm64/pi-mygo-0.1.0-linux-arm64.tar.gz
-build/windows-amd64/pi-mygo-setup-0.1.0-amd64.exe
-build/windows-arm64/pi-mygo-setup-0.1.0-arm64.exe
+build/darwin-arm64/PiS.app                  27.0 MB
+build/darwin-arm64/pis-0.1.0-arm64.dmg       6.8 MB
+build/darwin-amd64/pis-0.1.0-amd64.dmg       7.5 MB
+build/linux-amd64/pis-0.1.0-linux-amd64.tar.gz  8.9 MB
+build/linux-arm64/pis-0.1.0-linux-arm64.tar.gz  8.5 MB
+build/windows-amd64/pis-setup-0.1.0-amd64.exe   7.0 MB
+build/windows-arm64/pis-setup-0.1.0-arm64.exe   6.4 MB
 ```
 
 The build is ad-hoc signed, not notarized. macOS may require
@@ -27,7 +27,7 @@ GitHub Releases can serve updates without an Apple Developer account: mygo
 signs update archives with a generated Ed25519 key, and the installed app
 verifies that signature. macOS code signing is separate; without a Developer
 ID the `.app` is ad-hoc signed and Gatekeeper asks the user to approve it once.
-Users can also run `xattr -dr com.apple.quarantine "/Applications/Pi Mygo.app"`
+Users can also run `xattr -dr com.apple.quarantine "/Applications/PiS.app"`
 after moving it from the DMG. The release repository or feed must be public:
 private release assets are not readable by an installed app. Windows builds are
 unsigned, so SmartScreen shows its one-time warning; Linux archives include
@@ -37,10 +37,10 @@ To configure the update key in GitHub:
 
 ```sh
 ./scripts/update-keygen.sh
-gh variable set PI_MYGO_UPDATE_PUBLIC_KEY < "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.pub"
-gh secret set MYGO_UPDATER_PRIVATE_KEY < "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.key"
+gh variable set PIS_UPDATE_PUBLIC_KEY < "$HOME/Library/Application Support/PiS/update-keys/mygo-update.pub"
+gh secret set MYGO_UPDATER_PRIVATE_KEY < "$HOME/Library/Application Support/PiS/update-keys/mygo-update.key"
 # Optional; defaults to the repository running the workflow.
-gh variable set PI_MYGO_UPDATE_GITHUB --body "owner/pi-mygo"
+gh variable set PIS_UPDATE_GITHUB --body "owner/pis"
 ```
 
 Make the repository public (or point the variable at a public release-only
@@ -68,13 +68,13 @@ For a local release with optional Apple signing/notarization:
 
 ```sh
 ./scripts/update-keygen.sh                 # writes a key pair outside the repo
-export PI_MYGO_VERSION=0.2.0
-export PI_MYGO_UPDATE_PUBLIC_KEY="$(cat "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.pub")"
-export PI_MYGO_UPDATE_GITHUB=owner/pi-mygo # or PI_MYGO_UPDATE_URL=https://…
+export PIS_VERSION=0.2.0
+export PIS_UPDATE_PUBLIC_KEY="$(cat "$HOME/Library/Application Support/PiS/update-keys/mygo-update.pub")"
+export PIS_UPDATE_GITHUB=owner/pis # or PIS_UPDATE_URL=https://…
 # Optional Apple credentials; omit both for an ad-hoc macOS build.
 # export MACOS_SIGNING_IDENTITY="Developer ID Application: …"
 # export MACOS_NOTARY_PROFILE=notary
-export MYGO_UPDATER_PRIVATE_KEY_FILE="$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.key"
+export MYGO_UPDATER_PRIVATE_KEY_FILE="$HOME/Library/Application Support/PiS/update-keys/mygo-update.key"
 ./scripts/release.sh -platform "darwin/arm64,darwin/amd64" -upload
 ```
 
@@ -82,7 +82,7 @@ export MYGO_UPDATER_PRIVATE_KEY_FILE="$HOME/Library/Application Support/Pi Mygo/
 secret, requires a feed when a public key is set, and refuses a notarization
 profile without a signing identity. The keygen output and `*.key` files are
 ignored by Git. CI exposes the same inputs as repository variables/secrets
-(`PI_MYGO_UPDATE_*`, `MYGO_UPDATER_PRIVATE_KEY`, `MACOS_SIGNING_IDENTITY`,
+(`PIS_UPDATE_*`, `MYGO_UPDATER_PRIVATE_KEY`, `MACOS_SIGNING_IDENTITY`,
 `MACOS_NOTARY_PROFILE`).
 
 Without a public repository or update URL, the updater menu reports that the
@@ -94,11 +94,11 @@ supported by mygo.
 ## Requirements on the validation machine
 
 - pi >= 1.6 < 2 installed and authenticated. The app also finds pi through
-  Settings, `PI_MYGO_PI`, `PATH`, common install paths, then the login shell.
+  Settings, `PIS_PI`, `PATH`, common install paths, then the login shell.
 - Your existing `~/.pi/agent` configuration is used as-is. Existing sessions
   appear under their projects.
 - No Node requirement for a standalone pi binary. An npm-installed pi may need
-  Node on PATH; Pi Mygo resolves the login shell.
+  Node on PATH; PiS resolves the login shell.
 
 ## Five-minute validation
 
@@ -117,7 +117,7 @@ supported by mygo.
 6. Turn Plan on. Ask for a plan; mutating tools are blocked. Turn Plan off.
 7. Ask to run a destructive command. With Smart approvals and no other guard,
    an approval dock shows the command and risk. Deny; the tool is blocked.
-   If `cc-safety-net` is detected, Settings shows that Pi Mygo's guard is off
+   If `cc-safety-net` is detected, Settings shows that PiS's guard is off
    unless you enable it.
 8. Session menu: rename, clone, session tree, compact, export HTML, reveal,
    close, delete to Trash.
@@ -141,17 +141,17 @@ Screenshots: `docs/images/`.
 - English/Chinese UI switch with CJK QA; screenshots in `zh-chat.png` and
   `zh-settings.png`. Native menu names remain English.
 - Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
-- Screenshots in `docs/images/` were refreshed for chat, session tree, diff, and
-  login after the UI migration. `real-pi.png` records the P0 native run.
+- Screenshots in `docs/images/` were refreshed for PiS: home, chat, plan,
+  trust, settings, session tree, diff, login, and both Chinese views. The
+  approval dock awaits a native recapture. `real-pi.png` records the
+  pre-rebrand P0 native run.
 
 ## Next before a wider release
 
 1. **User validation** — install, launch, and run the five-minute checklist
    against a real pi account and project.
-2. **Screenshot refresh** — refresh the plan and approval images after the UI
-   migration; trust is current.
-3. **Update feed** — make the release repository public or set a public
-   `PI_MYGO_UPDATE_URL`, then set the updater public key and private-key secret.
+2. **Update feed** — make the release repository public or set a public
+   `PIS_UPDATE_URL`, then set the updater public key and private-key secret.
    Apple signing/notarization is optional; macOS can ship ad-hoc with Gatekeeper
    approval.
 The real-pi UI smoke, native-window check, performance closure, CI, updater

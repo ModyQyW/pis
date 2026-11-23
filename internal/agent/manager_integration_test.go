@@ -6,16 +6,16 @@ import (
 	"testing"
 	"time"
 
-	"pi-mygo/internal/piinfo"
+	"pis/internal/piinfo"
 )
 
 // This test starts the installed pi. It never sends a prompt, so it does not
-// spend model tokens. Run with PI_MYGO_INTEGRATION=1.
+// spend model tokens. Run with PIS_INTEGRATION=1.
 func TestStartAndInspectRealPi(t *testing.T) {
-	if os.Getenv("PI_MYGO_INTEGRATION") != "1" {
-		t.Skip("set PI_MYGO_INTEGRATION=1 to run against the installed pi")
+	if os.Getenv("PIS_INTEGRATION") != "1" {
+		t.Skip("set PIS_INTEGRATION=1 to run against the installed pi")
 	}
-	st := piinfo.Discover(context.Background(), os.Getenv("PI_MYGO_PI"))
+	st := piinfo.Discover(context.Background(), os.Getenv("PIS_PI"))
 	if !st.Found || !st.Compatible {
 		t.Fatalf("pi is not usable: %+v", st)
 	}

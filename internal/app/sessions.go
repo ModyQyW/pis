@@ -9,8 +9,8 @@ import (
 
 	"github.com/egoist/mygo"
 
-	"pi-mygo/internal/agent"
-	"pi-mygo/internal/sessions"
+	"pis/internal/agent"
+	"pis/internal/sessions"
 )
 
 // SessionsService exposes pi's session files for display and management.

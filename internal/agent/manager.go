@@ -172,10 +172,10 @@ func (m *Manager) Start(ctx context.Context, req StartRequest) (SessionInfo, err
 		guardPolicy = "off"
 	}
 	env := append(os.Environ(),
-		"PI_MYGO=1",
-		"PI_MYGO_SESSION_ID="+id,
-		"PI_MYGO_GUARD="+guardPolicy,
-		"PI_MYGO_WORKSPACE="+cwd,
+		"PIS=1",
+		"PIS_SESSION_ID="+id,
+		"PIS_GUARD="+guardPolicy,
+		"PIS_WORKSPACE="+cwd,
 	)
 
 	s := &session{info: SessionInfo{

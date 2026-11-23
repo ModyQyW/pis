@@ -1,4 +1,4 @@
-// Pi Mygo is a desktop coding agent built on mygo with pi as the engine.
+// PiS is a desktop coding agent built on mygo with pi as the engine.
 package main
 
 import (
@@ -13,31 +13,31 @@ import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/plugins/updater"
 
-	"pi-mygo/internal/agent"
-	"pi-mygo/internal/app"
-	"pi-mygo/internal/auth"
-	"pi-mygo/internal/bridge"
-	"pi-mygo/internal/files"
-	"pi-mygo/internal/gitx"
-	"pi-mygo/internal/guard"
-	"pi-mygo/internal/mcp"
-	"pi-mygo/internal/sessions"
-	"pi-mygo/internal/settings"
+	"pis/internal/agent"
+	"pis/internal/app"
+	"pis/internal/auth"
+	"pis/internal/bridge"
+	"pis/internal/files"
+	"pis/internal/gitx"
+	"pis/internal/guard"
+	"pis/internal/mcp"
+	"pis/internal/sessions"
+	"pis/internal/settings"
 )
 
 func main() {
-	mygo.App.SetName("Pi Mygo")
+	mygo.App.SetName("PiS")
 	mygo.Use(updater.Plugin)
 
 	dataDir, err := mygo.App.Path(mygo.PathUserData)
 	if err != nil {
-		log.Printf("pi-mygo: user data directory: %v", err)
-		dataDir = filepath.Join(os.TempDir(), "pi-mygo")
+		log.Printf("pis: user data directory: %v", err)
+		dataDir = filepath.Join(os.TempDir(), "pis")
 	}
 	store, err := settings.Open(dataDir)
 	if err != nil {
 		// A corrupt settings file must not prevent the app from opening.
-		log.Printf("pi-mygo: %v (using defaults)", err)
+		log.Printf("pis: %v (using defaults)", err)
 	}
 
 	app.ApplyTheme(store.Snapshot().Theme)
@@ -46,20 +46,20 @@ func main() {
 	if bridgePath, err := bridge.Ensure(dataDir); err == nil {
 		mgr.SetBridgePath(bridgePath)
 	} else {
-		log.Printf("pi-mygo: bridge extension: %v", err)
+		log.Printf("pis: bridge extension: %v", err)
 	}
 	guardPolicy := app.EffectiveGuardPolicy(store.Snapshot(), guard.Detected(sessions.AgentDir()))
 	if mygo.IsDev() {
-		if override := os.Getenv("PI_MYGO_GUARD_OVERRIDE"); override != "" {
+		if override := os.Getenv("PIS_GUARD_OVERRIDE"); override != "" {
 			guardPolicy = override
 		}
 	}
 	mgr.SetGuardPolicy(guardPolicy)
 	svc := app.New(store, dataDir, mgr)
 	if mygo.IsDev() {
-		if open := os.Getenv("PI_MYGO_OPEN"); open != "" {
+		if open := os.Getenv("PIS_OPEN"); open != "" {
 			if _, err := svc.OpenProject(open); err != nil {
-				log.Printf("pi-mygo: open project: %v", err)
+				log.Printf("pis: open project: %v", err)
 			}
 		}
 	}
@@ -99,7 +99,7 @@ func main() {
 				Type:               mygo.MessageWarning,
 				Title:              "Sessions are running",
 				Message:            fmt.Sprintf("%d session%s still working. Quit and stop the runs?", n, plural(n)),
-				Detail:             "Pi Mygo will stop the pi processes. Session files stay on disk and can be resumed.",
+				Detail:             "PiS will stop the pi processes. Session files stay on disk and can be resumed.",
 				Buttons:            []string{"Cancel", "Quit and Stop"},
 				DefaultButton:      0,
 				CancelButton:       0,
@@ -133,10 +133,10 @@ var (
 func openWindow() {
 	pageURL := "/"
 	if mygo.IsDev() {
-		if session := os.Getenv("PI_MYGO_OPEN_SESSION"); session != "" {
+		if session := os.Getenv("PIS_OPEN_SESSION"); session != "" {
 			pageURL = "/?session=" + url.QueryEscape(session)
 		}
-		if prompt := os.Getenv("PI_MYGO_DEV_PROMPT"); prompt != "" {
+		if prompt := os.Getenv("PIS_DEV_PROMPT"); prompt != "" {
 			sep := "?"
 			if strings.Contains(pageURL, "?") {
 				sep = "&"
@@ -145,7 +145,7 @@ func openWindow() {
 		}
 	}
 	win := mygo.NewWindow(mygo.WindowOptions{
-		Title:                "Pi Mygo",
+		Title:                "PiS",
 		URL:                  pageURL,
 		Width:                1320,
 		Height:               860,

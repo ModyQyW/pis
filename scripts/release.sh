@@ -5,12 +5,12 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
-if [ -z "${PI_MYGO_VERSION:-}" ]; then
-  echo "release: set PI_MYGO_VERSION (for example 0.2.0)" >&2
+if [ -z "${PIS_VERSION:-}" ]; then
+  echo "release: set PIS_VERSION (for example 0.2.0)" >&2
   exit 2
 fi
-PI_MYGO_VERSION=${PI_MYGO_VERSION#v}
-export PI_MYGO_VERSION
+PIS_VERSION=${PIS_VERSION#v}
+export PIS_VERSION
 
 if [ -n "${MYGO_UPDATER_PRIVATE_KEY_FILE:-}" ]; then
   if [ ! -f "$MYGO_UPDATER_PRIVATE_KEY_FILE" ]; then
@@ -21,10 +21,10 @@ if [ -n "${MYGO_UPDATER_PRIVATE_KEY_FILE:-}" ]; then
   export MYGO_UPDATER_PRIVATE_KEY
 fi
 
-if [ -n "${PI_MYGO_UPDATE_PUBLIC_KEY:-}" ] &&
-  [ -z "${PI_MYGO_UPDATE_URL:-}" ] &&
-  [ -z "${PI_MYGO_UPDATE_GITHUB:-}" ]; then
-  echo "release: set PI_MYGO_UPDATE_URL or PI_MYGO_UPDATE_GITHUB with the public key" >&2
+if [ -n "${PIS_UPDATE_PUBLIC_KEY:-}" ] &&
+  [ -z "${PIS_UPDATE_URL:-}" ] &&
+  [ -z "${PIS_UPDATE_GITHUB:-}" ]; then
+  echo "release: set PIS_UPDATE_URL or PIS_UPDATE_GITHUB with the public key" >&2
   exit 2
 fi
 
@@ -43,5 +43,5 @@ if [ -z "${MYGO_UPDATER_PRIVATE_KEY:-}" ]; then
   echo "release: no updater private key; update archives will be skipped" >&2
 fi
 
-echo "release: building $PI_MYGO_VERSION"
+echo "release: building $PIS_VERSION"
 exec go tool mygo build "$@"

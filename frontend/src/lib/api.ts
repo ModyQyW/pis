@@ -25,7 +25,7 @@ import {
   type Workspace,
   type Worktree,
 } from "../mygo";
-import { mockBootstrap, mockDiff, mockGitStatus, mockModels, mockStart, mockSummary, mockTranscript, mockTree } from "./mock";
+import { mockBootstrap, mockDiff, mockGitStatus, mockModels, mockStart, mockSummary, mockTranscript, mockTree, setMockLanguage } from "./mock";
 
 /** True when the page is running inside the mygo shell. */
 export const insideShell = isMyGo();
@@ -78,7 +78,10 @@ export const api = {
     await Desktop.setTheme(theme);
   },
   async setPreferences(p: import("../mygo").Preferences): Promise<void> {
-    if (!insideShell) return;
+    if (!insideShell) {
+      if (p.language) setMockLanguage(p.language);
+      return;
+    }
     await Desktop.setPreferences(p);
   },
   async notify(id: string, title: string, body: string): Promise<void> {

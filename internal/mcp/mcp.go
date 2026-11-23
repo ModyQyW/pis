@@ -11,7 +11,7 @@ import (
 	"sort"
 	"strings"
 
-	"pi-mygo/internal/sessions"
+	"pis/internal/sessions"
 )
 
 // Service is the bound MCP configuration API.

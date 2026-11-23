@@ -1,5 +1,5 @@
 /**
- * Pi Mygo's bridge into pi's RPC mode.
+ * PiS's bridge into pi's RPC mode.
  *
  * Loaded with `-e` for every session. It only fills gaps in the RPC protocol:
  * session-tree navigation, plan mode, and optional smart approvals. It never
@@ -7,15 +7,15 @@
  * extension. All commands are namespaced `mygo-*`.
  *
  * Env:
- *   PI_MYGO_GUARD      off | smart | ask | allow   (default off)
- *   PI_MYGO_WORKSPACE  absolute project directory
+ *   PIS_GUARD      off | smart | ask | allow   (default off)
+ *   PIS_WORKSPACE  absolute project directory
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { dirname, isAbsolute, relative, resolve } from "node:path";
 import { homedir } from "node:os";
 
-const POLICY = (process.env.PI_MYGO_GUARD || "off") as "off" | "smart" | "ask" | "allow";
-const WORKSPACE = process.env.PI_MYGO_WORKSPACE || process.cwd();
+const POLICY = (process.env.PIS_GUARD || "off") as "off" | "smart" | "ask" | "allow";
+const WORKSPACE = process.env.PIS_WORKSPACE || process.cwd();
 const PLAN_STATUS = "mygo:plan";
 const GUARD_STATUS = "mygo:guard";
 
@@ -125,7 +125,7 @@ export default function (pi: ExtensionAPI) {
   };
 
   pi.registerCommand("mygo-navigate", {
-    description: "Internal: move within the session tree (used by Pi Mygo)",
+    description: "Internal: move within the session tree (used by PiS)",
     handler: async (args: string, ctx: any) => {
       const [targetId, mode] = args.trim().split(/\s+/);
       if (!targetId) {
@@ -139,7 +139,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand("mygo-plan", {
-    description: "Turn read-only plan mode on or off (used by Pi Mygo)",
+    description: "Turn read-only plan mode on or off (used by PiS)",
     handler: async (args: string, ctx: any) => {
       const next = args.trim().toLowerCase();
       await ctx.waitForIdle?.();

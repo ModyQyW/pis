@@ -62,15 +62,15 @@ jobs:
         shell: bash
         run: |
           v="${{ github.event.inputs.version || github.ref_name }}"
-          echo "PI_MYGO_VERSION=${v#v}" >> "$GITHUB_ENV"
+          echo "PIS_VERSION=${v#v}" >> "$GITHUB_ENV"
       - name: Verify update signing configuration
         shell: bash
         env:
-          PI_MYGO_UPDATE_PUBLIC_KEY: ${{ vars.PI_MYGO_UPDATE_PUBLIC_KEY }}
+          PIS_UPDATE_PUBLIC_KEY: ${{ vars.PIS_UPDATE_PUBLIC_KEY }}
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
         run: |
-          if [ -z "$PI_MYGO_UPDATE_PUBLIC_KEY" ]; then
-            echo "::error::Set the repository variable PI_MYGO_UPDATE_PUBLIC_KEY (from scripts/update-keygen.sh)."
+          if [ -z "$PIS_UPDATE_PUBLIC_KEY" ]; then
+            echo "::error::Set the repository variable PIS_UPDATE_PUBLIC_KEY (from scripts/update-keygen.sh)."
             exit 1
           fi
           if [ -z "$MYGO_UPDATER_PRIVATE_KEY" ]; then
@@ -82,12 +82,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MYGO_UPDATER_PRIVATE_KEY: ${{ secrets.MYGO_UPDATER_PRIVATE_KEY }}
-          PI_MYGO_UPDATE_PUBLIC_KEY: ${{ vars.PI_MYGO_UPDATE_PUBLIC_KEY }}
-          PI_MYGO_UPDATE_GITHUB: ${{ vars.PI_MYGO_UPDATE_GITHUB || github.repository }}
+          PIS_UPDATE_PUBLIC_KEY: ${{ vars.PIS_UPDATE_PUBLIC_KEY }}
+          PIS_UPDATE_GITHUB: ${{ vars.PIS_UPDATE_GITHUB || github.repository }}
         run: ./scripts/release.sh -platform "${{ matrix.platform }}" -upload
       - uses: actions/upload-artifact@v7
         with:
-          name: pi-mygo-${{ matrix.name }}
+          name: pis-${{ matrix.name }}
           path: build/**
           if-no-files-found: error
 

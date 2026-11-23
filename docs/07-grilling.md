@@ -118,7 +118,7 @@ deferred until the safety model is proven.
 ### Q9. Language and name
 
 - A. English UI, Chinese README/quickstart, all strings i18n-keyed; app name
-  "Pi Mygo"; repo `pi-mygo`.
+  "PiS"; repo `pis`.
 - B. Chinese-first UI.
 - C. English only, strings inline.
 

@@ -80,7 +80,7 @@ func (m *Manager) Start(provider string, apiKey bool) (Info, error) {
 	cmd.Env = append(os.Environ(),
 		"TERM=xterm-256color",
 		"COLORTERM=truecolor",
-		"PI_MYGO=1",
+		"PIS=1",
 	)
 	ptmx, err := pty.Start(cmd)
 	if err != nil {

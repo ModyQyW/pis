@@ -34,7 +34,7 @@ export function EmptyState({
       <div className="mb-5 flex items-center gap-3">
         <BrandMark size={38} />
         <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-faint">
-          {workspace ? workspace.name : "Pi Mygo"}
+          {workspace ? workspace.name : "PiS"}
         </div>
       </div>
       <h1 className="max-w-[560px] text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.025em]">

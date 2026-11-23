@@ -84,7 +84,7 @@ export function SettingsDialog({
   const copyReport = async () => {
     if (!diag) return;
     const report = [
-      `Pi Mygo ${diag.appVersion}`,
+      `PiS ${diag.appVersion}`,
       `${platformName(diag.platform)} ${diag.arch}`,
       `data: ${diag.dataDir}`,
       `settings: ${diag.settings}`,
@@ -111,7 +111,7 @@ export function SettingsDialog({
             <div>
               <Dialog.Title className="text-[14px] font-semibold">{tr("Settings")}</Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                Pi Mygo {boot.appVersion} · {platformName(boot.platform)}
+                PiS {boot.appVersion} · {platformName(boot.platform)}
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
@@ -213,7 +213,7 @@ export function SettingsDialog({
                 disabled={busy || !boot.settings.notifications}
                 onClick={async () => {
                   try {
-                    await api.notify("test", "Pi Mygo", "Notifications are working.");
+                    await api.notify("test", "PiS", "Notifications are working.");
                   } catch (err) {
                     toast.error(err instanceof Error ? err.message : String(err));
                   }
@@ -226,7 +226,7 @@ export function SettingsDialog({
 
             <Section
               title={tr("Providers")}
-              description={tr("Pi Mygo uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.")}
+              description={tr("PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.")}
             >
               <div className="flex items-center gap-2">
                 <button
@@ -250,7 +250,7 @@ export function SettingsDialog({
               </div>
             </Section>
 
-            <Section title={tr("pi executable")} description={tr("Pi Mygo uses the pi you already have. It never installs or updates it.")}>
+            <Section title={tr("pi executable")} description={tr("PiS uses the pi you already have. It never installs or updates it.")}>
               <div className="flex gap-2">
                 <input
                   value={path}
@@ -297,7 +297,7 @@ export function SettingsDialog({
 
             <Section
               title={tr("Approvals")}
-              description={tr("Pi Mygo can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.")}
+              description={tr("PiS can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.")}
             >
               <div className="flex flex-wrap gap-1.5">
                 {(
@@ -357,7 +357,7 @@ export function SettingsDialog({
                   className="mt-0.5 size-3.5 accent-[var(--brand)]"
                 />
                 <span>
-                  {tr("Use Pi Mygo approvals")}
+                  {tr("Use PiS approvals")}
                   <span className="block text-[10px] text-faint">
                     {boot.guard.detected.length
                       ? tr("Another guard is present ({names}); built-in approvals stay off unless enabled.", { names: boot.guard.detected.join(", ") })

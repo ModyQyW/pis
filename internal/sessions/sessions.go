@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	"pi-mygo/internal/jsonx"
+	"pis/internal/jsonx"
 )
 
 // maxIndexBytes bounds how much of a large session is scanned for its title.

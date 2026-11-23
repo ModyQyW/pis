@@ -4,12 +4,12 @@
 set -eu
 
 cd "$(dirname "$0")/.."
-dest=${1:-"$HOME/Library/Application Support/Pi Mygo/update-keys"}
+dest=${1:-"$HOME/Library/Application Support/PiS/update-keys"}
 
 mkdir -p "$dest"
 chmod 700 "$dest"
 go tool mygo keygen -o "$dest"
 
 printf '\nUpdate keys written to %s\n' "$dest"
-printf 'Set PI_MYGO_UPDATE_PUBLIC_KEY from the .pub file and put the .key file\n'
+printf 'Set PIS_UPDATE_PUBLIC_KEY from the .pub file and put the .key file\n'
 printf 'in the CI secret MYGO_UPDATER_PRIVATE_KEY (or a password manager).\n'

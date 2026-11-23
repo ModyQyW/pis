@@ -1,4 +1,4 @@
-// Package guard detects existing pi permission/safety packages so Pi Mygo's
+// Package guard detects existing pi permission/safety packages so PiS's
 // own approvals do not double-prompt.
 package guard
 

@@ -1,16 +1,16 @@
-# Pi Mygo
+# PiS
 
 A desktop coding agent built on [mygo](https://mygo.run) with
-[pi](https://pi.dev) as the engine.
+[pi](https://pi.dev) as the engine. The S stands for strong.
 
-![Pi Mygo empty state](docs/images/empty.png)
+![PiS empty state](docs/images/empty.png)
 
-Pi Mygo is a small native shell around a rich web UI. It runs your installed
+PiS is a small native shell around a rich web UI. It runs your installed
 pi over RPC, so your existing models, credentials, sessions, skills, prompt
 templates, packages, and extensions are the ones it uses. It does not bundle
 pi, replace pi's data, or install a second agent runtime.
 
-## Status (2026-11-23)
+## Status (2026-11-24)
 
 V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
@@ -18,9 +18,8 @@ streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work; the
 current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs a
 public update feed/key; macOS is ad-hoc signed, so Gatekeeper requires a
-one-time approval. English is the default; Chinese
-is available in Settings. See
-[`docs/03-progress.md`](docs/03-progress.md) for evidence and
+one-time approval. English is the default; Chinese is available in Settings.
+See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
 [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 
 ## What works
@@ -42,7 +41,7 @@ is available in Settings. See
   pi's own trust store is read, never written.
 - **Approvals**: optional Smart / Ask all / Allow all policy, once/session
   grants, no auto-deny. When another guard such as `cc-safety-net` is detected,
-  Pi Mygo's guard stays off unless enabled in Settings.
+  PiS's guard stays off unless enabled in Settings.
 - **Plan mode**: read-only exploration and a plan, mutating tools blocked until
   you turn it off.
 - **Changes and files**: Git branch/status, per-file unified diff, copy patch,
@@ -67,17 +66,17 @@ is available in Settings. See
   quit guard for running sessions, single small binary.
 
 More screenshots: [chat](docs/images/chat.png),
-[approval](docs/images/approval.png), [plan mode](docs/images/plan.png),
-[trust](docs/images/trust.png), [session tree](docs/images/session-tree.png),
-[diff](docs/images/diff.png), [login](docs/images/login.png),
-[Chinese shell](docs/images/zh-chat.png), [Chinese settings](docs/images/zh-settings.png).
+[plan mode](docs/images/plan.png), [trust](docs/images/trust.png),
+[session tree](docs/images/session-tree.png), [diff](docs/images/diff.png),
+[login](docs/images/login.png), [Chinese shell](docs/images/zh-chat.png),
+[Chinese settings](docs/images/zh-settings.png).
 
 ## Requirements
 
 - macOS (arm64 verified; Windows/Linux builds are produced but runtime-untested).
 - Go 1.27.3+ and Bun for building.
-- pi **>= 1.6 < 2** installed and authenticated. Pi Mygo finds it in Settings,
-  `PI_MYGO_PI`, `PATH`, common install locations, then your login shell.
+- pi **>= 1.6 < 2** installed and authenticated. PiS finds it in Settings,
+  `PIS_PI`, `PATH`, common install locations, then your login shell.
   Use `pi auth login` (also available in the app) to connect a provider.
 
 Pi is not bundled. The app is 27.0 MB and the initial DMG is 6.8 MB; pi itself
@@ -94,17 +93,17 @@ Useful environment variables during development:
 
 | Variable | Purpose |
 |---|---|
-| `PI_MYGO_PI` | explicit pi executable |
-| `PI_MYGO_OPEN` | open a workspace on launch |
-| `PI_MYGO_OPEN_SESSION` | open a session file on launch |
-| `PI_MYGO_DEV_PROMPT` | send a prompt after the deep-linked session opens |
-| `PI_MYGO_GUARD_OVERRIDE` | force `off`, `smart`, `ask`, or `allow` for a test |
+| `PIS_PI` | explicit pi executable |
+| `PIS_OPEN` | open a workspace on launch |
+| `PIS_OPEN_SESSION` | open a session file on launch |
+| `PIS_DEV_PROMPT` | send a prompt after the deep-linked session opens |
+| `PIS_GUARD_OVERRIDE` | force `off`, `smart`, `ask`, or `allow` for a test |
 
 ## Build
 
 ```sh
 bun run build
-open "build/darwin-arm64/Pi Mygo.app"
+open "build/darwin-arm64/PiS.app"
 ```
 
 The build is ad-hoc signed and not notarized; macOS may require
@@ -121,7 +120,7 @@ This runs Go build/vet/tests, frontend typecheck/tests, and the production
 frontend build. A real-pi integration test is opt-in:
 
 ```sh
-PI_MYGO_INTEGRATION=1 go test ./internal/agent -run TestStartAndInspectRealPi
+PIS_INTEGRATION=1 go test ./internal/agent -run TestStartAndInspectRealPi
 ```
 
 ## Architecture
@@ -146,7 +145,7 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - The app requires an installed compatible pi. There is no bundled/auto-installer.
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
-  degrade or offer text fallbacks; Pi Mygo does not fake them.
+  degrade or offer text fallbacks; PiS does not fake them.
 - Auto-update is wired through mygo's updater and the release workflow, but the
   repository still needs a public release feed and an update signing key before
   installed apps can update. macOS builds are ad-hoc signed, not notarized;

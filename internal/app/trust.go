@@ -4,9 +4,9 @@ import (
 	"errors"
 	"path/filepath"
 
-	"pi-mygo/internal/sessions"
-	"pi-mygo/internal/settings"
-	"pi-mygo/internal/trust"
+	"pis/internal/sessions"
+	"pis/internal/settings"
+	"pis/internal/trust"
 )
 
 // WorkspaceTrust reports whether project-local pi resources may load.

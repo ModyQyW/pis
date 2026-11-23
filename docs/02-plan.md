@@ -6,7 +6,7 @@ phase. Update `03-progress.md` when a phase starts and ends.
 
 ## 1. Goal
 
-Deliver a macOS desktop coding agent, `Pi Mygo`, built on mygo with pi as the
+Deliver a macOS desktop coding agent, `PiS`, built on mygo with pi as the
 engine. It must feel like a polished native app, not a web page in a box:
 
 - Instant, calm shell; fast transcript; smooth streaming.
@@ -78,7 +78,7 @@ engine. It must feel like a polished native app, not a web page in a box:
 10. **Platform**
     - macOS menus, traffic lights, notifications, Dock, single instance.
     - Graceful quit with running sessions (warn), child cleanup.
-    - Logs under `~/Library/Logs/Pi Mygo`; diagnostics panel.
+    - Logs under `~/Library/Logs/PiS`; diagnostics panel.
 11. **Delivery**
     - `bun run build` → `.app` + `.dmg` (unsigned) in `build/`.
     - `go test ./...`, frontend typecheck/lint/tests, UI visual QA.
@@ -111,7 +111,7 @@ engine. It must feel like a polished native app, not a web page in a box:
 ## 3. Architecture and file layout
 
 ```
-pi-mygo/
+pis/
 ├── main.go                     app entry, bindings, menu, window
 ├── mygo.config.ts              name/id/version, dev/build commands, dist
 ├── go.mod

@@ -172,7 +172,7 @@ export function App() {
         !document.hasFocus()
       ) {
         void api
-          .notify(session.key, session.name || "Pi Mygo", session.error ? "Run failed" : "Run finished")
+          .notify(session.key, session.name || "PiS", session.error ? "Run failed" : "Run finished")
           .catch(() => {});
       }
     }
@@ -257,7 +257,7 @@ export function App() {
     restoredLast.current = true;
     let last = "";
     try {
-      last = localStorage.getItem("pi-mygo:last-session") ?? "";
+      last = localStorage.getItem("pis:last-session") ?? "";
     } catch {
       return;
     }
@@ -283,7 +283,7 @@ export function App() {
         void refreshSessions();
       } catch {
         try {
-          localStorage.removeItem("pi-mygo:last-session");
+          localStorage.removeItem("pis:last-session");
         } catch {
           // ignore
         }
@@ -777,7 +777,7 @@ export function App() {
       <div className="flex h-full items-center justify-center bg-canvas p-8">
         <div className="w-full max-w-[440px] rounded-xl border border-border bg-surface p-6">
           <BrandMark size={34} />
-          <h1 className="mt-4 text-[16px] font-semibold">{t("Pi Mygo could not start")}</h1>
+          <h1 className="mt-4 text-[16px] font-semibold">{t("PiS could not start")}</h1>
           <p className="mt-2 text-[12px] leading-5 text-subtle">{fatal}</p>
           <button
             type="button"
@@ -796,7 +796,7 @@ export function App() {
       <div className="flex h-full items-center justify-center bg-canvas">
         <div className="flex items-center gap-3 text-[12px] text-subtle">
           <BrandMark size={30} />
-          <span className="pulse-soft">{t("Starting Pi Mygo…")}</span>
+          <span className="pulse-soft">{t("Starting PiS…")}</span>
         </div>
       </div>
     );
@@ -897,7 +897,7 @@ export function App() {
                 <span className="min-w-0 flex-1">
                   {boot.pi.found
                     ? boot.pi.error || `pi ${boot.pi.version} is outside the supported range.`
-                    : "pi was not found. Pi Mygo runs the pi you install; it does not bundle it."}
+                    : "pi was not found. PiS runs the pi you install; it does not bundle it."}
                 </span>
                 <button
                   type="button"

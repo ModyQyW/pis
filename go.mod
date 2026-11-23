@@ -1,4 +1,4 @@
-module pi-mygo
+module pis
 
 go 1.27.3
 

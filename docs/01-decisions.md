@@ -308,7 +308,7 @@ in Settings. Keep the main shell/dialog strings in `lib/i18n.ts`, keyed by the
 English source text, with a `t()` lookup and `{name}` placeholders. The root
 subscribes to locale changes so non-React memoization does not freeze copy.
 Native shell/updater language follows the same setting via
-`mygo.App.SetLocale`. App name "Pi Mygo" (repo `pi-mygo`).
+`mygo.App.SetLocale`. App name "PiS" (repo `pis`).
 
 **Consequences.** Chinese users get a translated shell, settings, onboarding,
 MCP/worktree managers, and extension dialogs. Tool output, server names, model
@@ -388,7 +388,7 @@ images, and tool output).
 ## ADR-018 — Official Streamdown plugins for code and Mermaid
 
 **Context.** The Markdown surface needs syntax highlighting and Mermaid
-diagrams. Pi Mygo had wrapped Pele for Mermaid and considered a bespoke Shiki
+diagrams. PiS had wrapped Pele for Mermaid and considered a bespoke Shiki
 highlighter to cut language chunks. Streamdown already publishes supported
 `@streamdown/code` and `@streamdown/mermaid` plugins with lazy grammar loading,
 controls, error handling, and a tested integration surface. Maintaining custom

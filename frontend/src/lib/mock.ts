@@ -1,15 +1,20 @@
 import type { Bootstrap, MenuCommand, PiStatus } from "./types";
 
 const now = Date.now();
+let mockLanguage: "en" | "zh" = "en";
+
+export function setMockLanguage(value: string): void {
+  mockLanguage = value === "zh" ? "zh" : "en";
+}
 
 /** A believable first-run state for the browser-only UI dev server. */
 export function mockBootstrap(): Bootstrap {
   return {
-    appName: "Pi Mygo",
+    appName: "PiS",
     appVersion: "0.1.0-dev",
     platform: "darwin",
     arch: "arm64",
-    dataDir: "/Users/you/Library/Application Support/Pi Mygo",
+    dataDir: "/Users/you/Library/Application Support/PiS",
     settings: {
       version: 1,
       theme: "system",
@@ -37,7 +42,7 @@ export function mockBootstrap(): Bootstrap {
       uiFontSize: 14,
       sendOnEnter: true,
       checkUpdates: false,
-      language: "en",
+      language: mockLanguage,
     },
     recents: [
       {

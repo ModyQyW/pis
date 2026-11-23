@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"pi-mygo/internal/settings"
+	"pis/internal/settings"
 )
 
 // Info is the trust state shown to the user.

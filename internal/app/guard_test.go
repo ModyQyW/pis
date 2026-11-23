@@ -3,7 +3,7 @@ package app
 import (
 	"testing"
 
-	"pi-mygo/internal/settings"
+	"pis/internal/settings"
 )
 
 func TestEffectiveGuardPolicy(t *testing.T) {

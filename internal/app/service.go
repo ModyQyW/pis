@@ -1,4 +1,4 @@
-// Package app exposes Pi Mygo's desktop services to the frontend. It owns
+// Package app exposes PiS's desktop services to the frontend. It owns
 // workspace selection, app preferences, and pi discovery; agent sessions live
 // in internal/agent once Phase 1 lands.
 package app
@@ -17,11 +17,11 @@ import (
 
 	"github.com/egoist/mygo"
 
-	"pi-mygo/internal/agent"
-	"pi-mygo/internal/guard"
-	"pi-mygo/internal/piinfo"
-	"pi-mygo/internal/sessions"
-	"pi-mygo/internal/settings"
+	"pis/internal/agent"
+	"pis/internal/guard"
+	"pis/internal/piinfo"
+	"pis/internal/sessions"
+	"pis/internal/settings"
 )
 
 // Workspace is a project the user can chat in.
@@ -371,7 +371,7 @@ func (s *Service) Notify(id, title, body string) error {
 	title = strings.TrimSpace(title)
 	body = strings.TrimSpace(body)
 	if title == "" {
-		title = "Pi Mygo"
+		title = "PiS"
 	}
 	if len([]rune(title)) > 120 {
 		title = string([]rune(title)[:119]) + "…"
@@ -386,7 +386,7 @@ func (s *Service) Notify(id, title, body string) error {
 		ID:    "session:" + strings.TrimSpace(id),
 		Title: title,
 		Body:  body,
-		Group: "Pi Mygo sessions",
+		Group: "PiS sessions",
 	}).Show()
 }
 

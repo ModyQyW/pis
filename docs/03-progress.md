@@ -3,12 +3,17 @@
 Read this before starting work. Update it when a phase starts, when a check
 passes/fails, and when a decision changes. Keep entries short and factual.
 
-## Current gate (2026-11-23)
+## Current gate (2026-11-24)
 
 - Research and decisions: complete (2026-11-22).
+- Rebrand (2026-11-24): product is **PiS**, binary/slug `pis`, bundle ID
+  `dev.pis.app`, env prefix `PIS_`, data directory `PiS`, GitHub repository
+  `ModyQyW/pis`. The S stands for strong. Source, tests, docs, release scripts,
+  and workflow identities were updated; the feature screenshots were refreshed
+  for PiS, except the pre-rebrand real-pi P0 capture.
 - Initial implementation: complete enough for user validation on macOS arm64.
-- Release build: `build/darwin-arm64/Pi Mygo.app` (27.0 MB) and
-  `pi-mygo-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
+- Release build: `build/darwin-arm64/PiS.app` (27.0 MB) and
+  `pis-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff were exercised
   before the Base UI/Streamdown UI migration; the post-migration native session
@@ -16,20 +21,20 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Remaining before a wider release: refresh plan/approval screenshots, a public
-  update feed/key, and runtime QA on Windows/Linux. macOS is ad-hoc signed and
-  requires a one-time Gatekeeper approval.
+- Remaining before a wider release: a public update feed/key and runtime QA on
+  Windows/Linux. macOS is ad-hoc signed and requires a one-time Gatekeeper
+  approval.
 
 ### Open validation and performance
 
 - Real-pi UI smoke after the UI migration: **pass** (2026-11-23). A disposable
   real pi session rendered Read, Shell, and Edit tool cards, streamed the final
   answer, and the native development window rendered it. Screenshot:
-  `docs/images/real-pi.png`.
+  `docs/images/real-pi.png` (pre-rebrand capture).
 - Native window check: **pass** for traffic lights, hidden-inset title bar,
   sidebar, composer, and menus; full-screen and dark theme still follow the
-  same shell and need no code change. Plan and approval screenshots still
-  predate the UI migration; the trust dialog is current.
+  same shell and need no code change. Plan and trust screenshots are refreshed
+  for PiS; the approval screenshot awaits a native recapture.
 - Performance closure: **pass** in a throwaway 1,000-item browser harness.
   Rendering after data is ready took 3 ms; parser was previously 3.5 ms for
   1,000 messages. Cached session switch took 32 ms cold / 19 ms warm; 60
@@ -171,7 +176,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   `scripts/update-keygen.sh` generates the Ed25519 pair outside the repo. The
   no-credential release build and keygen path were exercised; no public feed is
   configured.
-- **Version**: `mygo.config.ts` reads `PI_MYGO_VERSION`; `main.go` no longer
+- **Version**: `mygo.config.ts` reads `PIS_VERSION`; `main.go` no longer
   hard-codes 0.1.0. Local builds still default to 0.1.0.
 
 ### Transcript virtualization and dependencies

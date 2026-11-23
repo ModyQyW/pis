@@ -2,7 +2,7 @@
 
 ## 0.1.0
 
-- Initial macOS arm64 build of Pi Mygo.
+- Initial macOS arm64 build of PiS.
 - Real pi sessions, streaming transcript, tool cards, approvals, plan mode,
   session tree, changes, and extensions.
 - TanStack Virtual transcript, Streamdown code/Mermaid plugins, and native

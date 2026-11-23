@@ -89,8 +89,8 @@ type Store = {
 
 const now = () => Date.now();
 
-const DRAFT_PREFIX = "pi-mygo:draft:";
-const LAST_SESSION = "pi-mygo:last-session";
+const DRAFT_PREFIX = "pis:draft:";
+const LAST_SESSION = "pis:last-session";
 
 function draftKey(session: ChatSession): string {
   return DRAFT_PREFIX + (session.path || session.appId || session.key);

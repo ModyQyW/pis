@@ -223,7 +223,7 @@ sessions even if pi normally writes usage.
 **Symptom.** Editing frontend code reloads the webview; the active session
 returns to the home state because the store is in memory.
 **Rule.** Do not treat this as production behavior. For QA, relaunch with the
-dev deep link (`PI_MYGO_OPEN_SESSION` / `?session=`). A production reload should
+dev deep link (`PIS_OPEN_SESSION` / `?session=`). A production reload should
 eventually restore the last session from app state.
 
 ### P-037 — `--session` resume with crafted history can break extensions
@@ -274,7 +274,7 @@ does not help a user decide.
 ### P-044 — Trust decisions are app-owned but pi-compatible
 **Symptom.** RPC has no trust UI; without a flag project resources silently do
 not load.
-**Rule.** Read pi's `trust.json`, keep Pi Mygo's decision in app settings, and
+**Rule.** Read pi's `trust.json`, keep PiS's decision in app settings, and
 pass `--approve` only after consent. Never write pi's trust file.
 
 ### P-045 — Q6 extension conflicts
@@ -372,8 +372,8 @@ renderer uses. Prefer a direct version that matches the consumer when the
 duplicate has no benefit.
 
 ### P-056 — macOS symlinked workspace paths create duplicate projects
-**Symptom.** Opening `/tmp/pi-mygo-p0` added one project, then opening its
-real pi session (which records `/private/tmp/pi-mygo-p0`) added a second project
+**Symptom.** Opening `/tmp/pis-p0` added one project, then opening its
+real pi session (which records `/private/tmp/pis-p0`) added a second project
 with the same name.
 **Rule.** Canonicalize workspace paths before comparison and persistence:
 `filepath.Abs`, then `filepath.EvalSymlinks`, then `os.Stat`. Deduplicate
@@ -425,3 +425,12 @@ reader had not delivered the final `got:hello`.
 drain (bounded, in case a child holds the pty) before closing `ptmx` and
 emitting the exit event. A login window must not disappear before its last
 line is visible.
+
+### P-062 — A product rename changes the app data directory
+**Symptom.** The PiS build opens with default preferences and no trust
+decisions because mygo derives the user data path from the display name; the
+old `Pi Mygo` directory is still on disk.
+**Rule.** Treat data migration as a separate, explicit decision. The rebrand
+leaves the old directory untouched instead of deleting or half-merging it; a
+future migration can copy only settings, trust, and window state. Do not point
+two app identities at the same directory.

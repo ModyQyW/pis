@@ -7,9 +7,9 @@ import (
 )
 
 func TestReadRealSession(t *testing.T) {
-	path := os.Getenv("PI_MYGO_SESSION_FILE")
+	path := os.Getenv("PIS_SESSION_FILE")
 	if path == "" {
-		t.Skip("set PI_MYGO_SESSION_FILE to a real pi session")
+		t.Skip("set PIS_SESSION_FILE to a real pi session")
 	}
 	start := time.Now()
 	tr, err := Read(path)
@@ -23,9 +23,9 @@ func TestReadRealSession(t *testing.T) {
 }
 
 func TestListRealWorkspace(t *testing.T) {
-	cwd := os.Getenv("PI_MYGO_WORKSPACE")
+	cwd := os.Getenv("PIS_WORKSPACE")
 	if cwd == "" {
-		t.Skip("set PI_MYGO_WORKSPACE to a real project")
+		t.Skip("set PIS_WORKSPACE to a real project")
 	}
 	start := time.Now()
 	list, err := List(cwd, 50)

@@ -210,7 +210,7 @@ export function RightPanel({
         open={Boolean(revertPath)}
         onOpenChange={(next) => !next && setRevertPath(null)}
         title={t("Revert {path}?", { path: revertPath ?? "file" })}
-        message={t("This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo.")}
+        message={t("This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by PiS.")}
         confirmLabel={t("Revert file")}
         danger
         onConfirm={async () => {

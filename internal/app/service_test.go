@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"pi-mygo/internal/settings"
+	"pis/internal/settings"
 )
 
 func TestNormalizeDirResolvesSymlinks(t *testing.T) {

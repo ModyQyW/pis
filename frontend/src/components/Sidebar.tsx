@@ -45,7 +45,7 @@ export function Sidebar({
           <BrandMark size={26} />
           <div className="min-w-0">
             <div className="truncate text-[13px] font-semibold tracking-[-0.01em]">
-              Pi Mygo
+              PiS
             </div>
             <div className="truncate text-[10.5px] text-faint">
               {t("desktop coding agent")}

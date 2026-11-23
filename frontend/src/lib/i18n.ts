@@ -94,8 +94,8 @@ const zh: Record<string, string> = {
   "Revert file": "还原文件",
   "Revert to HEAD": "还原到 HEAD",
   "File reverted": "文件已还原",
-  "This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo.":
-    "这会从 HEAD 恢复文件，并丢弃已暂存和未暂存的更改。Pi Mygo 无法撤销。",
+  "This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by PiS.":
+    "这会从 HEAD 恢复文件，并丢弃已暂存和未暂存的更改。PiS 无法撤销。",
   "Desktop notifications": "桌面通知",
   "Notify when a background run finishes. The setting is off if the system does not allow notifications.":
     "后台运行结束时通知。系统不允许通知时此设置不会生效。",
@@ -105,26 +105,26 @@ const zh: Record<string, string> = {
   "TUI widgets are off by default because they are designed for a terminal, not this layout.":
     "TUI 组件默认关闭，因为它们是为终端设计的，不适合此布局。",
   Providers: "提供商",
-  "Pi Mygo uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.":
-    "Pi Mygo 使用 pi 自己的凭据。登录运行 pi 的终端登录流程，应用本身不保存任何凭据。",
+  "PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.":
+    "PiS 使用 pi 自己的凭据。登录运行 pi 的终端登录流程，应用本身不保存任何凭据。",
   "Sign in to a provider…": "登录提供商…",
   "MCP servers…": "MCP 服务器…",
   "Credentials live in pi's auth store": "凭据保存在 pi 的授权存储中",
   "pi executable": "pi 可执行文件",
-  "Pi Mygo uses the pi you already have. It never installs or updates it.":
-    "Pi Mygo 使用你已有的 pi，不会安装或更新它。",
+  "PiS uses the pi you already have. It never installs or updates it.":
+    "PiS 使用你已有的 pi，不会安装或更新它。",
   "Auto-detect pi": "自动检测 pi",
   "Use path": "使用此路径",
   Check: "检查",
   "Looking for pi…": "正在查找 pi…",
   "pi was not found": "未找到 pi",
   Approvals: "审批",
-  "Pi Mygo can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.":
-    "Pi Mygo 可在破坏性或工作区外操作前询问。除非你在此启用，否则不会替换已有防护。",
+  "PiS can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.":
+    "PiS 可在破坏性或工作区外操作前询问。除非你在此启用，否则不会替换已有防护。",
   Smart: "智能",
   "Ask all": "全部询问",
   "Allow all": "全部允许",
-  "Use Pi Mygo approvals": "使用 Pi Mygo 审批",
+  "Use PiS approvals": "使用 PiS 审批",
   "Another guard is present (cc-safety-net); built-in approvals stay off unless enabled.":
     "检测到另一个防护（cc-safety-net）；除非启用，否则内置审批保持关闭。",
   "Close settings": "关闭设置",
@@ -175,9 +175,9 @@ const zh: Record<string, string> = {
   Stop: "停止",
   Send: "发送",
   "Connect a provider to start": "连接提供商以开始",
-  "Starting Pi Mygo…": "正在启动 Pi Mygo…",
+  "Starting PiS…": "正在启动 PiS…",
   "Try again": "重试",
-  "Pi Mygo could not start": "Pi Mygo 无法启动",
+  "PiS could not start": "PiS 无法启动",
   "Locate pi": "定位 pi",
   "Install guide": "安装指南",
   "No models are available. Connect a provider in pi to start.":
@@ -215,14 +215,14 @@ const zh: Record<string, string> = {
   "This folder contains pi resources that can run code or change how the agent behaves. Trusting it lets pi load them for sessions in this project.":
     "此文件夹包含可运行代码或改变 agent 行为的 pi 资源。信任后，pi 会在此项目的会话中加载它们。",
   "Resources found": "发现的资源",
-  "The decision is stored by Pi Mygo, not written to pi's trust store. Existing sessions keep their current trust until restarted.":
-    "决定由 Pi Mygo 保存，不会写入 pi 的信任存储。现有会话在重启前保持当前信任状态。",
+  "The decision is stored by PiS, not written to pi's trust store. Existing sessions keep their current trust until restarted.":
+    "决定由 PiS 保存，不会写入 pi 的信任存储。现有会话在重启前保持当前信任状态。",
   "Don't trust": "不信任",
   "Trust project": "信任项目",
   "Rename session": "重命名会话",
   "Close rename dialog": "关闭重命名对话框",
-  "The name appears in pi's session selector and Pi Mygo.":
-    "名称会显示在 pi 的会话选择器和 Pi Mygo 中。",
+  "The name appears in pi's session selector and PiS.":
+    "名称会显示在 pi 的会话选择器和 PiS 中。",
   Cancel: "取消",
   Save: "保存",
   "Session actions": "会话操作",
@@ -243,8 +243,8 @@ const zh: Record<string, string> = {
   "This request may resolve automatically after {seconds}s.":
     "此请求可能在 {seconds} 秒后自动结束。",
   "Connect a provider": "连接提供商",
-  "Runs pi's own login. Pi Mygo does not store or log credentials.":
-    "运行 pi 自己的登录流程。Pi Mygo 不会保存或记录凭据。",
+  "Runs pi's own login. PiS does not store or log credentials.":
+    "运行 pi 自己的登录流程。PiS 不会保存或记录凭据。",
   "Close login": "关闭登录",
   Provider: "提供商",
   "anthropic, openai, google, openrouter…": "anthropic、openai、google、openrouter…",

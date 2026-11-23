@@ -1,4 +1,4 @@
-// Package settings stores Pi Mygo's own preferences. It never touches pi's
+// Package settings stores PiS's own preferences. It never touches pi's
 // configuration or session files.
 package settings
 
@@ -79,7 +79,7 @@ type Permissions struct {
 	Policy PermissionPolicy `json:"policy"`
 	// Disabled lets a user rely on another guard extension.
 	Disabled bool `json:"disabled"`
-	// Force enables Pi Mygo's guard even when another guard is detected.
+	// Force enables PiS's guard even when another guard is detected.
 	Force bool `json:"force"`
 }
 

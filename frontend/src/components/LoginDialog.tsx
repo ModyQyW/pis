@@ -138,7 +138,7 @@ export function LoginDialog({
                 {t("Connect a provider")}
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                {t("Runs pi's own login. Pi Mygo does not store or log credentials.")}
+                {t("Runs pi's own login. PiS does not store or log credentials.")}
               </Dialog.Description>
             </div>
             <button

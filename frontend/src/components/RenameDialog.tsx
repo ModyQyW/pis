@@ -51,7 +51,7 @@ export function RenameDialog({
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-1 text-[10.5px] text-faint">
-            {t("The name appears in pi's session selector and Pi Mygo.")}
+            {t("The name appears in pi's session selector and PiS.")}
           </Dialog.Description>
           <input
             autoFocus

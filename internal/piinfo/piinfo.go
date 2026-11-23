@@ -65,7 +65,7 @@ func Compatible(v Version) bool {
 }
 
 // Discover finds pi. explicit is the user's configured path, if any.
-// It checks the explicit path, PI_MYGO_PI, PATH, and common install locations.
+// It checks the explicit path, PIS_PI, PATH, and common install locations.
 // Login-shell PATH resolution is added by the caller when this fails.
 func Discover(ctx context.Context, explicit string) Status {
 	type candidate struct {
@@ -76,7 +76,7 @@ func Discover(ctx context.Context, explicit string) Status {
 	if explicit != "" {
 		candidates = append(candidates, candidate{explicit, "settings"})
 	}
-	if env := os.Getenv("PI_MYGO_PI"); env != "" {
+	if env := os.Getenv("PIS_PI"); env != "" {
 		candidates = append(candidates, candidate{env, "environment"})
 	}
 	if p, err := exec.LookPath("pi"); err == nil {
