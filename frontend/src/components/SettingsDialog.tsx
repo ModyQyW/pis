@@ -6,6 +6,7 @@ import { toast } from "../lib/toast";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { platformName } from "../lib/format";
+import { t as tr } from "../lib/i18n";
 import type { Bootstrap, Diagnostics, Theme } from "../lib/types";
 
 export function SettingsDialog({
@@ -108,7 +109,7 @@ export function SettingsDialog({
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(720px,calc(100vh-64px))] w-[min(720px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
             <div>
-              <Dialog.Title className="text-[14px] font-semibold">Settings</Dialog.Title>
+              <Dialog.Title className="text-[14px] font-semibold">{tr("Settings")}</Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[11px] text-faint">
                 Pi Mygo {boot.appVersion} · {platformName(boot.platform)}
               </Dialog.Description>
@@ -117,7 +118,7 @@ export function SettingsDialog({
               <button
                 type="button"
                 className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close settings"
+                aria-label={tr("Close settings")}
               >
                 <X size={15} />
               </button>
@@ -125,25 +126,44 @@ export function SettingsDialog({
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
-            <Section title="Appearance">
+            <Section title={tr("Appearance")}>
               <div className="flex gap-1.5">
-                {(["system", "light", "dark"] as const).map((t) => (
+                {(["system", "light", "dark"] as const).map((option) => (
                   <button
-                    key={t}
+                    key={option}
                     type="button"
-                    onClick={() => onTheme(t)}
+                    onClick={() => onTheme(option)}
                     className={cn(
                       "flex h-8 items-center gap-1.5 rounded-md border px-3 text-[11.5px] capitalize transition-colors",
-                      theme === t
+                      theme === option
                         ? "border-brand/40 bg-brand-soft text-brand"
                         : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    {theme === t ? <Check size={12} /> : null}
-                    {t}
+                    {theme === option ? <Check size={12} /> : null}
+                    {tr(option.charAt(0).toUpperCase() + option.slice(1))}
                   </button>
                 ))}
               </div>
+              <label className="mt-2.5 flex items-center gap-2 text-[11px] text-subtle">
+                <span>{tr("Language")}</span>
+                <select
+                  value={boot.settings.language === "zh" ? "zh" : "en"}
+                  onChange={async (e) => {
+                    setBusy(true);
+                    try {
+                      await api.setPreferences({ language: e.target.value });
+                      onReload();
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                  className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                >
+                  <option value="en">English</option>
+                  <option value="zh">中文</option>
+                </select>
+              </label>
               <label className="mt-2.5 flex items-start gap-2 text-[11px] leading-4 text-subtle">
                 <input
                   type="checkbox"
@@ -160,10 +180,9 @@ export function SettingsDialog({
                   className="mt-0.5 size-3.5 accent-[var(--brand)]"
                 />
                 <span>
-                  Show raw extension widgets
+                  {tr("Show raw extension widgets")}
                   <span className="block text-[10px] text-faint">
-                    TUI widgets are off by default because they are designed for a
-                    terminal, not this layout.
+                    {tr("TUI widgets are off by default because they are designed for a terminal, not this layout.")}
                   </span>
                 </span>
               </label>
@@ -183,10 +202,9 @@ export function SettingsDialog({
                   className="mt-0.5 size-3.5 accent-[var(--brand)]"
                 />
                 <span>
-                  Desktop notifications
+                  {tr("Desktop notifications")}
                   <span className="block text-[10px] text-faint">
-                    Notify when a background run finishes. The setting is off if
-                    the system does not allow notifications.
+                    {tr("Notify when a background run finishes. The setting is off if the system does not allow notifications.")}
                   </span>
                 </span>
               </label>
@@ -202,13 +220,13 @@ export function SettingsDialog({
                 }}
                 className="mt-2 h-7 rounded-md border border-border px-2.5 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
               >
-                Test notification
+                {tr("Test notification")}
               </button>
             </Section>
 
             <Section
-              title="Providers"
-              description="Pi Mygo uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself."
+              title={tr("Providers")}
+              description={tr("Pi Mygo uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.")}
             >
               <div className="flex items-center gap-2">
                 <button
@@ -216,7 +234,7 @@ export function SettingsDialog({
                   onClick={onLogin}
                   className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
                 >
-                  Sign in to a provider…
+                  {tr("Sign in to a provider…")}
                 </button>
                 <button
                   type="button"
@@ -224,20 +242,20 @@ export function SettingsDialog({
                   disabled={!onMCP}
                   className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
                 >
-                  MCP servers…
+                  {tr("MCP servers…")}
                 </button>
                 <span className="text-[10.5px] text-faint">
-                  {boot.pi.compatible ? "Credentials live in pi's auth store" : "Locate pi first"}
+                  {boot.pi.compatible ? tr("Credentials live in pi's auth store") : tr("Locate pi first")}
                 </span>
               </div>
             </Section>
 
-            <Section title="pi executable" description="Pi Mygo uses the pi you already have. It never installs or updates it.">
+            <Section title={tr("pi executable")} description={tr("Pi Mygo uses the pi you already have. It never installs or updates it.")}>
               <div className="flex gap-2">
                 <input
                   value={path}
                   onChange={(e) => setPath(e.target.value)}
-                  placeholder="Auto-detect pi"
+                  placeholder={tr("Auto-detect pi")}
                   className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
                   spellCheck={false}
                 />
@@ -247,7 +265,7 @@ export function SettingsDialog({
                   onClick={savePath}
                   className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
-                  Use path
+                  {tr("Use path")}
                 </button>
                 <button
                   type="button"
@@ -256,7 +274,7 @@ export function SettingsDialog({
                   className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
                   <RefreshCw size={12} />
-                  Check
+                  {tr("Check")}
                 </button>
               </div>
               <div className="mt-2 flex items-center gap-2 text-[11px] text-faint">
@@ -267,10 +285,10 @@ export function SettingsDialog({
                   )}
                 />
                 {boot.pi.checking
-                  ? "Looking for pi…"
+                  ? tr("Looking for pi…")
                   : boot.pi.found
                     ? `pi ${boot.pi.version} · ${boot.pi.path}`
-                    : "pi was not found"}
+                    : tr("pi was not found")}
               </div>
               {boot.pi.error ? (
                 <p className="mt-1.5 text-[11px] leading-4 text-danger">{boot.pi.error}</p>
@@ -278,8 +296,8 @@ export function SettingsDialog({
             </Section>
 
             <Section
-              title="Approvals"
-              description="Pi Mygo can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here."
+              title={tr("Approvals")}
+              description={tr("Pi Mygo can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.")}
             >
               <div className="flex flex-wrap gap-1.5">
                 {(
@@ -312,7 +330,7 @@ export function SettingsDialog({
                         : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    {label}
+                    {tr(label)}
                   </button>
                 ))}
               </div>
@@ -339,23 +357,22 @@ export function SettingsDialog({
                   className="mt-0.5 size-3.5 accent-[var(--brand)]"
                 />
                 <span>
-                  Use Pi Mygo approvals
+                  {tr("Use Pi Mygo approvals")}
                   <span className="block text-[10px] text-faint">
                     {boot.guard.detected.length
-                      ? `Another guard is present (${boot.guard.detected.join(", ")}); built-in approvals stay off unless enabled.`
-                      : "Destructive shell commands, sensitive files, and edits outside the project ask first."}
+                      ? tr("Another guard is present ({names}); built-in approvals stay off unless enabled.", { names: boot.guard.detected.join(", ") })
+                      : tr("Destructive shell commands, sensitive files, and edits outside the project ask first.")}
                   </span>
                 </span>
               </label>
               {boot.guard.detected.length > 0 ? (
                 <p className="mt-1.5 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-[10px] leading-4 text-warning">
-                  Detected: {boot.guard.detected.join(", ")}. Both guards are never
-                  enabled by default.
+                  {tr("Detected: {names}. Both guards are never enabled by default.", { names: boot.guard.detected.join(", ") })}
                 </p>
               ) : null}
             </Section>
 
-            <Section title="Diagnostics" description="Paths and versions only. Prompts and credentials are never included.">
+            <Section title={tr("Diagnostics")} description={tr("Paths and versions only. Prompts and credentials are never included.")}>
               <div className="rounded-lg border border-border bg-canvas p-3 font-mono text-[10.5px] leading-5 text-subtle">
                 <div className="truncate">data {diag?.dataDir ?? boot.dataDir}</div>
                 <div className="truncate">settings {diag?.settings ?? "settings.json"}</div>
@@ -375,7 +392,7 @@ export function SettingsDialog({
                   className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   <Clipboard size={12} />
-                  Copy report
+                  {tr("Copy report")}
                 </button>
                 <button
                   type="button"
@@ -383,7 +400,7 @@ export function SettingsDialog({
                   className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   <FolderOpen size={12} />
-                  Reveal data folder
+                  {tr("Reveal data folder")}
                 </button>
               </div>
             </Section>

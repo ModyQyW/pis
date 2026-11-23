@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import * as Dialog from "@/components/ui/dialog-compat";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 import type { Server as MCPServer } from "../mygo";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -64,7 +65,7 @@ export function MCPDialog({
       setUrl("");
       setDescription("");
       await load();
-      toast.success("MCP server added");
+      toast.success(t("MCP server added"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
@@ -80,17 +81,17 @@ export function MCPDialog({
               <div>
                 <Dialog.Title className="flex items-center gap-2 text-[14px] font-semibold">
                   <Server size={15} className="text-brand" />
-                  MCP servers
+                  {t("MCP servers")}
                 </Dialog.Title>
                 <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                  Edit pi&apos;s mcp.json. pi connects enabled servers at session start.
+                  {t("Edit pi's mcp.json. pi connects enabled servers at session start.")}
                 </Dialog.Description>
               </div>
               <Dialog.Close asChild>
                 <button
                   type="button"
                   className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                  aria-label="Close MCP servers"
+                  aria-label={t("Close MCP servers")}
                 >
                   <X size={15} />
                 </button>
@@ -104,25 +105,25 @@ export function MCPDialog({
                 <>
                   <div className="flex items-center justify-between">
                     <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
-                      Configured
+                      {t("Configured")}
                     </h3>
                     <button
                       type="button"
                       onClick={() => void load()}
                       className="text-[10.5px] text-subtle hover:text-fg"
                     >
-                      Refresh
+                      {t("Refresh")}
                     </button>
                   </div>
                   {loading && servers.length === 0 ? (
                     <div className="flex items-center gap-2 py-8 text-[11px] text-faint">
                       <Loader2 size={13} className="animate-spin" />
-                      Reading mcp.json…
+                      {t("Reading mcp.json…")}
                     </div>
                   ) : error ? (
                     <p className="py-4 text-[11px] leading-5 text-danger">{error}</p>
                   ) : servers.length === 0 ? (
-                    <p className="py-4 text-[11px] text-faint">No MCP servers configured.</p>
+                    <p className="py-4 text-[11px] text-faint">{t("No MCP servers configured.")}</p>
                   ) : (
                     <ul className="mt-2 space-y-1">
                       {servers.map((server) => (
@@ -147,7 +148,7 @@ export function MCPDialog({
                                 )
                             }
                             className="mt-0.5 size-3.5 accent-[var(--brand)]"
-                            aria-label={`Enable ${server.name}`}
+                            aria-label={t("Enable {name}", { name: server.name })}
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
@@ -170,8 +171,8 @@ export function MCPDialog({
                             type="button"
                             onClick={() => setRemove(server)}
                             className="flex size-7 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                            aria-label={`Remove ${server.name}`}
-                            title="Remove"
+                            aria-label={t("Remove {name}", { name: server.name })}
+                            title={t("Remove")}
                           >
                             <Trash2 size={12} />
                           </button>
@@ -181,37 +182,37 @@ export function MCPDialog({
                   )}
 
                   <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
-                    Add a server
+                    {t("Add a server")}
                   </h3>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="server name"
+                      placeholder={t("server name")}
                       className="h-8 rounded-md border border-border bg-canvas px-2.5 text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                     <input
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      placeholder="description (optional)"
+                      placeholder={t("description (optional)")}
                       className="h-8 rounded-md border border-border bg-canvas px-2.5 text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                     <input
                       value={command}
                       onChange={(e) => setCommand(e.target.value)}
-                      placeholder="command (stdio)"
+                      placeholder={t("command (stdio)")}
                       className="h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                     <input
                       value={args}
                       onChange={(e) => setArgs(e.target.value)}
-                      placeholder="arguments"
+                      placeholder={t("arguments")}
                       className="h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                     <input
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
-                      placeholder="or URL (http)"
+                      placeholder={t("or URL (http)")}
                       className="col-span-2 h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                   </div>
@@ -223,7 +224,7 @@ export function MCPDialog({
                         onChange={(e) => setLocal(e.target.checked)}
                         className="size-3.5 accent-[var(--brand)]"
                       />
-                      Project-local (.pi/mcp.json)
+                      {t("Project-local (.pi/mcp.json)")}
                     </label>
                     <button
                       type="button"
@@ -232,12 +233,11 @@ export function MCPDialog({
                       className="ml-auto flex h-7 items-center gap-1.5 rounded-md bg-brand px-2.5 text-[10.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
                     >
                       <Plus size={11} />
-                      Add server
+                      {t("Add server")}
                     </button>
                   </div>
                   <p className={cn("mt-2 text-[10px] leading-4 text-faint")}>
-                    Environment variables, headers, OAuth, and tool exposure can be edited
-                    in mcp.json. Reload the session or run <code>/mcp</code> in pi after changes.
+                    {t("Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.")}
                   </p>
                 </>
               )}
@@ -248,9 +248,9 @@ export function MCPDialog({
       <ConfirmDialog
         open={Boolean(remove)}
         onOpenChange={(next) => !next && setRemove(null)}
-        title={`Remove ${remove?.name ?? "MCP server"}?`}
-        message="This deletes the entry from mcp.json. It does not uninstall the server package."
-        confirmLabel="Remove"
+        title={t("Remove {name}?", { name: remove?.name ?? "MCP server" })}
+        message={t("This deletes the entry from mcp.json. It does not uninstall the server package.")}
+        confirmLabel={t("Remove")}
         danger
         onConfirm={async () => {
           if (!workspace || !remove) return;

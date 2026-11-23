@@ -41,6 +41,7 @@ func main() {
 	}
 
 	app.ApplyTheme(store.Snapshot().Theme)
+	app.ApplyLanguage(store.Snapshot().Language)
 	mgr := agent.NewManager(func(ev agent.Event) { AgentEvent.Broadcast(ev) })
 	if bridgePath, err := bridge.Ensure(dataDir); err == nil {
 		mgr.SetBridgePath(bridgePath)

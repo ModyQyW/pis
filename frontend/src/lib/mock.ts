@@ -37,6 +37,7 @@ export function mockBootstrap(): Bootstrap {
       uiFontSize: 14,
       sendOnEnter: true,
       checkUpdates: false,
+      language: "en",
     },
     recents: [
       {

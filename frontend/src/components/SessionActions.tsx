@@ -10,6 +10,8 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { t } from "../lib/i18n";
+
 export function SessionActions({
   onRename,
   onClone,
@@ -35,8 +37,8 @@ export function SessionActions({
         <button
           type="button"
           className="flex size-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-          aria-label="Session actions"
-          title="Session actions"
+          aria-label={t("Session actions")}
+          title={t("Session actions")}
         >
           <CircleEllipsis size={15} />
         </button>
@@ -47,16 +49,16 @@ export function SessionActions({
           sideOffset={6}
           className="z-50 min-w-[190px] rounded-lg border border-border-strong bg-surface p-1 shadow-xl"
         >
-          <Item icon={Pencil} onSelect={onRename}>Rename session…</Item>
-          <Item icon={GitBranch} onSelect={onClone}>Clone branch</Item>
-          <Item icon={ListTree} onSelect={onTree}>Session tree…</Item>
-          <Item icon={Minimize2} onSelect={onCompact}>Compact context</Item>
+          <Item icon={Pencil} onSelect={onRename}>{t("Rename session…")}</Item>
+          <Item icon={GitBranch} onSelect={onClone}>{t("Clone branch")}</Item>
+          <Item icon={ListTree} onSelect={onTree}>{t("Session tree…")}</Item>
+          <Item icon={Minimize2} onSelect={onCompact}>{t("Compact context")}</Item>
           <DropdownMenu.Separator className="my-1 h-px bg-border" />
-          <Item icon={Download} onSelect={onExport}>Export as HTML…</Item>
-          <Item icon={FolderOpen} onSelect={onReveal}>Reveal session file</Item>
+          <Item icon={Download} onSelect={onExport}>{t("Export as HTML…")}</Item>
+          <Item icon={FolderOpen} onSelect={onReveal}>{t("Reveal session file")}</Item>
           <DropdownMenu.Separator className="my-1 h-px bg-border" />
-          <Item icon={Trash2} onSelect={onClose} danger>Close session</Item>
-          <Item icon={Trash2} onSelect={onDelete} danger>Delete session…</Item>
+          <Item icon={Trash2} onSelect={onClose} danger>{t("Close session")}</Item>
+          <Item icon={Trash2} onSelect={onDelete} danger>{t("Delete session…")}</Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
     </DropdownMenu.Root>

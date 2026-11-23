@@ -1,6 +1,7 @@
 import { ArrowRight, CircleAlert, HelpCircle, X } from "lucide-react";
 import { useState } from "react";
 
+import { t } from "../lib/i18n";
 import type { ExtensionDialog, ExtensionUIResponse } from "../lib/pi-types";
 
 export function DialogDock({
@@ -35,16 +36,16 @@ export function DialogDock({
             <div className="flex items-center gap-2">
               <span className="text-[11px] font-medium text-brand">
                 {dialog.method === "confirm"
-                  ? "Approval needed"
+                  ? t("Approval needed")
                   : dialog.method === "select"
-                    ? "Choose an answer"
+                    ? t("Choose an answer")
                     : dialog.method === "editor"
-                      ? "Edit text"
-                      : "Input needed"}
+                      ? t("Edit text")
+                      : t("Input needed")}
               </span>
               {pending > 1 ? (
                 <span className="rounded-full border border-brand/25 px-1.5 py-0.5 text-[9px] text-brand/80">
-                  1 of {pending}
+                  {t("1 of {count}", { count: pending })}
                 </span>
               ) : null}
             </div>
@@ -63,8 +64,8 @@ export function DialogDock({
             type="button"
             onClick={() => onRespond({ cancelled: true })}
             className="flex size-6 shrink-0 items-center justify-center rounded text-faint hover:bg-surface-2 hover:text-fg"
-            aria-label="Cancel request"
-            title="Cancel"
+            aria-label={t("Cancel request")}
+            title={t("Cancel")}
           >
             <X size={13} />
           </button>
@@ -78,14 +79,14 @@ export function DialogDock({
                 onClick={() => onRespond({ confirmed: false })}
                 className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
               >
-                Deny
+                {t("Deny")}
               </button>
               <button
                 type="button"
                 onClick={() => onRespond({ confirmed: true })}
                 className="h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90"
               >
-                Allow
+                {t("Allow")}
               </button>
             </div>
           ) : dialog.method === "select" ? (
@@ -114,7 +115,7 @@ export function DialogDock({
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.nativeEvent.isComposing) submitText();
                   }}
-                  placeholder="Or type your own answer…"
+                  placeholder={t("Or type your own answer…")}
                   className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
                 />
                 <button
@@ -123,7 +124,7 @@ export function DialogDock({
                   onClick={submitText}
                   className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
                 >
-                  Send
+                  {t("Send")}
                 </button>
               </div>
               ) : null}
@@ -145,22 +146,21 @@ export function DialogDock({
                 className="w-full resize-y rounded-md border border-border bg-canvas px-2.5 py-2 text-[11.5px] leading-5 outline-none placeholder:text-faint focus:border-border-strong"
               />
               <div className="mt-2 flex items-center justify-end gap-2">
-                <span className="mr-auto text-[9.5px] text-faint">⌘Enter to send</span>
+                <span className="mr-auto text-[9.5px] text-faint">{t("⌘Enter to send")}</span>
                 <button
                   type="button"
                   disabled={!text.trim()}
                   onClick={submitText}
                   className="h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
                 >
-                  Send
+                  {t("Send")}
                 </button>
               </div>
             </div>
           )}
           {dialog.timeout ? (
             <p className="mt-2 text-[9.5px] text-faint">
-              This request may resolve automatically after{" "}
-              {Math.round(dialog.timeout / 1000)}s.
+              {t("This request may resolve automatically after {seconds}s.", { seconds: Math.round(dialog.timeout / 1000) })}
             </p>
           ) : null}
         </div>

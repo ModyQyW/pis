@@ -1,5 +1,6 @@
 import { ArrowUpRight, Bug, FileSearch, GitPullRequest } from "lucide-react";
 
+import { t } from "../lib/i18n";
 import type { Workspace } from "../lib/types";
 import { BrandMark } from "./BrandMark";
 
@@ -37,12 +38,10 @@ export function EmptyState({
         </div>
       </div>
       <h1 className="max-w-[560px] text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.025em]">
-        What are we building?
+        {t("What are we building?")}
       </h1>
       <p className="mt-3 max-w-[520px] text-[13.5px] leading-6 text-subtle">
-        Pi works in your project folder with your models, skills, and
-        extensions. Describe the outcome; it will inspect, edit, and run
-        commands.
+        {t("Pi works in your project folder with your models, skills, and extensions. Describe the outcome; it will inspect, edit, and run commands.")}
       </p>
 
       <div className="mt-8 grid max-w-[620px] gap-2 sm:grid-cols-3">
@@ -50,14 +49,14 @@ export function EmptyState({
           <button
             key={label}
             type="button"
-            onClick={() => onStarter(prompt)}
+            onClick={() => onStarter(t(prompt))}
             className="group flex flex-col items-start gap-3 rounded-xl border border-border/80 bg-surface/70 p-3.5 text-left transition-colors hover:border-border-strong hover:bg-surface"
           >
             <span className="flex size-7 items-center justify-center rounded-lg bg-surface-2 text-subtle transition-colors group-hover:text-brand">
               <Icon size={14} />
             </span>
             <span className="flex w-full items-start justify-between gap-2">
-              <span className="text-[12px] font-medium leading-4">{label}</span>
+              <span className="text-[12px] font-medium leading-4">{t(label)}</span>
               <ArrowUpRight size={12} className="mt-0.5 shrink-0 text-faint" />
             </span>
           </button>

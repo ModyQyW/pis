@@ -202,6 +202,7 @@ export interface Preferences {
   codeFontSize?: number;
   uiFontSize?: number;
   sendOnEnter?: boolean;
+  language?: string;
   policy?: string;
   guardDisabled?: boolean;
   guardForce?: boolean;
@@ -302,6 +303,7 @@ export interface Settings {
   uiFontSize: number;
   sendOnEnter: boolean;
   checkUpdates: boolean;
+  language: string;
 }
 
 /** StartRequest opens a new session or resumes an existing one. */

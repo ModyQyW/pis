@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import * as Dialog from "@/components/ui/dialog-compat";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
 import type { SearchHit, Summary } from "../mygo";
 
 export type PaletteAction = {
@@ -119,7 +120,7 @@ export function CommandPalette({
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
         <Dialog.Content className="fixed left-1/2 top-[18%] z-50 w-[min(560px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-xl border border-border-strong bg-surface p-0 shadow-2xl outline-none">
-          <Dialog.Title className="sr-only">Command palette</Dialog.Title>
+          <Dialog.Title className="sr-only">{t("Command palette")}</Dialog.Title>
           <div className="flex flex-col">
             <div className="flex items-center gap-2 border-b border-border px-3">
               <Search size={14} className="shrink-0 text-faint" />
@@ -145,7 +146,7 @@ export function CommandPalette({
                     }
                   }
                 }}
-                placeholder="Search commands, sessions, and settings…"
+                placeholder={t("Search commands, sessions, and settings…")}
                 className="h-11 w-full bg-transparent text-[13px] outline-none placeholder:text-faint"
               />
               <kbd className="rounded border border-border px-1.5 py-0.5 text-[9px] text-faint">
@@ -155,13 +156,13 @@ export function CommandPalette({
             <div className="max-h-[320px] overflow-y-auto scroll-thin p-1.5">
               {visible.length === 0 && !searching ? (
                 <div className="px-3 py-8 text-center text-[12px] text-faint">
-                  Nothing found.
+                  {t("Nothing found.")}
                 </div>
               ) : (
                 groups.map((group) => (
                   <div key={group}>
                     <div className="px-2 pb-1 pt-2 text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
-                      {group}
+                      {t(group)}
                     </div>
                     {visible
                       .filter((a) => a.group === group)
@@ -185,7 +186,7 @@ export function CommandPalette({
                           >
                             {Icon ? <Icon size={13} className="mt-0.5 shrink-0 text-faint" /> : null}
                             <span className="min-w-0 flex-1">
-                              <span className="block truncate">{label}</span>
+                              <span className="block truncate">{t(label)}</span>
                               {detail ? (
                                 <span className="mt-0.5 block truncate text-[10.5px] text-faint">
                                   {detail}
@@ -206,7 +207,7 @@ export function CommandPalette({
               {searching ? (
                 <div className="flex items-center gap-2 px-3 py-2 text-[10.5px] text-faint">
                   <Loader2 size={11} className="animate-spin" />
-                  Searching session text…
+                  {t("Searching session text…")}
                 </div>
               ) : null}
             </div>

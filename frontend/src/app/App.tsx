@@ -39,6 +39,7 @@ import { WorktreeDialog } from "../components/WorktreeDialog";
 import { Sidebar } from "../components/Sidebar";
 import { TopBar } from "../components/TopBar";
 import { api, insideShell } from "../lib/api";
+import { setLocale, t } from "../lib/i18n";
 import { buildTranscript } from "../lib/transcript";
 import type { Info as TrustInfo, Summary } from "../mygo";
 import { useChat } from "../store/chat";
@@ -114,6 +115,10 @@ export function App() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (boot) setLocale(boot.settings.language);
+  }, [boot?.settings.language, boot]);
 
   // Development-only deep link: `mygo dev` can open a real session for QA.
   useEffect(() => {
@@ -772,14 +777,14 @@ export function App() {
       <div className="flex h-full items-center justify-center bg-canvas p-8">
         <div className="w-full max-w-[440px] rounded-xl border border-border bg-surface p-6">
           <BrandMark size={34} />
-          <h1 className="mt-4 text-[16px] font-semibold">Pi Mygo could not start</h1>
+          <h1 className="mt-4 text-[16px] font-semibold">{t("Pi Mygo could not start")}</h1>
           <p className="mt-2 text-[12px] leading-5 text-subtle">{fatal}</p>
           <button
             type="button"
             onClick={() => void load()}
             className="mt-5 h-8 rounded-md border border-border px-3 text-[12px] hover:bg-surface-2"
           >
-            Try again
+            {t("Try again")}
           </button>
         </div>
       </div>
@@ -791,7 +796,7 @@ export function App() {
       <div className="flex h-full items-center justify-center bg-canvas">
         <div className="flex items-center gap-3 text-[12px] text-subtle">
           <BrandMark size={30} />
-          <span className="pulse-soft">Starting Pi Mygo…</span>
+          <span className="pulse-soft">{t("Starting Pi Mygo…")}</span>
         </div>
       </div>
     );
@@ -862,7 +867,7 @@ export function App() {
       <main className="flex min-w-0 flex-1 flex-col">
         <TopBar
           workspace={displayWorkspace}
-          title={active?.name || "New chat"}
+          title={active?.name || t("New chat")}
           state={state}
           rightOpen={rightOpen}
           sidebarOpen={sidebarOpen}
@@ -899,14 +904,14 @@ export function App() {
                   onClick={() => setSettingsOpen(true)}
                   className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-[10px] hover:bg-warning/10"
                 >
-                  Locate pi
+                  {t("Locate pi")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void api.openExternal("https://pi.dev/docs/latest/quickstart")}
                   className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-[10px] hover:bg-warning/10"
                 >
-                  Install guide
+                  {t("Install guide")}
                 </button>
               </div>
             ) : null}
@@ -919,7 +924,7 @@ export function App() {
                   onClick={() => useChat.getState().close(active.key)}
                   className="shrink-0 rounded border border-danger/30 px-1.5 py-0.5 text-[10px] hover:bg-danger/10"
                 >
-                  Close
+                  {t("Close")}
                 </button>
               </div>
             ) : null}
@@ -927,14 +932,14 @@ export function App() {
               {active && active.status === "ready" && active.models.length === 0 ? (
               <div className="flex items-center gap-2 border-b border-brand/20 bg-brand-soft/40 px-4 py-2 text-[11px] text-subtle">
                 <span className="min-w-0 flex-1">
-                  No models are available. Connect a provider in pi to start.
+                  {t("No models are available. Connect a provider in pi to start.")}
                 </span>
                 <button
                   type="button"
                   onClick={() => setLoginOpen(true)}
                   className="shrink-0 rounded-md border border-brand/30 bg-surface px-2 py-1 text-[10.5px] text-brand hover:bg-surface-2"
                 >
-                  Connect
+                  {t("Connect")}
                 </button>
               </div>
             ) : null}
@@ -976,7 +981,7 @@ export function App() {
               running={running}
               onStop={stop}
               disabled={!boot.pi.compatible || active?.status === "loading"}
-              modelLabel={active?.model?.name ?? "Choose model"}
+              modelLabel={active?.model?.name ?? t("Choose model")}
               thinking={active?.thinking}
               contextPercent={active?.stats?.contextUsage?.percent ?? null}
               onOpenModelPicker={() => setModelPickerOpen(true)}
@@ -1060,13 +1065,13 @@ export function App() {
       <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title="Delete this session?"
+        title={t("Delete this session?")}
         message={
           active?.path
             ? "The session file moves to the Trash. Your project files are untouched."
             : "There is no live session to delete."
         }
-        confirmLabel="Move to Trash"
+        confirmLabel={t("Move to Trash")}
         danger
         onConfirm={async () => {
           const s = active;

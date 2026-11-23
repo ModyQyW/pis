@@ -2,6 +2,7 @@ import { ChevronRight, Command, PanelRight, Search } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
 import type { RunState, Workspace } from "../lib/types";
 
 const stateLabel: Record<RunState, string> = {
@@ -41,7 +42,7 @@ export function TopBar({
       )}
     >
       <div className="flex min-w-0 items-center gap-1.5 text-[12px]">
-        <span className="truncate text-subtle">{workspace?.name ?? "No project"}</span>
+        <span className="truncate text-subtle">{workspace?.name ?? t("No project")}</span>
         <ChevronRight size={12} className="shrink-0 text-faint" />
         <span className="truncate font-medium text-fg">{title}</span>
       </div>
@@ -49,7 +50,7 @@ export function TopBar({
       <div className="no-drag ml-auto flex items-center gap-1.5">
         {preview ? (
           <span className="mr-1 rounded-full border border-border bg-surface px-2 py-0.5 text-[9.5px] text-faint">
-            Preview
+            {t("Preview")}
           </span>
         ) : null}
         <span
@@ -72,7 +73,7 @@ export function TopBar({
               state === "sleeping" && "bg-faint",
             )}
           />
-          {stateLabel[state]}
+          {t(stateLabel[state])}
         </span>
 
         {sessionActions}
@@ -80,10 +81,10 @@ export function TopBar({
           type="button"
           onClick={onPalette}
           className="flex h-7 items-center gap-2 rounded-md border border-border bg-surface px-2 text-[11px] text-subtle transition-colors hover:border-border-strong hover:text-fg"
-          title="Command palette"
+          title={t("Command palette")}
         >
           <Search size={12} />
-          <span className="hidden sm:inline">Commands</span>
+          <span className="hidden sm:inline">{t("Commands")}</span>
           <span className="ml-1 flex items-center gap-0.5 rounded border border-border/80 px-1 py-0.5 text-[9.5px] text-faint">
             <Command size={9} />K
           </span>
@@ -98,8 +99,8 @@ export function TopBar({
               ? "border-border-strong bg-surface-3 text-fg"
               : "border-transparent text-subtle hover:bg-surface-2 hover:text-fg",
           )}
-          title="Toggle changes panel"
-          aria-label="Toggle changes panel"
+          title={t("Toggle changes panel")}
+          aria-label={t("Toggle changes panel")}
         >
           <PanelRight size={14} />
         </button>

@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
 import { extractTodos, type TodoItem } from "../lib/todos";
 import { toast } from "../lib/toast";
 import type { Hit, Status } from "../mygo";
@@ -89,7 +90,7 @@ export function RightPanel({
       <div className="flex h-[52px] shrink-0 items-center gap-1 border-b border-border/70 px-2">
         <TabButton active={tab === "changes"} onClick={() => setTab("changes")}>
           <GitBranch size={12} />
-          Changes
+          {t("Changes")}
           {changed > 0 ? (
             <span className="ml-0.5 rounded-full bg-surface-3 px-1 text-[9px] tabular-nums text-subtle">
               {changed}
@@ -98,11 +99,11 @@ export function RightPanel({
         </TabButton>
         <TabButton active={tab === "files"} onClick={() => setTab("files")}>
           <FileText size={12} />
-          Files
+          {t("Files")}
         </TabButton>
         <TabButton active={tab === "plan"} onClick={() => setTab("plan")}>
           <ListTodo size={12} />
-          Plan
+          {t("Plan")}
           {todos.length > 0 ? (
             <span className="ml-0.5 rounded-full bg-surface-3 px-1 text-[9px] tabular-nums text-subtle">
               {doneTodos}/{todos.length}
@@ -113,8 +114,8 @@ export function RightPanel({
           type="button"
           onClick={() => setRefresh((v) => v + 1)}
           className="ml-auto flex size-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-          aria-label="Refresh panel"
-          title="Refresh"
+          aria-label={t("Refresh panel")}
+          title={t("Refresh")}
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
         </button>
@@ -122,8 +123,8 @@ export function RightPanel({
           type="button"
           onClick={onClose}
           className="flex size-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-          aria-label="Close panel"
-          title="Close panel"
+          aria-label={t("Close panel")}
+          title={t("Close panel")}
         >
           <PanelRightClose size={14} />
         </button>
@@ -137,10 +138,10 @@ export function RightPanel({
           {status?.behind ? <span className="text-warning">↓{status.behind}</span> : null}
           <span className="ml-auto truncate text-[10px] text-faint">
             {tab === "changes"
-              ? `${changed} changed`
+              ? t("{count} changed", { count: changed })
               : tab === "files"
-                ? `${files.length} files`
-                : `${doneTodos}/${todos.length} steps`}
+                ? t("{count} files", { count: files.length })
+                : t("{done}/{total} steps", { done: doneTodos, total: todos.length })}
           </span>
         </div>
       ) : null}
@@ -151,7 +152,7 @@ export function RightPanel({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Filter files…"
+            placeholder={t("Filter files…")}
             className="h-8 min-w-0 flex-1 bg-transparent text-[11px] outline-none placeholder:text-faint"
           />
         </div>
@@ -159,7 +160,7 @@ export function RightPanel({
 
       <div className="min-h-0 flex-1 overflow-y-auto scroll-thin p-1.5">
         {!workspace ? (
-          <Empty icon={<GitBranch size={15} />} title="No project" detail="Open a project to see changes." />
+          <Empty icon={<GitBranch size={15} />} title={t("No project")} detail={t("Open a project to see changes.")} />
         ) : tab === "changes" ? (
           tabChanges(status, error, loading, setDiffPath, setRevertPath)
         ) : tab === "files" ? (
@@ -188,9 +189,9 @@ export function RightPanel({
       <ConfirmDialog
         open={Boolean(revertPath)}
         onOpenChange={(next) => !next && setRevertPath(null)}
-        title={`Revert ${revertPath ?? "file"}?`}
-        message="This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo."
-        confirmLabel="Revert file"
+        title={t("Revert {path}?", { path: revertPath ?? "file" })}
+        message={t("This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo.")}
+        confirmLabel={t("Revert file")}
         danger
         onConfirm={async () => {
           if (!workspace || !revertPath) return;
@@ -219,14 +220,14 @@ function tabChanges(
     return <Loading />;
   }
   if (error) {
-    return <Empty icon={<GitBranch size={15} />} title="Git error" detail={error} />;
+    return <Empty icon={<GitBranch size={15} />} title={t("Git error")} detail={error} />;
   }
   if (status && !status.isRepo) {
     return (
       <Empty
         icon={<GitBranch size={15} />}
-        title="Not a git repository"
-        detail="Changes are shown for Git projects."
+        title={t("Not a git repository")}
+        detail={t("Changes are shown for Git projects.")}
       />
     );
   }
@@ -234,8 +235,8 @@ function tabChanges(
     return (
       <Empty
         icon={<GitBranch size={15} />}
-        title="No changes"
-        detail="Edits made by pi and your working tree changes appear here."
+        title={t("No changes")}
+        detail={t("Edits made by pi and your working tree changes appear here.")}
       />
     );
   }
@@ -298,7 +299,7 @@ function tabChanges(
 
 function FileList({ files, onOpen }: { files: Hit[]; onOpen: (path: string) => void }) {
   if (files.length === 0) {
-    return <Empty icon={<FileText size={15} />} title="No files" detail="No files match this project." />;
+    return <Empty icon={<FileText size={15} />} title={t("No files")} detail={t("No files match this project.")} />;
   }
   return (
     <ul className="space-y-0.5">
@@ -323,8 +324,8 @@ function TodoList({ todos }: { todos: TodoItem[] }) {
     return (
       <Empty
         icon={<ListTodo size={15} />}
-        title="No plan yet"
-        detail="Plans and todo lists created by pi appear here."
+        title={t("No plan yet")}
+        detail={t("Plans and todo lists created by pi appear here.")}
       />
     );
   }
@@ -364,7 +365,7 @@ function Loading() {
   return (
     <div className="flex items-center justify-center gap-2 py-16 text-[11px] text-faint">
       <Loader2 size={13} className="animate-spin" />
-      Reading changes…
+      {t("Reading changes…")}
     </div>
   );
 }

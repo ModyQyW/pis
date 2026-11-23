@@ -3,6 +3,7 @@ import { Check, RefreshCw, Search, X } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
 import type { Model } from "../mygo";
 import type { ChatSession } from "../store/chat";
 
@@ -61,17 +62,17 @@ export function ModelPickerDialog({
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
               <Dialog.Title className="text-[13.5px] font-semibold">
-                Model & thinking
+                {t("Model & thinking")}
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                Models come from your pi credentials and configuration.
+                {t("Models come from your pi credentials and configuration.")}
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
               <button
                 type="button"
                 className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close model picker"
+                aria-label={t("Close model picker")}
               >
                 <X size={15} />
               </button>
@@ -84,15 +85,15 @@ export function ModelPickerDialog({
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search models…"
+              placeholder={t("Search models…")}
               className="h-9 min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-faint"
             />
             <button
               type="button"
               onClick={() => void onRefresh()}
               className="flex size-6 items-center justify-center rounded text-faint hover:bg-surface-2 hover:text-fg"
-              aria-label="Refresh models"
-              title="Refresh models"
+              aria-label={t("Refresh models")}
+              title={t("Refresh models")}
             >
               <RefreshCw size={12} />
             </button>
@@ -101,8 +102,7 @@ export function ModelPickerDialog({
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-2 py-1.5">
             {grouped.length === 0 ? (
               <div className="px-4 py-12 text-center text-[11.5px] leading-5 text-faint">
-                No models available. Sign in with pi or configure a provider, then
-                refresh.
+                {t("No models available. Sign in with pi or configure a provider, then refresh.")}
               </div>
             ) : (
               grouped.map(([provider, models]) => (
@@ -147,7 +147,7 @@ export function ModelPickerDialog({
           <div className="border-t border-border px-4 py-3">
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
-                Thinking
+                {t("Thinking")}
               </span>
               <div className="flex gap-1">
                 {(session?.thinkingLevels.length
@@ -177,7 +177,7 @@ export function ModelPickerDialog({
                   onChange={(e) => void onToggleAutoCompaction(e.target.checked)}
                   className="size-3.5 accent-[var(--brand)]"
                 />
-                Auto-compact
+                {t("Auto-compact")}
               </label>
             </div>
           </div>

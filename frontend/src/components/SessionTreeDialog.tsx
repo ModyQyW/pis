@@ -3,6 +3,7 @@ import { GitBranch, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { api } from "../lib/api";
+import { t } from "../lib/i18n";
 import { cn } from "../lib/cn";
 import type { Entry } from "../mygo";
 
@@ -69,16 +70,16 @@ export function SessionTreeDialog({
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(680px,calc(100vh-80px))] w-[min(640px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
-              <Dialog.Title className="text-[13.5px] font-semibold">Session tree</Dialog.Title>
+              <Dialog.Title className="text-[13.5px] font-semibold">{t("Session tree")}</Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                Pick a point to continue from. The abandoned branch is kept.
+                {t("Pick a point to continue from. The abandoned branch is kept.")}
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
               <button
                 type="button"
                 className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close session tree"
+                aria-label={t("Close session tree")}
               >
                 <X size={15} />
               </button>
@@ -88,18 +89,18 @@ export function SessionTreeDialog({
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-3 py-2">
             {!sessionId ? (
               <div className="px-2 py-10 text-center text-[11.5px] text-faint">
-                Open a session first.
+                {t("Open a session first.")}
               </div>
             ) : !data && !error ? (
               <div className="flex items-center justify-center gap-2 py-16 text-[11.5px] text-faint">
                 <Loader2 size={14} className="animate-spin" />
-                Reading the tree…
+                {t("Reading the tree…")}
               </div>
             ) : error ? (
               <div className="px-2 py-10 text-center text-[11.5px] text-danger">{error}</div>
             ) : data && data.tree.length === 0 ? (
               <div className="px-2 py-10 text-center text-[11.5px] text-faint">
-                This session has no entries yet.
+                {t("This session has no entries yet.")}
               </div>
             ) : (
               data?.tree.map((node) => (
@@ -123,7 +124,7 @@ export function SessionTreeDialog({
                 onChange={(e) => setSummarize(e.target.checked)}
                 className="size-3.5 accent-[var(--brand)]"
               />
-              Summarize the branch I leave
+              {t("Summarize the branch I leave")}
             </label>
             <button
               type="button"

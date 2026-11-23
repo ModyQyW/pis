@@ -1,0 +1,320 @@
+export type Locale = "en" | "zh";
+
+const zh: Record<string, string> = {
+  "desktop coding agent": "桌面编程助手",
+  "New chat": "新对话",
+  Projects: "项目",
+  Chats: "对话",
+  "Open a project folder": "打开项目文件夹",
+  "No chats yet. Start one above.": "还没有对话。先新建一个。",
+  "Open a project to see its chats.": "打开项目以查看对话。",
+  "Needs input": "需要输入",
+  Working: "运行中",
+  "Starting pi…": "正在启动 pi…",
+  Stopped: "已停止",
+  Open: "打开",
+  Settings: "设置",
+  "Finding pi…": "正在查找 pi…",
+  "pi version unsupported": "不支持的 pi 版本",
+  "pi not found": "未找到 pi",
+  "No project": "未打开项目",
+  Ready: "就绪",
+  Sleeping: "休眠",
+  Error: "错误",
+  Preview: "预览",
+  Commands: "命令",
+  "Command palette": "命令面板",
+  "Toggle changes panel": "显示/隐藏更改面板",
+  "What are we building?": "我们在构建什么？",
+  "Pi works in your project folder with your models, skills, and extensions. Describe the outcome; it will inspect, edit, and run commands.":
+    "pi 在你的项目文件夹中工作，使用你的模型、技能和扩展。描述目标即可；它会检查、修改并运行命令。",
+  "Explain this codebase": "解释这个代码库",
+  "Find and fix a bug": "查找并修复 bug",
+  "Review my changes": "审查我的更改",
+  "Give me a tour of this codebase: the main entry points, the data flow, and where I should start reading.":
+    "带我浏览这个代码库：主要入口、数据流，以及我应该从哪里开始阅读。",
+  "Look for a real bug in this project, explain the root cause, and fix it with a test.":
+    "在这个项目里找一个真实的 bug，解释根因，并用测试修复它。",
+  "Review the current uncommitted changes for correctness, risks, and missing tests.":
+    "审查当前未提交的更改，关注正确性、风险和缺失的测试。",
+  "Ask pi to inspect, change, or explain…": "让 pi 检查、修改或解释…",
+  "Choose model": "选择模型",
+  Plan: "计划",
+  "Enter sends · Shift+Enter newline": "Enter 发送 · Shift+Enter 换行",
+  "Pi can read, edit, and run commands in this project.":
+    "pi 可以读取、编辑并在此项目中运行命令。",
+  Changes: "更改",
+  Files: "文件",
+  "Refresh panel": "刷新面板",
+  "Close panel": "关闭面板",
+  "Filter files…": "筛选文件…",
+  "No changes": "没有更改",
+  "Edits made by pi and your working tree changes appear here.":
+    "pi 的编辑和你的工作区更改会显示在这里。",
+  "Not a git repository": "不是 Git 仓库",
+  "Changes are shown for Git projects.": "更改仅对 Git 项目显示。",
+  "No files": "没有文件",
+  "No files match this project.": "此项目中没有匹配的文件。",
+  "No plan yet": "还没有计划",
+  "Plans and todo lists created by pi appear here.": "pi 创建的计划和待办会显示在这里。",
+  "Search commands, sessions, and settings…": "搜索命令、会话和设置…",
+  "Nothing found.": "没有找到结果。",
+  "Session text": "会话文本",
+  "Searching session text…": "正在搜索会话文本…",
+  "MCP servers": "MCP 服务器",
+  "Edit pi's mcp.json. pi connects enabled servers at session start.":
+    "编辑 pi 的 mcp.json。pi 会在会话启动时连接已启用的服务器。",
+  Configured: "已配置",
+  Refresh: "刷新",
+  "Reading mcp.json…": "正在读取 mcp.json…",
+  "No MCP servers configured.": "还没有配置 MCP 服务器。",
+  "Add a server": "添加服务器",
+  "server name": "服务器名称",
+  "description (optional)": "描述（可选）",
+  "command (stdio)": "命令（stdio）",
+  arguments: "参数",
+  "or URL (http)": "或 URL（http）",
+  "Project-local (.pi/mcp.json)": "项目本地（.pi/mcp.json）",
+  "Add server": "添加服务器",
+  "Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.":
+    "环境变量、请求头、OAuth 和工具暴露可在 mcp.json 中编辑。修改后重新加载会话，或在 pi 中运行 /mcp。",
+  Worktrees: "工作树",
+  "Parallel checkouts for the same repository. Open one as a project.":
+    "同一仓库的并行检出。可将其中一个作为项目打开。",
+  "Reading worktrees…": "正在读取工作树…",
+  "New worktree": "新建工作树",
+  "Absolute path": "绝对路径",
+  "new branch": "新分支",
+  "branch (optional)": "分支（可选）",
+  "Create branch": "创建分支",
+  "Create worktree": "创建工作树",
+  "Open a project first.": "请先打开项目。",
+  "Remove": "移除",
+  "Remove worktree": "移除工作树",
+  "Revert file": "还原文件",
+  "Revert to HEAD": "还原到 HEAD",
+  "File reverted": "文件已还原",
+  "This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by Pi Mygo.":
+    "这会从 HEAD 恢复文件，并丢弃已暂存和未暂存的更改。Pi Mygo 无法撤销。",
+  "Desktop notifications": "桌面通知",
+  "Notify when a background run finishes. The setting is off if the system does not allow notifications.":
+    "后台运行结束时通知。系统不允许通知时此设置不会生效。",
+  "Test notification": "测试通知",
+  "Notifications are working.": "通知工作正常。",
+  "Show raw extension widgets": "显示原始扩展组件",
+  "TUI widgets are off by default because they are designed for a terminal, not this layout.":
+    "TUI 组件默认关闭，因为它们是为终端设计的，不适合此布局。",
+  Providers: "提供商",
+  "Pi Mygo uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.":
+    "Pi Mygo 使用 pi 自己的凭据。登录运行 pi 的终端登录流程，应用本身不保存任何凭据。",
+  "Sign in to a provider…": "登录提供商…",
+  "MCP servers…": "MCP 服务器…",
+  "Credentials live in pi's auth store": "凭据保存在 pi 的授权存储中",
+  "pi executable": "pi 可执行文件",
+  "Pi Mygo uses the pi you already have. It never installs or updates it.":
+    "Pi Mygo 使用你已有的 pi，不会安装或更新它。",
+  "Auto-detect pi": "自动检测 pi",
+  "Use path": "使用此路径",
+  Check: "检查",
+  "Looking for pi…": "正在查找 pi…",
+  "pi was not found": "未找到 pi",
+  Approvals: "审批",
+  "Pi Mygo can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.":
+    "Pi Mygo 可在破坏性或工作区外操作前询问。除非你在此启用，否则不会替换已有防护。",
+  Smart: "智能",
+  "Ask all": "全部询问",
+  "Allow all": "全部允许",
+  "Use Pi Mygo approvals": "使用 Pi Mygo 审批",
+  "Another guard is present (cc-safety-net); built-in approvals stay off unless enabled.":
+    "检测到另一个防护（cc-safety-net）；除非启用，否则内置审批保持关闭。",
+  "Close settings": "关闭设置",
+  "Support report copied": "支持报告已复制",
+  "Could not access the clipboard": "无法访问剪贴板",
+  "Desktop notifications are not available in this build": "此构建不支持桌面通知",
+  "Remove worktree?": "移除工作树？",
+  "This deletes the entry from mcp.json. It does not uninstall the server package.":
+    "这会从 mcp.json 中删除条目，不会卸载服务器包。",
+  Session: "会话",
+  Workspace: "工作区",
+  Preferences: "偏好设置",
+  View: "视图",
+  Help: "帮助",
+  "Open project…": "打开项目…",
+  "Manage worktrees…": "管理工作树…",
+  "Session tree…": "会话树…",
+  "Clone branch": "克隆分支",
+  "Compact context": "压缩上下文",
+  "Rename session…": "重命名会话…",
+  "Connect a provider…": "连接提供商…",
+  "Manage MCP servers…": "管理 MCP 服务器…",
+  "Model & thinking…": "模型与思考…",
+  "Open settings": "打开设置",
+  "Toggle sidebar": "显示/隐藏侧边栏",
+  "Check pi installation": "检查 pi 安装",
+  "Open pi documentation": "打开 pi 文档",
+  "Preview trust dialog": "预览信任对话框",
+  "{count} changed": "{count} 项更改",
+  "{count} files": "{count} 个文件",
+  "{done}/{total} steps": "{done}/{total} 步",
+  "Revert {path}?": "还原 {path}？",
+  "Reading changes…": "正在读取更改…",
+  "Open a project to see changes.": "打开项目以查看更改。",
+  "Git error": "Git 错误",
+  "Pi commands": "pi 命令",
+  "searching…": "搜索中…",
+  "Mention a project file": "提及项目文件",
+  "Attach a file": "附加文件",
+  "Model and thinking": "模型与思考",
+  "Thinking level": "思考级别",
+  "Use the installed /{command} command": "使用已安装的 /{command} 命令",
+  "Plan mode: read-only until you approve": "计划模式：在你批准前只读",
+  Planning: "计划中",
+  "Enter queues · Esc stops": "Enter 排队 · Esc 停止",
+  "Context used": "已用上下文",
+  "Stop run": "停止运行",
+  Stop: "停止",
+  Send: "发送",
+  "Connect a provider to start": "连接提供商以开始",
+  "Starting Pi Mygo…": "正在启动 Pi Mygo…",
+  "Try again": "重试",
+  "Pi Mygo could not start": "Pi Mygo 无法启动",
+  "Locate pi": "定位 pi",
+  "Install guide": "安装指南",
+  "No models are available. Connect a provider in pi to start.":
+    "没有可用模型。请在 pi 中连接提供商后开始。",
+  Connect: "连接",
+  Close: "关闭",
+  "Appearance": "外观",
+  System: "系统",
+  Light: "浅色",
+  Dark: "深色",
+  "Worktree created": "工作树已创建",
+  "Remove {branch}?": "移除 {branch}？",
+  "The worktree directory is removed. Its branch and commits remain in the repository.":
+    "工作树目录会被移除，其分支和提交仍保留在仓库中。",
+  "Remove {name}?": "移除 {name}？",
+  "Enable {name}": "启用 {name}",
+  "Remove {name}": "移除 {name}",
+  "MCP server added": "MCP 服务器已添加",
+  "Session moved to Trash": "会话已移到废纸篓",
+  "Delete this session?": "删除此会话？",
+  "Move to Trash": "移到废纸篓",
+  Language: "语言",
+  Diagnostics: "诊断",
+  "Copy report": "复制报告",
+  "Reveal data folder": "打开数据文件夹",
+  "Paths and versions only. Prompts and credentials are never included.":
+    "仅包含路径和版本，不包含提示词或凭据。",
+  "Destructive shell commands, sensitive files, and edits outside the project ask first.":
+    "破坏性 shell 命令、敏感文件以及项目外编辑都会先询问。",
+  "Another guard is present ({names}); built-in approvals stay off unless enabled.":
+    "检测到另一个防护（{names}）；除非启用，否则内置审批保持关闭。",
+  "Detected: {names}. Both guards are never enabled by default.":
+    "检测到：{names}。两个防护不会同时默认启用。",
+  "Trust this project?": "信任此项目？",
+  "This folder contains pi resources that can run code or change how the agent behaves. Trusting it lets pi load them for sessions in this project.":
+    "此文件夹包含可运行代码或改变 agent 行为的 pi 资源。信任后，pi 会在此项目的会话中加载它们。",
+  "Resources found": "发现的资源",
+  "The decision is stored by Pi Mygo, not written to pi's trust store. Existing sessions keep their current trust until restarted.":
+    "决定由 Pi Mygo 保存，不会写入 pi 的信任存储。现有会话在重启前保持当前信任状态。",
+  "Don't trust": "不信任",
+  "Trust project": "信任项目",
+  "Rename session": "重命名会话",
+  "Close rename dialog": "关闭重命名对话框",
+  "The name appears in pi's session selector and Pi Mygo.":
+    "名称会显示在 pi 的会话选择器和 Pi Mygo 中。",
+  Cancel: "取消",
+  Save: "保存",
+  "Session actions": "会话操作",
+  "Export as HTML…": "导出为 HTML…",
+  "Reveal session file": "显示会话文件",
+  "Close session": "关闭会话",
+  "Delete session…": "删除会话…",
+  "Approval needed": "需要审批",
+  "Choose an answer": "选择答案",
+  "Edit text": "编辑文本",
+  "Input needed": "需要输入",
+  "1 of {count}": "第 1 个，共 {count} 个",
+  "Cancel request": "取消请求",
+  Deny: "拒绝",
+  Allow: "允许",
+  "Or type your own answer…": "或输入自己的答案…",
+  "⌘Enter to send": "⌘Enter 发送",
+  "This request may resolve automatically after {seconds}s.":
+    "此请求可能在 {seconds} 秒后自动结束。",
+  "Connect a provider": "连接提供商",
+  "Runs pi's own login. Pi Mygo does not store or log credentials.":
+    "运行 pi 自己的登录流程。Pi Mygo 不会保存或记录凭据。",
+  "Close login": "关闭登录",
+  Provider: "提供商",
+  "anthropic, openai, google, openrouter…": "anthropic、openai、google、openrouter…",
+  "Account sign-in": "账户登录",
+  "API key": "API 密钥",
+  "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.":
+    "账户登录会打开提供商的浏览器流程。API 密钥模式会在终端中询问密钥。不确定提供商 ID 时可查阅 pi 文档。",
+  "Provider docs": "提供商文档",
+  "Start sign-in": "开始登录",
+  "Provider connected": "提供商已连接",
+  "Login did not complete": "登录未完成",
+  "Finished. You can close this window.": "已完成，可以关闭此窗口。",
+  "The login did not complete.": "登录未完成。",
+  "Credential surface · output is not logged": "凭据界面 · 输出不会被记录",
+  "Working tree diff against HEAD": "工作区相对 HEAD 的差异",
+  "Patch copied": "补丁已复制",
+  "Could not copy the patch": "无法复制补丁",
+  "Copy patch": "复制补丁",
+  "Close diff": "关闭差异",
+  "Reading diff…": "正在读取差异…",
+  "No textual diff for this file.": "此文件没有文本差异。",
+  "File contents copied": "文件内容已复制",
+  "Could not copy": "无法复制",
+  Copy: "复制",
+  "Close preview": "关闭预览",
+  "Reading file…": "正在读取文件…",
+  "Model & thinking": "模型与思考",
+  "Models come from your pi credentials and configuration.":
+    "模型来自你的 pi 凭据和配置。",
+  "Close model picker": "关闭模型选择器",
+  "Search models…": "搜索模型…",
+  "Refresh models": "刷新模型",
+  "No models available. Sign in with pi or configure a provider, then refresh.":
+    "没有可用模型。请使用 pi 登录或配置提供商，然后刷新。",
+  Thinking: "思考",
+  "Auto-compact": "自动压缩",
+  "Session tree": "会话树",
+  "Pick a point to continue from. The abandoned branch is kept.":
+    "选择一个继续的位置。被放弃的分支会保留。",
+  "Close session tree": "关闭会话树",
+  "Open a session first.": "请先打开会话。",
+  "Reading the tree…": "正在读取会话树…",
+  "This session has no entries yet.": "此会话还没有条目。",
+  "Summarize the branch I leave": "总结我离开的分支",
+};
+
+let locale: Locale = "en";
+const listeners = new Set<() => void>();
+
+export function getLocale(): Locale {
+  return locale;
+}
+
+export function setLocale(tag: string): void {
+  const next: Locale = tag === "zh" ? "zh" : "en";
+  if (next === locale) return;
+  locale = next;
+  document.documentElement.lang = next === "zh" ? "zh-Hans" : "en";
+  for (const listener of listeners) listener();
+}
+
+export function subscribeLocale(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+export function t(source: string, vars?: Record<string, string | number>): string {
+  const template = locale === "zh" ? zh[source] ?? source : source;
+  if (!vars) return template;
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    key in vars ? String(vars[key]) : match,
+  );
+}

@@ -1,6 +1,7 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { Clipboard, FolderOpen, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
 import { api } from "../lib/api";
@@ -65,15 +66,15 @@ export function FilePreviewDialog({
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(text);
-                  toast.success("File contents copied");
+                  toast.success(t("File contents copied"));
                 } catch {
-                  toast.error("Could not copy");
+                  toast.error(t("Could not copy"));
                 }
               }}
               className="flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg"
             >
               <Clipboard size={11} />
-              Copy
+              {t("Copy")}
             </button>
             <button
               type="button"
@@ -87,7 +88,7 @@ export function FilePreviewDialog({
               <button
                 type="button"
                 className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close preview"
+                aria-label={t("Close preview")}
               >
                 <X size={15} />
               </button>
@@ -97,7 +98,7 @@ export function FilePreviewDialog({
             {loading ? (
               <div className="flex items-center justify-center gap-2 py-16 text-[11.5px] text-faint">
                 <Loader2 size={14} className="animate-spin" />
-                Reading file…
+                {t("Reading file…")}
               </div>
             ) : error ? (
               <div className="px-3 py-12 text-center text-[11.5px] text-danger">{error}</div>

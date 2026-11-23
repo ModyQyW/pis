@@ -2,6 +2,7 @@ import { Folder, MessageSquare, Plus, Settings2 } from "lucide-react";
 
 import { cn } from "../lib/cn";
 import { relativeTime } from "../lib/format";
+import { t } from "../lib/i18n";
 import type { Summary } from "../mygo";
 import type { ChatSession } from "../store/chat";
 import type { Bootstrap, Workspace } from "../lib/types";
@@ -47,7 +48,7 @@ export function Sidebar({
               Pi Mygo
             </div>
             <div className="truncate text-[10.5px] text-faint">
-              desktop coding agent
+              {t("desktop coding agent")}
             </div>
           </div>
         </div>
@@ -60,21 +61,21 @@ export function Sidebar({
           className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-border-strong/70 bg-surface text-[12.5px] font-medium shadow-[0_1px_0_rgba(0,0,0,0.03)] transition-colors hover:bg-surface-2"
         >
           <Plus size={15} strokeWidth={2.2} />
-          New chat
+          {t("New chat")}
         </button>
       </div>
 
       <div className="no-drag mt-5 min-h-0 flex-1 overflow-y-auto scroll-thin px-2 pb-3">
         <div className="flex items-center justify-between px-2 pb-1.5">
           <span className="text-[10.5px] font-medium uppercase tracking-[0.08em] text-faint">
-            Projects
+            {t("Projects")}
           </span>
           <button
             type="button"
             onClick={onOpenProject}
             className="rounded p-1 text-faint transition-colors hover:bg-surface-2 hover:text-subtle"
-            aria-label="Open project"
-            title="Open project"
+            aria-label={t("Open a project folder")}
+            title={t("Open a project folder")}
           >
             <Plus size={13} />
           </button>
@@ -86,7 +87,7 @@ export function Sidebar({
             className="mx-1 mt-1 flex w-[calc(100%-8px)] items-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-left text-[12px] text-subtle transition-colors hover:border-border-strong hover:text-fg"
           >
             <Folder size={14} />
-            Open a project folder
+            {t("Open a project folder")}
           </button>
         ) : (
           <ul className="space-y-0.5">
@@ -126,12 +127,12 @@ export function Sidebar({
         <div className="mt-5 px-2">
           <div className="flex items-center justify-between pb-1.5">
             <span className="text-[10.5px] font-medium uppercase tracking-[0.08em] text-faint">
-              Chats
+              {t("Chats")}
             </span>
           </div>
           {openSessions.length === 0 && recentSessions.length === 0 ? (
             <div className="rounded-lg px-2 py-2 text-[11px] leading-4 text-faint">
-              {selected ? "No chats yet. Start one above." : "Open a project to see its chats."}
+              {selected ? t("No chats yet. Start one above.") : t("Open a project to see its chats.")}
             </div>
           ) : (
             <ul className="space-y-0.5">
@@ -163,18 +164,18 @@ export function Sidebar({
                     />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[12px] font-medium">
-                        {s.name || "New chat"}
+                        {s.name || t("New chat")}
                       </span>
                       <span className="mt-0.5 block truncate text-[10px] text-faint">
                         {s.dialogs.length > 0
-                          ? "Needs input"
+                          ? t("Needs input")
                           : s.streaming
-                            ? "Working"
+                            ? t("Working")
                             : s.status === "loading"
-                              ? "Starting pi…"
+                              ? t("Starting pi…")
                               : s.status === "error" || s.status === "exited"
-                                ? "Stopped"
-                                : "Open"}
+                                ? t("Stopped")
+                                : t("Open")}
                       </span>
                     </span>
                   </button>
@@ -211,7 +212,7 @@ export function Sidebar({
           className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[11.5px] text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
         >
           <Settings2 size={14} />
-          Settings
+          {t("Settings")}
         </button>
         <div className="mt-1 flex items-center gap-2 px-2 py-1.5 text-[10.5px] text-faint">
           <span
@@ -222,12 +223,12 @@ export function Sidebar({
           />
           <span className="truncate">
             {pi.checking
-              ? "Finding pi…"
+              ? t("Finding pi…")
               : pi.compatible
                 ? `pi ${pi.version}`
                 : pi.found
-                  ? "pi version unsupported"
-                  : "pi not found"}
+                  ? t("pi version unsupported")
+                  : t("pi not found")}
           </span>
         </div>
       </div>

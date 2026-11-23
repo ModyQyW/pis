@@ -71,6 +71,7 @@ type Settings struct {
 	UIFontSize    int                      `json:"uiFontSize"`
 	SendOnEnter   bool                     `json:"sendOnEnter"`
 	CheckUpdates  bool                     `json:"checkUpdates"`
+	Language      string                   `json:"language"`
 }
 
 // Permissions configures the bundled bridge guard.
@@ -98,6 +99,7 @@ func Defaults() Settings {
 		UIFontSize:    14,
 		SendOnEnter:   true,
 		CheckUpdates:  false,
+		Language:      "en",
 	}
 }
 
@@ -154,6 +156,9 @@ func merge(def, cfg Settings) Settings {
 	}
 	if cfg.UIFontSize < 11 || cfg.UIFontSize > 22 {
 		cfg.UIFontSize = def.UIFontSize
+	}
+	if cfg.Language != "en" && cfg.Language != "zh" {
+		cfg.Language = def.Language
 	}
 	if cfg.Recents == nil {
 		cfg.Recents = []Recent{}

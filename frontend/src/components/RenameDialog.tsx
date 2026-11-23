@@ -2,6 +2,8 @@ import * as Dialog from "@/components/ui/dialog-compat";
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { t } from "../lib/i18n";
+
 export function RenameDialog({
   open,
   onOpenChange,
@@ -37,19 +39,19 @@ export function RenameDialog({
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(440px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border-strong bg-surface p-4 shadow-2xl outline-none">
           <div className="flex items-center justify-between">
-            <Dialog.Title className="text-[13.5px] font-semibold">Rename session</Dialog.Title>
+            <Dialog.Title className="text-[13.5px] font-semibold">{t("Rename session")}</Dialog.Title>
             <Dialog.Close asChild>
               <button
                 type="button"
                 className="flex size-6 items-center justify-center rounded text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close rename dialog"
+                aria-label={t("Close rename dialog")}
               >
                 <X size={13} />
               </button>
             </Dialog.Close>
           </div>
           <Dialog.Description className="mt-1 text-[10.5px] text-faint">
-            The name appears in pi's session selector and Pi Mygo.
+            {t("The name appears in pi's session selector and Pi Mygo.")}
           </Dialog.Description>
           <input
             autoFocus
@@ -66,7 +68,7 @@ export function RenameDialog({
                 type="button"
                 className="h-7 rounded-md border border-border px-2.5 text-[11px] text-subtle hover:bg-surface-2 hover:text-fg"
               >
-                Cancel
+                {t("Cancel")}
               </button>
             </Dialog.Close>
             <button
@@ -75,7 +77,7 @@ export function RenameDialog({
               onClick={() => void save()}
               className="h-7 rounded-md bg-brand px-3 text-[11px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
             >
-              Save
+              {t("Save")}
             </button>
           </div>
         </Dialog.Content>

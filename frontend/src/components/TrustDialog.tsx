@@ -1,6 +1,7 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { FolderLock, ShieldCheck } from "lucide-react";
 
+import { t } from "../lib/i18n";
 import type { Info as TrustInfo } from "../mygo";
 
 export function TrustDialog({
@@ -25,7 +26,7 @@ export function TrustDialog({
             </span>
             <div className="min-w-0">
               <Dialog.Title className="text-[14px] font-semibold">
-                Trust this project?
+                {t("Trust this project?")}
               </Dialog.Title>
               <Dialog.Description className="mt-1 text-[11.5px] leading-5 text-subtle">
                 <span className="font-mono text-[10.5px]">{info?.path}</span>
@@ -34,14 +35,12 @@ export function TrustDialog({
           </div>
 
           <p className="mt-3 text-[11.5px] leading-5 text-subtle">
-            This folder contains pi resources that can run code or change how the
-            agent behaves. Trusting it lets pi load them for sessions in this
-            project.
+            {t("This folder contains pi resources that can run code or change how the agent behaves. Trusting it lets pi load them for sessions in this project.")}
           </p>
 
           <div className="mt-3 rounded-lg border border-border bg-canvas p-3">
             <div className="text-[9.5px] font-medium uppercase tracking-[0.08em] text-faint">
-              Resources found
+              {t("Resources found")}
             </div>
             <ul className="mt-1.5 space-y-1">
               {(info?.resources ?? []).map((r) => (
@@ -54,8 +53,7 @@ export function TrustDialog({
           </div>
 
           <p className="mt-3 text-[10px] leading-4 text-faint">
-            The decision is stored by Pi Mygo, not written to pi's trust store.
-            Existing sessions keep their current trust until restarted.
+            {t("The decision is stored by Pi Mygo, not written to pi's trust store. Existing sessions keep their current trust until restarted.")}
           </p>
 
           <div className="mt-4 flex justify-end gap-2">
@@ -64,7 +62,7 @@ export function TrustDialog({
               onClick={() => onChoose(false)}
               className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
             >
-              Don't trust
+              {t("Don't trust")}
             </button>
             <button
               type="button"
@@ -72,7 +70,7 @@ export function TrustDialog({
               className="flex h-8 items-center gap-1.5 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90"
             >
               <ShieldCheck size={12} />
-              Trust project
+              {t("Trust project")}
             </button>
           </div>
         </Dialog.Content>

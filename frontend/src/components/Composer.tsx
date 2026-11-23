@@ -1,5 +1,6 @@
 import { ArrowUp, CornerDownLeft, FileText, Paperclip, Plus, Square, Target, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
 import {
@@ -290,7 +291,7 @@ export function Composer({
               }
             }}
             rows={1}
-            placeholder="Ask pi to inspect, change, or explain…"
+            placeholder={t("Ask pi to inspect, change, or explain…")}
             disabled={disabled}
             className="max-h-[260px] min-h-[64px] w-full resize-none bg-transparent px-4 pb-1 pt-3.5 text-[13.5px] leading-6 outline-none placeholder:text-faint disabled:opacity-60"
           />
@@ -298,8 +299,8 @@ export function Composer({
           {suggestions.length > 0 && !disabled ? (
             <div className="mx-2 mb-1 max-h-[240px] overflow-y-auto scroll-thin rounded-lg border border-border bg-surface p-1 shadow-lg">
               <div className="flex items-center justify-between px-1.5 pb-1 pt-0.5 text-[9px] uppercase tracking-[0.08em] text-faint">
-                <span>{token?.kind === "command" ? "Pi commands" : "Files"}</span>
-                {fileLoading ? <span>searching…</span> : null}
+                <span>{token?.kind === "command" ? t("Pi commands") : t("Files")}</span>
+                {fileLoading ? <span>{t("searching…")}</span> : null}
               </div>
               {suggestions.map((s, i) => (
                 <button
@@ -342,8 +343,8 @@ export function Composer({
                 });
               }}
               className="flex size-7 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-              title="Mention a project file"
-              aria-label="Mention a project file"
+              title={t("Mention a project file")}
+              aria-label={t("Mention a project file")}
             >
               <Plus size={15} />
             </button>
@@ -351,8 +352,8 @@ export function Composer({
               type="button"
               onClick={() => fileInput.current?.click()}
               className="flex size-7 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-              title="Attach a file"
-              aria-label="Attach a file"
+              title={t("Attach a file")}
+              aria-label={t("Attach a file")}
             >
               <Paperclip size={14} />
             </button>
@@ -362,7 +363,7 @@ export function Composer({
                 type="button"
                 onClick={onOpenModelPicker}
                 className="flex h-7 max-w-[240px] items-center gap-1.5 rounded-lg px-2 text-[11px] text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-                title="Model and thinking"
+                title={t("Model and thinking")}
               >
                 <span className="size-1.5 rounded-full bg-brand/70" />
                 <span className="truncate">{modelLabel}</span>
@@ -372,7 +373,7 @@ export function Composer({
                   type="button"
                   onClick={onOpenModelPicker}
                   className="hidden h-7 items-center gap-1 rounded-lg px-2 text-[10px] capitalize text-faint transition-colors hover:bg-surface-2 hover:text-fg sm:flex"
-                  title="Thinking level"
+                  title={t("Thinking level")}
                 >
                   {thinking}
                 </button>
@@ -405,22 +406,22 @@ export function Composer({
                 )}
                 title={
                   externalPlanCommand
-                    ? `Use the installed /${externalPlanCommand} command`
-                    : "Plan mode: read-only until you approve"
+                    ? t("Use the installed /{command} command", { command: externalPlanCommand })
+                    : t("Plan mode: read-only until you approve")
                 }
               >
                 <Target size={12} />
-                {planMode ? "Planning" : "Plan"}
+                {planMode ? t("Planning") : t("Plan")}
               </button>
             </div>
 
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden text-[10px] text-faint sm:inline">
-                {running ? "Enter queues · Esc stops" : "Enter sends · Shift+Enter newline"}
+                {running ? t("Enter queues · Esc stops") : t("Enter sends · Shift+Enter newline")}
               </span>
               <div
                 className="flex size-7 items-center justify-center rounded-full border border-border text-[9px] font-medium tabular-nums text-faint"
-                title="Context used"
+                title={t("Context used")}
               >
                 {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
               </div>
@@ -429,8 +430,8 @@ export function Composer({
                   type="button"
                   onClick={onStop}
                   className="flex size-8 items-center justify-center rounded-full bg-fg text-canvas transition-transform hover:scale-[1.03]"
-                  aria-label="Stop run"
-                  title="Stop"
+                  aria-label={t("Stop run")}
+                  title={t("Stop")}
                 >
                   <Square size={11} fill="currentColor" />
                 </button>
@@ -445,8 +446,8 @@ export function Composer({
                       ? "bg-fg text-canvas hover:scale-[1.03]"
                       : "bg-surface-3 text-faint",
                   )}
-                  aria-label="Send"
-                  title="Send"
+                  aria-label={t("Send")}
+                  title={t("Send")}
                 >
                   <ArrowUp size={15} strokeWidth={2.2} />
                 </button>
@@ -458,8 +459,8 @@ export function Composer({
           <CornerDownLeft size={10} />
           <span>
             {disabled
-              ? "Connect a provider to start"
-              : "Pi can read, edit, and run commands in this project."}
+              ? t("Connect a provider to start")
+              : t("Pi can read, edit, and run commands in this project.")}
           </span>
         </div>
       </div>

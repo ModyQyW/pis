@@ -62,6 +62,33 @@ func TestUpdateRoundTripAndValidation(t *testing.T) {
 	}
 }
 
+func TestLanguageValidation(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte(`{"language":"zh"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	store, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := store.Snapshot().Language; got != "zh" {
+		t.Fatalf("language = %q, want zh", got)
+	}
+	if err := store.Update(func(c *Settings) error {
+		c.Language = "fr"
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	again, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := again.Snapshot().Language; got != "en" {
+		t.Fatalf("invalid language = %q, want en", got)
+	}
+}
+
 func TestSnapshotCopiesMapsAndSlices(t *testing.T) {
 	store := &Store{cfg: Defaults()}
 	store.cfg.Trust["/x"] = TrustTrusted

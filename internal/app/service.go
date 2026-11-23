@@ -296,6 +296,7 @@ type Preferences struct {
 	CodeFontSize  *int    `json:"codeFontSize,omitempty"`
 	UIFontSize    *int    `json:"uiFontSize,omitempty"`
 	SendOnEnter   *bool   `json:"sendOnEnter,omitempty"`
+	Language      *string `json:"language,omitempty"`
 	Policy        *string `json:"policy,omitempty"`
 	GuardDisabled *bool   `json:"guardDisabled,omitempty"`
 	GuardForce    *bool   `json:"guardForce,omitempty"`
@@ -322,6 +323,13 @@ func (s *Service) SetPreferences(p Preferences) error {
 		if p.SendOnEnter != nil {
 			c.SendOnEnter = *p.SendOnEnter
 		}
+		if p.Language != nil {
+			lang := *p.Language
+			if lang != "en" && lang != "zh" {
+				return fmt.Errorf("unknown language %q", lang)
+			}
+			c.Language = lang
+		}
 		if p.Policy != nil {
 			pol := settings.PermissionPolicy(*p.Policy)
 			if pol != settings.PolicySmart && pol != settings.PolicyAsk && pol != settings.PolicyAllow {
@@ -339,8 +347,18 @@ func (s *Service) SetPreferences(p Preferences) error {
 	})
 	if err == nil {
 		s.refreshGuardPolicy()
+		ApplyLanguage(s.store.Snapshot().Language)
 	}
 	return err
+}
+
+// ApplyLanguage sets the native shell language and the updater window.
+func ApplyLanguage(language string) {
+	if language == "zh" {
+		mygo.App.SetLocale("zh-Hans")
+		return
+	}
+	mygo.App.SetLocale("en")
 }
 
 // Notify shows a native completion notification when the user enabled them.

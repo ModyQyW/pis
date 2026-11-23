@@ -3,6 +3,7 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import { KeyRound, Loader2, LogIn, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
 import "@xterm/xterm/css/xterm.css";
@@ -50,10 +51,10 @@ export function LoginDialog({
       if (o.id !== authId) return;
       setExited({ code: o.code, error: o.error });
       if (o.code === 0) {
-        toast.success("Provider connected");
+        toast.success(t("Provider connected"));
         onDone();
       } else {
-        toast.error(o.error || "Login did not complete");
+        toast.error(o.error || t("Login did not complete"));
       }
     });
     return () => {
@@ -134,17 +135,17 @@ export function LoginDialog({
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
               <Dialog.Title className="text-[13.5px] font-semibold">
-                Connect a provider
+                {t("Connect a provider")}
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                Runs pi's own login. Pi Mygo does not store or log credentials.
+                {t("Runs pi's own login. Pi Mygo does not store or log credentials.")}
               </Dialog.Description>
             </div>
             <button
               type="button"
               onClick={() => void cancel()}
               className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-              aria-label="Close login"
+              aria-label={t("Close login")}
             >
               <X size={15} />
             </button>
@@ -153,12 +154,12 @@ export function LoginDialog({
           {!authId ? (
             <div className="px-5 py-5">
               <label className="text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
-                Provider
+                {t("Provider")}
               </label>
               <input
                 value={provider}
                 onChange={(e) => setProvider(e.target.value)}
-                placeholder="anthropic, openai, google, openrouter…"
+                placeholder={t("anthropic, openai, google, openrouter…")}
                 spellCheck={false}
                 autoFocus
                 className="mt-1.5 h-8 w-full rounded-md border border-border bg-canvas px-2.5 text-[12px] outline-none placeholder:text-faint focus:border-border-strong"
@@ -166,17 +167,15 @@ export function LoginDialog({
               <div className="mt-3 flex gap-1.5">
                 <Method active={!apiKey} onClick={() => setApiKey(false)}>
                   <LogIn size={12} />
-                  Account sign-in
+                  {t("Account sign-in")}
                 </Method>
                 <Method active={apiKey} onClick={() => setApiKey(true)}>
                   <KeyRound size={12} />
-                  API key
+                  {t("API key")}
                 </Method>
               </div>
               <p className="mt-3 text-[10.5px] leading-4 text-faint">
-                Account sign-in opens the provider's browser flow. API key mode asks
-                for the key in the terminal. Use pi's provider docs if you are unsure
-                of the provider id.
+                {t("Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.")}
               </p>
               <div className="mt-4 flex justify-end gap-2">
                 <a
@@ -189,7 +188,7 @@ export function LoginDialog({
                   }}
                   className="mr-auto self-center text-[10.5px] text-subtle underline underline-offset-2 hover:text-fg"
                 >
-                  Provider docs
+                  {t("Provider docs")}
                 </a>
                 <button
                   type="button"
@@ -198,7 +197,7 @@ export function LoginDialog({
                   className="flex h-8 items-center gap-1.5 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
                 >
                   {starting ? <Loader2 size={12} className="animate-spin" /> : <LogIn size={12} />}
-                  Start sign-in
+                  {t("Start sign-in")}
                 </button>
               </div>
             </div>
@@ -212,16 +211,16 @@ export function LoginDialog({
                 <span className="text-[10px] text-faint">
                   {exited
                     ? exited.code === 0
-                      ? "Finished. You can close this window."
-                      : "The login did not complete."
-                    : "Credential surface · output is not logged"}
+                      ? t("Finished. You can close this window.")
+                      : t("The login did not complete.")
+                    : t("Credential surface · output is not logged")}
                 </span>
                 <button
                   type="button"
                   onClick={() => void cancel()}
                   className="ml-auto h-7 rounded-md border border-border px-2.5 text-[11px] text-subtle hover:bg-surface-2 hover:text-fg"
                 >
-                  {exited ? "Close" : "Cancel"}
+                  {exited ? t("Close") : t("Cancel")}
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { Clipboard, FolderOpen, Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
 import { api } from "../lib/api";
@@ -56,7 +57,7 @@ export function DiffDialog({
                 {path}
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10px] text-faint">
-                Working tree diff against HEAD
+                {t("Working tree diff against HEAD")}
               </Dialog.Description>
             </div>
             <button
@@ -64,15 +65,15 @@ export function DiffDialog({
               onClick={async () => {
                 try {
                   await navigator.clipboard.writeText(diff);
-                  toast.success("Patch copied");
+                  toast.success(t("Patch copied"));
                 } catch {
-                  toast.error("Could not copy the patch");
+                  toast.error(t("Could not copy the patch"));
                 }
               }}
               className="flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg"
             >
               <Clipboard size={11} />
-              Copy patch
+              {t("Copy patch")}
             </button>
             <button
               type="button"
@@ -86,7 +87,7 @@ export function DiffDialog({
               <button
                 type="button"
                 className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label="Close diff"
+                aria-label={t("Close diff")}
               >
                 <X size={15} />
               </button>
@@ -96,7 +97,7 @@ export function DiffDialog({
             {loading ? (
               <div className="flex items-center justify-center gap-2 py-16 text-[11.5px] text-faint">
                 <Loader2 size={14} className="animate-spin" />
-                Reading diff…
+                {t("Reading diff…")}
               </div>
             ) : error ? (
               <div className="px-3 py-12 text-center text-[11.5px] text-danger">{error}</div>
@@ -104,7 +105,7 @@ export function DiffDialog({
               <DiffView diff={diff} />
             ) : (
               <div className="px-3 py-12 text-center text-[11.5px] text-faint">
-                No textual diff for this file.
+                {t("No textual diff for this file.")}
               </div>
             )}
           </div>

@@ -1,11 +1,13 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 
+import { t } from "../lib/i18n";
+
 export function ConfirmDialog({
   open,
   onOpenChange,
   title,
   message,
-  confirmLabel = "Confirm",
+  confirmLabel,
   danger,
   onConfirm,
 }: {
@@ -32,7 +34,7 @@ export function ConfirmDialog({
                 type="button"
                 className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
               >
-                Cancel
+                {t("Cancel")}
               </button>
             </Dialog.Close>
             <button
@@ -44,7 +46,7 @@ export function ConfirmDialog({
                   : "h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90"
               }
             >
-              {confirmLabel}
+              {confirmLabel ?? t("Confirm")}
             </button>
           </div>
         </Dialog.Content>

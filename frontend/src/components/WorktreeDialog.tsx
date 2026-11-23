@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import * as Dialog from "@/components/ui/dialog-compat";
 import { api } from "../lib/api";
+import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 import type { Worktree } from "../mygo";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -50,7 +51,7 @@ export function WorktreeDialog({
       setPath("");
       setBranch("");
       await load();
-      toast.success("Worktree created");
+      toast.success(t("Worktree created"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
@@ -66,17 +67,17 @@ export function WorktreeDialog({
               <div>
                 <Dialog.Title className="flex items-center gap-2 text-[14px] font-semibold">
                   <FolderGit2 size={15} className="text-brand" />
-                  Worktrees
+                  {t("Worktrees")}
                 </Dialog.Title>
                 <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                  Parallel checkouts for the same repository. Open one as a project.
+                  {t("Parallel checkouts for the same repository. Open one as a project.")}
                 </Dialog.Description>
               </div>
               <Dialog.Close asChild>
                 <button
                   type="button"
                   className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                  aria-label="Close worktrees"
+                  aria-label={t("Close worktrees")}
                 >
                   <X size={15} />
                 </button>
@@ -85,11 +86,11 @@ export function WorktreeDialog({
 
             <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
               {!workspace ? (
-                <p className="py-6 text-center text-[11.5px] text-faint">Open a project first.</p>
+                <p className="py-6 text-center text-[11.5px] text-faint">{t("Open a project first.")}</p>
               ) : loading && list.length === 0 ? (
                 <div className="flex items-center gap-2 py-8 text-[11px] text-faint">
                   <Loader2 size={13} className="animate-spin" />
-                  Reading worktrees…
+                  {t("Reading worktrees…")}
                 </div>
               ) : (
                 <ul className="space-y-1">
@@ -115,16 +116,16 @@ export function WorktreeDialog({
                         onClick={() => onOpen(wt.path)}
                         className="h-7 rounded-md border border-border px-2 text-[10px] text-subtle hover:bg-surface-2 hover:text-fg"
                       >
-                        Open
+                        {t("Open")}
                       </button>
                       {list.length > 1 ? (
                         <button
                           type="button"
                           onClick={() => setRemove(wt)}
                           className="h-7 rounded-md px-1.5 text-[10px] text-faint hover:bg-danger/10 hover:text-danger"
-                          title="Remove worktree"
+                          title={t("Remove worktree")}
                         >
-                          Remove
+                          {t("Remove")}
                         </button>
                       ) : null}
                     </li>
@@ -135,19 +136,19 @@ export function WorktreeDialog({
               {workspace ? (
                 <>
                   <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
-                    New worktree
+                    {t("New worktree")}
                   </h3>
                   <div className="mt-2 flex gap-2">
                     <input
                       value={path}
                       onChange={(e) => setPath(e.target.value)}
-                      placeholder="Absolute path"
+                      placeholder={t("Absolute path")}
                       className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                     <input
                       value={branch}
                       onChange={(e) => setBranch(e.target.value)}
-                      placeholder={createBranch ? "new branch" : "branch (optional)"}
+                      placeholder={createBranch ? t("new branch") : t("branch (optional)")}
                       className="h-8 w-[180px] rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
                     />
                   </div>
@@ -159,7 +160,7 @@ export function WorktreeDialog({
                         onChange={(e) => setCreateBranch(e.target.checked)}
                         className="size-3.5 accent-[var(--brand)]"
                       />
-                      Create branch
+                      {t("Create branch")}
                     </label>
                     <button
                       type="button"
@@ -167,7 +168,7 @@ export function WorktreeDialog({
                       onClick={() => void add()}
                       className="ml-auto h-7 rounded-md bg-brand px-2.5 text-[10.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
                     >
-                      Create worktree
+                      {t("Create worktree")}
                     </button>
                   </div>
                 </>
@@ -179,9 +180,9 @@ export function WorktreeDialog({
       <ConfirmDialog
         open={Boolean(remove)}
         onOpenChange={(next) => !next && setRemove(null)}
-        title={`Remove ${remove?.branch ?? "worktree"}?`}
-        message="The worktree directory is removed. Its branch and commits remain in the repository."
-        confirmLabel="Remove"
+        title={t("Remove {branch}?", { branch: remove?.branch ?? "worktree" })}
+        message={t("The worktree directory is removed. Its branch and commits remain in the repository.")}
+        confirmLabel={t("Remove")}
         danger
         onConfirm={async () => {
           if (!workspace || !remove) return;
