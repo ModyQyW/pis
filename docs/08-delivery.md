@@ -30,6 +30,21 @@ ID the `.app` is ad-hoc signed and Gatekeeper asks the user to approve it once.
 The release repository or feed must be public: private release assets are not
 readable by an installed app.
 
+To configure the update key in GitHub:
+
+```sh
+./scripts/update-keygen.sh
+gh variable set PI_MYGO_UPDATE_PUBLIC_KEY < "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.pub"
+gh secret set MYGO_UPDATER_PRIVATE_KEY < "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.key"
+# Optional; defaults to the repository running the workflow.
+gh variable set PI_MYGO_UPDATE_GITHUB --body "owner/pi-mygo"
+```
+
+Make the repository public (or point the variable at a public release-only
+repository) before relying on updater checks. Then push a `v*` tag. The
+workflow creates a draft release; review its assets and publish it. Never
+commit the private key.
+
 Build a release from GitHub Actions by pushing a `v*` tag (or dispatching an
 existing tag). The workflow creates a draft release, then builds:
 
