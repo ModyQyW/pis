@@ -5,6 +5,7 @@ import {
   CircleAlert,
   FileText,
   FolderSearch,
+  HelpCircle,
   Pencil,
   Search,
   SquareTerminal,
@@ -13,12 +14,16 @@ import {
 import { useState } from "react";
 
 import { cn } from "../lib/cn";
+import { t } from "../lib/i18n";
+import { parseAnswers, parseQuestions, type Question } from "../lib/questions";
 import type { AssistantBlock, ToolBlock, ToolResultView } from "../lib/transcript";
 import { toolTarget } from "../lib/transcript";
 import { DiffView } from "./DiffView";
 
 export function ToolCard({ tool }: { tool: ToolBlock }) {
   const [open, setOpen] = useState(false);
+  const questions = tool.name === "ask_user_question" ? parseQuestions(tool.args) : [];
+  if (questions.length > 0) return <QuestionCard tool={tool} questions={questions} />;
   const result = tool.result;
   const run = tool.run;
   const running = !result && (!run || run.running);
@@ -104,6 +109,80 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
 
 export function StandaloneTool({ tool }: { tool: ToolBlock }) {
   return <ToolCard tool={tool} />;
+}
+
+
+function QuestionCard({
+  tool,
+  questions,
+}: {
+  tool: ToolBlock;
+  questions: Question[];
+}) {
+  const answers = parseAnswers(tool.result?.details);
+  return (
+    <div className="my-1.5 overflow-hidden rounded-lg border border-brand/25 bg-surface/70">
+      <div className="flex items-center gap-2 border-b border-border/70 bg-brand-soft/30 px-2.5 py-2">
+        <span className="flex size-5 items-center justify-center rounded-md border border-brand/25 bg-surface text-brand">
+          <HelpCircle size={11} />
+        </span>
+        <span className="text-[11.5px] font-medium">{t("Question")}</span>
+        <span className="ml-auto text-[9.5px] text-faint">
+          {tool.result ? t("Answered") : t("Waiting for answer")}
+        </span>
+      </div>
+      <div className="space-y-2.5 px-2.5 py-2">
+        {questions.map((question, index) => {
+          const answer = answers.find((item) => item.questionIndex === index)?.answer;
+          return (
+            <div key={`${question.question}-${index}`}>
+              {question.header ? (
+                <div className="text-[9px] font-medium uppercase tracking-[0.08em] text-faint">
+                  {question.header}
+                </div>
+              ) : null}
+              <div className="mt-0.5 text-[11.5px] leading-5 text-subtle">{question.question}</div>
+              {question.options.length ? (
+                <ul className="mt-1.5 space-y-1">
+                  {question.options.map((option) => {
+                    const selected = answer === option.label;
+                    return (
+                      <li
+                        key={option.label}
+                        className={cn(
+                          "flex items-start gap-2 rounded-md border px-2 py-1.5 text-[10.5px] leading-4",
+                          selected
+                            ? "border-brand/40 bg-brand-soft/50 text-fg"
+                            : "border-border/70 text-subtle",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "mt-0.5 flex size-3 shrink-0 items-center justify-center rounded-full border",
+                            selected ? "border-brand bg-brand text-brand-fg" : "border-border-strong",
+                          )}
+                        >
+                          {selected ? <Check size={8} /> : null}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block">{option.label}</span>
+                          {option.description ? (
+                            <span className="mt-0.5 block text-[9.5px] text-faint">
+                              {option.description}
+                            </span>
+                          ) : null}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 function iconFor(name: string) {

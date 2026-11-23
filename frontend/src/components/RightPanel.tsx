@@ -1,5 +1,6 @@
 import {
   Circle,
+  CircleAlert,
   CircleCheck,
   FileText,
   GitBranch,
@@ -9,12 +10,14 @@ import {
   RefreshCw,
   Search,
   Undo2,
+  Users,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { t } from "../lib/i18n";
+import { extractSubagents, type SubagentRun } from "../lib/subagents";
 import { extractTodos, type TodoItem } from "../lib/todos";
 import { toast } from "../lib/toast";
 import type { Hit, Status } from "../mygo";
@@ -24,7 +27,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { DiffDialog } from "./DiffDialog";
 import { FilePreviewDialog } from "./FilePreviewDialog";
 
-type Tab = "changes" | "files" | "plan";
+type Tab = "changes" | "files" | "plan" | "agents";
 
 export function RightPanel({
   workspace,
@@ -81,6 +84,10 @@ export function RightPanel({
     return files.filter((f) => f.path.toLowerCase().includes(q));
   }, [files, query]);
   const todos = useMemo(() => extractTodos(session?.entries ?? []), [session?.entries]);
+  const subagents = useMemo(
+    () => extractSubagents(session?.entries ?? [], session?.live?.blocks ?? []),
+    [session?.entries, session?.live?.blocks],
+  );
 
   const changed = status?.files.length ?? 0;
   const doneTodos = todos.filter((todo) => todo.done).length;
@@ -107,6 +114,15 @@ export function RightPanel({
           {todos.length > 0 ? (
             <span className="ml-0.5 rounded-full bg-surface-3 px-1 text-[9px] tabular-nums text-subtle">
               {doneTodos}/{todos.length}
+            </span>
+          ) : null}
+        </TabButton>
+        <TabButton active={tab === "agents"} onClick={() => setTab("agents")}>
+          <Users size={12} />
+          {t("Agents")}
+          {subagents.length > 0 ? (
+            <span className="ml-0.5 rounded-full bg-surface-3 px-1 text-[9px] tabular-nums text-subtle">
+              {subagents.length}
             </span>
           ) : null}
         </TabButton>
@@ -141,7 +157,9 @@ export function RightPanel({
               ? t("{count} changed", { count: changed })
               : tab === "files"
                 ? t("{count} files", { count: files.length })
-                : t("{done}/{total} steps", { done: doneTodos, total: todos.length })}
+                : tab === "plan"
+                  ? t("{done}/{total} steps", { done: doneTodos, total: todos.length })
+                  : t("{count} subagents", { count: subagents.length })}
           </span>
         </div>
       ) : null}
@@ -165,8 +183,10 @@ export function RightPanel({
           tabChanges(status, error, loading, setDiffPath, setRevertPath)
         ) : tab === "files" ? (
           <FileList files={filteredFiles} onOpen={setFilePath} />
-        ) : (
+        ) : tab === "plan" ? (
           <TodoList todos={todos} />
+        ) : (
+          <SubagentList runs={subagents} />
         )}
       </div>
 
@@ -355,6 +375,51 @@ function TodoList({ todos }: { todos: TodoItem[] }) {
           {todo.active ? (
             <span className="shrink-0 text-[9px] uppercase tracking-wide text-brand">now</span>
           ) : null}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+
+function SubagentList({ runs }: { runs: SubagentRun[] }) {
+  if (runs.length === 0) {
+    return (
+      <Empty
+        icon={<Users size={15} />}
+        title={t("No subagents yet")}
+        detail={t("Subagent activity from pi appears here.")}
+      />
+    );
+  }
+  return (
+    <ul className="space-y-0.5 p-1">
+      {runs.map((run) => (
+        <li
+          key={run.id}
+          className="flex items-start gap-2 rounded-md px-2 py-1.5 text-[11.5px] leading-5"
+        >
+          {run.status === "running" ? (
+            <Loader2 size={12} className="mt-1 shrink-0 animate-spin text-brand" />
+          ) : run.status === "error" ? (
+            <CircleAlert size={13} className="mt-0.5 shrink-0 text-danger" />
+          ) : (
+            <CircleCheck size={13} className="mt-0.5 shrink-0 text-success" />
+          )}
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-subtle">{run.label}</span>
+            {run.agent ? (
+              <span className="mt-0.5 block truncate text-[10px] text-faint">{run.agent}</span>
+            ) : null}
+            {run.result ? (
+              <span className="mt-0.5 line-clamp-2 block text-[10px] leading-4 text-faint">
+                {run.result}
+              </span>
+            ) : null}
+          </span>
+          <span className="shrink-0 text-[9px] uppercase tracking-wide text-faint">
+            {t(run.status)}
+          </span>
         </li>
       ))}
     </ul>

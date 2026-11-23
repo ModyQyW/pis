@@ -289,6 +289,16 @@ const zh: Record<string, string> = {
   "Reading the tree…": "正在读取会话树…",
   "This session has no entries yet.": "此会话还没有条目。",
   "Summarize the branch I leave": "总结我离开的分支",
+  Agents: "代理",
+  "No subagents yet": "还没有子代理",
+  "Subagent activity from pi appears here.": "pi 的子代理活动会显示在这里。",
+  "{count} subagents": "{count} 个子代理",
+  running: "运行中",
+  complete: "已完成",
+  error: "失败",
+  Question: "问题",
+  Answered: "已回答",
+  "Waiting for answer": "等待回答",
 };
 
 let locale: Locale = "en";
