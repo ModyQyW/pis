@@ -1,6 +1,6 @@
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { ArrowDown, Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
-import { Virtuoso, type VirtuosoHandle } from "react-virtuoso";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,8 @@ import type { ChatItem } from "../lib/transcript";
 import { AssistantMessage } from "./AssistantMessage";
 import { StandaloneTool } from "./ToolCard";
 
+const BOTTOM_THRESHOLD = 100;
+
 export function SessionTranscript({
   session,
   items,
@@ -20,8 +22,70 @@ export function SessionTranscript({
   items: ChatItem[];
   onFork?: (entryId: string) => void;
 }) {
-  const ref = useRef<VirtuosoHandle>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const stickToBottom = useRef(true);
+  const previousCount = useRef(items.length);
   const [atBottom, setAtBottom] = useState(true);
+  const virtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
+    count: items.length,
+    enabled: items.length > 0,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 120,
+    getItemKey: (index) => items[index]?.id ?? index,
+    overscan: 8,
+    paddingStart: 24,
+    paddingEnd: 40,
+    followOnAppend: "smooth",
+  });
+
+  const updateStick = useCallback((next: boolean) => {
+    stickToBottom.current = next;
+    setAtBottom(next);
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    const distance = element.scrollHeight - element.scrollTop - element.clientHeight;
+    updateStick(distance <= BOTTOM_THRESHOLD);
+  }, [updateStick]);
+
+  useLayoutEffect(() => {
+    updateStick(true);
+    previousCount.current = items.length;
+    const frame = requestAnimationFrame(() => {
+      const element = scrollRef.current;
+      if (element) element.scrollTop = element.scrollHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [session.key, updateStick]);
+
+  useLayoutEffect(() => {
+    const appended = items.length > previousCount.current;
+    previousCount.current = items.length;
+    if (!stickToBottom.current || appended) return;
+    const element = scrollRef.current;
+    if (!element) return;
+    const frame = requestAnimationFrame(() => {
+      if (!stickToBottom.current) return;
+      element.scrollTop = element.scrollHeight;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [items]);
+
+  // Markdown, code highlighting, and images can grow rows after layout. Keep
+  // the viewport pinned while the reader has not scrolled away from the end.
+  useLayoutEffect(() => {
+    const content = contentRef.current;
+    const element = scrollRef.current;
+    if (!content || !element || !atBottom) return;
+    const observer = new ResizeObserver(() => {
+      if (stickToBottom.current) element.scrollTop = element.scrollHeight;
+    });
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, [atBottom, session.key]);
 
   if (items.length === 0) {
     return (
@@ -47,29 +111,42 @@ export function SessionTranscript({
 
   return (
     <div className="relative h-full">
-      <Virtuoso
-        key={session.key}
-        ref={ref}
-        data={items}
-        followOutput={(bottom) => (bottom ? "smooth" : false)}
-        atBottomStateChange={setAtBottom}
-        atBottomThreshold={100}
-        increaseViewportBy={600}
-        className="scroll-thin h-full"
-        components={{
-          Header: () => <div className="h-6" />,
-          Footer: () => <div className="h-10" />,
-        }}
-        itemContent={(_index, item) => (
-          <div className="mx-auto w-full max-w-[860px] px-7">
-            <TranscriptRow item={item} onFork={onFork} />
-          </div>
-        )}
-      />
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="scroll-thin h-full overflow-y-auto"
+      >
+        <div
+          ref={contentRef}
+          className="relative w-full"
+          style={{ height: virtualizer.getTotalSize() }}
+        >
+          {virtualizer.getVirtualItems().map((virtualRow) => {
+            const item = items[virtualRow.index];
+            if (!item) return null;
+            return (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                ref={virtualizer.measureElement}
+                className="absolute left-0 top-0 w-full"
+                style={{ transform: `translateY(${virtualRow.start}px)` }}
+              >
+                <div className="mx-auto w-full max-w-[860px] px-7">
+                  <TranscriptRow item={item} onFork={onFork} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
       {!atBottom ? (
         <button
           type="button"
-          onClick={() => ref.current?.scrollToIndex({ index: items.length - 1, behavior: "smooth" })}
+          onClick={() => {
+            updateStick(true);
+            virtualizer.scrollToEnd({ behavior: "smooth" });
+          }}
           className="absolute bottom-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-surface text-subtle shadow-sm hover:text-fg"
           aria-label="Scroll to latest"
         >
