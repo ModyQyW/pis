@@ -12,11 +12,13 @@ pi, replace pi's data, or install a second agent runtime.
 
 ## Status (2026-11-23)
 
-V1 is implemented and packaged for macOS arm64 validation. Core sessions,
+V1 is implemented and packaged for macOS arm64 validation; the release workflow
+builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work; the
-current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs
-signing/notarization and a public update feed. English is the default; Chinese
+current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs a
+public update feed/key; macOS is ad-hoc signed, so Gatekeeper requires a
+one-time approval. English is the default; Chinese
 is available in Settings. See
 [`docs/03-progress.md`](docs/03-progress.md) for evidence and
 [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
@@ -72,7 +74,7 @@ More screenshots: [chat](docs/images/chat.png),
 
 ## Requirements
 
-- macOS (arm64 verified; the code is portable, Windows/Linux are untested).
+- macOS (arm64 verified; Windows/Linux builds are produced but runtime-untested).
 - Go 1.27.3+ and Bun for building.
 - pi **>= 1.6 < 2** installed and authenticated. Pi Mygo finds it in Settings,
   `PI_MYGO_PI`, `PATH`, common install locations, then your login shell.
@@ -140,14 +142,15 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 
 ## Known limits
 
-- Windows and Linux are not validated; macOS arm64 is the delivered target.
+- macOS arm64 is runtime-validated; Windows/Linux artifacts build but have not had runtime QA.
 - The app requires an installed compatible pi. There is no bundled/auto-installer.
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; Pi Mygo does not fake them.
-- Auto-update is wired through mygo's updater, but the repository currently has
-  no public release feed or update signing key. Signed/notarized public builds
-  remain follow-up work.
+- Auto-update is wired through mygo's updater and the release workflow, but the
+  repository still needs a public release feed and an update signing key before
+  installed apps can update. macOS builds are ad-hoc signed, not notarized;
+  Gatekeeper requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's

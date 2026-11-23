@@ -16,8 +16,9 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Remaining before a wider release: refresh plan/approval screenshots,
-  signed/notarized public builds, and an update feed/key.
+- Remaining before a wider release: refresh plan/approval screenshots, a public
+  update feed/key, and runtime QA on Windows/Linux. macOS is ad-hoc signed and
+  requires a one-time Gatekeeper approval.
 
 ### Open validation and performance
 
@@ -49,8 +50,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 3. **P1 release engineering** — CI, cross-builds, versioned release workflow,
    optional signing/notarization, the updater window, and
    `scripts/release.sh`/`update-keygen.sh` are implemented. A public update
-   feed/key and an actual signed/notarized build still need credentials and a
-   release host.
+   feed/key still need a public release host. macOS is ad-hoc signed; Windows/
+   Linux artifacts build but have no runtime QA yet.
 4. **P2 localization and assets** — complete: English/Chinese UI, CJK QA, and
    official Streamdown code/Mermaid lazy chunks within the app budget.
 
@@ -151,8 +152,15 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   `language`, and `mygo.App.SetLocale` follows it for the native shell. Nine
   Vitest tests include translation lookup and placeholders; CJK screenshots are
   in `docs/images/zh-chat.png` and `zh-settings.png`.
-- **Release**: `.github/workflows/ci.yml` runs Go, cross-builds, frontend tests,
-  and a packaged macOS build. `release.yml` builds tagged artifacts with optional
+- **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
+  cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
+  Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
+  v8, and action-gh-release v3. The release workflow builds darwin arm64+amd64,
+  windows amd64+arm64 (NSIS from Ubuntu), and linux amd64+arm64, then uploads
+  through mygo to a draft release. A local Ubuntu 24.04 container built all
+  Linux/Windows targets and both installers successfully; local macOS builds
+  produced both DMGs. macOS update manifest generation was exercised with a
+  temporary Ed25519 key. `release.yml` builds tagged artifacts with optional
   signing/notarization and updater key variables. `mygo.Use(updater.Plugin)` and
   a Check for Updates menu item are wired; `scripts/release.sh` validates
   version/feed/signing inputs without printing secrets, and

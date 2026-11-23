@@ -99,7 +99,7 @@ engine. It must feel like a polished native app, not a web page in a box:
 ### Explicitly deferred
 
 - Windows/Linux QA and installers (code kept portable).
-- Signed/notarized releases and auto-update.
+- Apple-signed/notarized macOS releases and a public update feed; ad-hoc macOS releases are supported.
 - Remote access/relay, mobile, cloud sync.
 - Plugin/marketplace for app-level UI (we use pi packages, not a second plugin
   system).
@@ -285,15 +285,16 @@ the stale plan/approval screenshots. P1 daily-use features are implemented
 (notifications, MCP, worktrees, session search, per-file revert, Plan tab,
 subagent activity, inline question cards). P1 release engineering has CI, cross-builds,
 a versioned release workflow, optional signing, and the updater window; a public
-feed/key and an actual signed/notarized build need credentials and a release
-host. P2 localization is implemented for the English/Chinese shell, with CJK
+feed/key and an actual installed-update round trip need a public release host;
+Apple signing is optional. macOS is ad-hoc signed because no Apple Developer account is available;
+Gatekeeper requires a one-time approval. P2 localization is implemented for the English/Chinese shell, with CJK
 layout QA; native menu labels remain English.
 
 | Priority | Milestone | Exit criteria |
 |---|---|---|
 | P0 | Validation hardening | User validation pass; fresh real-pi UI smoke after the Base UI/Streamdown migration (prompt, tool card, diff, plan, approval, trust, login); native title bar/traffic-light/menu screenshot; refresh plan/approval screenshots; fix any blockers found. |
 | P0 | Performance closure | Profile full 1k-message transcript paint, streaming frame cost, and cached session switch; keep the budgets in ADR-013 or record a deliberate exception. Asset work: use the official Streamdown code/Mermaid plugins (done), verify grammar chunks load only on demand, and keep Markdown lazy. The app is within the 30 MB budget. |
-| P1 | Release engineering | Windows/Linux build probes and QA; signed and notarized macOS build; update feed and auto-update; fresh-clone CI build; crash/update diagnostics path. |
+| P1 | Release engineering | Multi-arch Windows/Linux/macOS builds; optional signing/notarization; public update feed and auto-update; fresh-clone CI build; ad-hoc macOS Gatekeeper path. |
 | P1 | Daily-use features | Complete: native completion notifications; MCP management; worktrees; subagent activity; session search; per-file revert; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |
 

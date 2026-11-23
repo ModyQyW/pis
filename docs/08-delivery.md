@@ -1,15 +1,20 @@
 # Initial delivery
 
 Status: ready for user validation on macOS arm64 (2026-11-23). A wider release
-is blocked on signed/notarized builds, a public update feed/key, and the
-plan/approval screenshot refresh. The P0 real-pi, native-window, and performance
-checks are complete.
+is blocked on a public update feed/key and the plan/approval screenshot refresh.
+macOS is ad-hoc signed and not notarized; Gatekeeper requires a one-time
+approval. The P0 real-pi, native-window, and performance checks are complete.
 
 ## Artifact
 
 ```text
 build/darwin-arm64/Pi Mygo.app            27.0 MB
 build/darwin-arm64/pi-mygo-0.1.0-arm64.dmg  6.8 MB
+build/darwin-amd64/pi-mygo-0.1.0-amd64.dmg  7.5 MB
+build/linux-amd64/pi-mygo-0.1.0-linux-amd64.tar.gz
+build/linux-arm64/pi-mygo-0.1.0-linux-arm64.tar.gz
+build/windows-amd64/pi-mygo-setup-0.1.0-amd64.exe
+build/windows-arm64/pi-mygo-setup-0.1.0-arm64.exe
 ```
 
 The build is ad-hoc signed, not notarized. macOS may require
@@ -18,17 +23,40 @@ System Settings → Privacy & Security → Open Anyway on first launch.
 ## Signed release and update feed
 
 The app includes the mygo updater plugin and a Check for Updates menu item.
-To build a distributable release, provide credentials and a public feed:
+GitHub Releases can serve updates without an Apple Developer account: mygo
+signs update archives with a generated Ed25519 key, and the installed app
+verifies that signature. macOS code signing is separate; without a Developer
+ID the `.app` is ad-hoc signed and Gatekeeper asks the user to approve it once.
+The release repository or feed must be public: private release assets are not
+readable by an installed app.
+
+Build a release from GitHub Actions by pushing a `v*` tag (or dispatching an
+existing tag). The workflow creates a draft release, then builds:
+
+- `macos-latest`: `darwin/arm64` and `darwin/amd64`, ad-hoc signed `.app` + DMG
+- `ubuntu-latest`: `windows/amd64` and `windows/arm64` with NSIS installers
+- `ubuntu-latest`: `linux/amd64` and `linux/arm64` with tar/deb/rpm/install.sh
+
+Actions are pinned to checkout v7, setup-go v7, upload-artifact v7,
+download-artifact v8, and action-gh-release v3. The Ubuntu jobs use
+`ubuntu-latest`; macOS packaging stays on `macos-latest` because ad-hoc signing
+and DMG creation require macOS. The builds upload the update archives and
+manifests with `-upload`. Review and publish the draft; the updater reads the
+latest published release. A private repository
+cannot serve this feed to users.
+
+For a local release with optional Apple signing/notarization:
 
 ```sh
 ./scripts/update-keygen.sh                 # writes a key pair outside the repo
 export PI_MYGO_VERSION=0.2.0
 export PI_MYGO_UPDATE_PUBLIC_KEY="$(cat "$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.pub")"
 export PI_MYGO_UPDATE_GITHUB=owner/pi-mygo # or PI_MYGO_UPDATE_URL=https://…
-export MACOS_SIGNING_IDENTITY="Developer ID Application: …"
-export MACOS_NOTARY_PROFILE=notary
+# Optional Apple credentials; omit both for an ad-hoc macOS build.
+# export MACOS_SIGNING_IDENTITY="Developer ID Application: …"
+# export MACOS_NOTARY_PROFILE=notary
 export MYGO_UPDATER_PRIVATE_KEY_FILE="$HOME/Library/Application Support/Pi Mygo/update-keys/mygo-update.key"
-./scripts/release.sh
+./scripts/release.sh -platform "darwin/arm64,darwin/amd64" -upload
 ```
 
 `scripts/release.sh` strips a leading `v` from the version, never prints the
@@ -39,9 +67,10 @@ ignored by Git. CI exposes the same inputs as repository variables/secrets
 `MACOS_NOTARY_PROFILE`).
 
 Without a public repository or update URL, the updater menu reports that the
-build cannot update itself. A signed/notarized build and an installed-update
-round trip have not been exercised on this machine because those credentials
-and the public feed are not present.
+build cannot update itself. An installed-update round trip on an ad-hoc signed
+macOS app has not been exercised on this machine because the public feed and
+update key are not configured; the workflow and manifests are otherwise
+supported by mygo.
 
 ## Requirements on the validation machine
 
@@ -102,8 +131,10 @@ Screenshots: `docs/images/`.
    against a real pi account and project.
 2. **Screenshot refresh** — refresh the plan and approval images after the UI
    migration; trust is current.
-3. **Signing and update feed** — provide an Apple Developer ID and notarization
-   profile, choose a public release host, and set the updater public key/URL.
+3. **Update feed** — make the release repository public or set a public
+   `PI_MYGO_UPDATE_URL`, then set the updater public key and private-key secret.
+   Apple signing/notarization is optional; macOS can ship ad-hoc with Gatekeeper
+   approval.
 The real-pi UI smoke, native-window check, performance closure, CI, updater
 window, P1 daily-use features (including subagent activity and inline questions), and English/Chinese UI are complete for this
 build; see `05-qa.md`.
@@ -112,8 +143,8 @@ The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 
 ## Known limits for this version
 
-- macOS arm64 only validated; Windows/Linux untested.
-- Unsigned/unnotarized, no auto-update.
+- macOS arm64 runtime-validated; Windows/Linux builds untested at runtime.
+- macOS is ad-hoc signed and not notarized; auto-update needs a public feed/key.
 - RPC extension UI subset: no `ctx.ui.custom()` TUI components, custom editors,
   terminal input, or theme switching. Dialogs/status/widgets/notify work.
 - Native menu names stay English in Chinese mode.

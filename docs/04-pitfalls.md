@@ -406,3 +406,13 @@ module scope has the same problem for starter labels.
 include the locale in the memo dependency. The root subscribes to locale changes
 so plain render-time lookups refresh. Keep duplicate dictionary keys out: TS1117
 catches them, but remove stale ranges rather than renaming one copy.
+
+### P-060 — GitHub Actions major updates need consumer checks
+**Symptom.** The action versions were several majors behind. `upload-artifact`
+v7 and `download-artifact` v8 are ESM-based, and v8 makes a digest mismatch a
+hard error instead of a warning. `action-gh-release` v3 runs on Node 24.
+**Rule.** Pin `checkout@v7` and `setup-go@v7`, keep `upload-artifact@v7` and
+`download-artifact@v8` on artifacts produced in the same run so hashes match,
+and keep `action-gh-release@v3`'s `draft: true` on re-runs. Build Windows on
+Ubuntu with NSIS and macOS on a macOS runner; a Linux runner cannot ad-hoc sign
+or create a DMG.

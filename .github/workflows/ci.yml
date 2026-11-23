@@ -15,10 +15,10 @@ concurrency:
 
 jobs:
   go:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
@@ -27,7 +27,7 @@ jobs:
       - run: go test ./...
 
   cross-build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -35,14 +35,17 @@ jobs:
           - linux/amd64
           - linux/arm64
           - windows/amd64
+          - windows/arm64
           - darwin/arm64
+          - darwin/amd64
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
-      - run: |
+      - name: Cross-compile ${{ matrix.target }}
+        run: |
           export GOOS="${TARGET%/*}"
           export GOARCH="${TARGET#*/}"
           export CGO_ENABLED=0
@@ -51,9 +54,9 @@ jobs:
           TARGET: ${{ matrix.target }}
 
   frontend:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.5
@@ -62,12 +65,12 @@ jobs:
       - run: bun run test
       - run: bun run build:web
 
-  package:
-    runs-on: macos-14
+  package-macos:
+    runs-on: macos-latest
     needs: [go, frontend]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
           cache: true
@@ -75,11 +78,10 @@ jobs:
         with:
           bun-version: 1.4.5
       - run: bun install --frozen-lockfile
-      - run: bun run build
-      - uses: actions/upload-artifact@v4
+      - name: Build ad-hoc macOS apps (arm64 + amd64)
+        run: go tool mygo build -platform "darwin/arm64,darwin/amd64"
+      - uses: actions/upload-artifact@v7
         with:
-          name: pi-mygo-darwin-arm64
-          path: |
-            build/darwin-arm64/Pi Mygo.app
-            build/darwin-arm64/*.dmg
+          name: pi-mygo-macos
+          path: build/**
           if-no-files-found: error
