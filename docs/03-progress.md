@@ -16,7 +16,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Remaining before a wider release: refresh plan/approval/trust screenshots,
+- Remaining before a wider release: refresh plan/approval screenshots,
   signed/notarized public builds, an update feed/key, and subagent/inline-question
   polish.
 
@@ -28,8 +28,8 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   `docs/images/real-pi.png`.
 - Native window check: **pass** for traffic lights, hidden-inset title bar,
   sidebar, composer, and menus; full-screen and dark theme still follow the
-  same shell and need no code change. Plan/approval/trust screenshots still
-  predate the UI migration.
+  same shell and need no code change. Plan and approval screenshots still
+  predate the UI migration; the trust dialog is current.
 - Performance closure: **pass** in a throwaway 1,000-item browser harness.
   Rendering after data is ready took 3 ms; parser was previously 3.5 ms for
   1,000 messages. Cached session switch took 32 ms cold / 19 ms warm; 60

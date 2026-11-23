@@ -1,9 +1,9 @@
 # Initial delivery
 
 Status: ready for user validation on macOS arm64 (2026-11-23). A wider release
-is blocked on signed/notarized builds, a public update feed/key, and the plan/
-approval/trust screenshot refresh. The P0 real-pi, native-window, and
-performance checks are complete.
+is blocked on signed/notarized builds, a public update feed/key, and the
+plan/approval screenshot refresh. The P0 real-pi, native-window, and performance
+checks are complete.
 
 ## Artifact
 
@@ -72,8 +72,8 @@ Screenshots: `docs/images/`.
 
 1. **User validation** — install, launch, and run the five-minute checklist
    against a real pi account and project.
-2. **Screenshot refresh** — refresh the plan, approval, and trust images after
-   the UI migration.
+2. **Screenshot refresh** — refresh the plan and approval images after the UI
+   migration; trust is current.
 3. **Signing and update feed** — provide an Apple Developer ID and notarization
    profile, choose a public release host, and set the updater public key/URL.
 The real-pi UI smoke, native-window check, performance closure, CI, updater
