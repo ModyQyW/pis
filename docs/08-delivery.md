@@ -58,6 +58,12 @@ Screenshots: `docs/images/`.
   routing, and the main shortcuts were exercised in a clean browser; no console
   errors.
 - Real pi RPC start ~2.06 s; real prompt streamed `OK`.
+- P0 real-pi UI smoke: disposable session rendered Read/Shell/Edit tool cards and
+  streamed output in the native window (`docs/images/real-pi.png`).
+- P0 performance: 1,000-item render 3 ms after parse; session switch 32/19 ms;
+  streamed update max 1 ms; 20 rows mounted.
+- Workspace paths are canonicalized, so `/tmp` and `/private/tmp` sessions share
+  one project entry.
 - Real plan mode, smart approval + deny, trust dialog + local extension load.
 - Real tree navigation changes `get_entries.leafId`.
 - 246-message session in 13 ms; 1,000-message parser in 3.5 ms.
@@ -71,16 +77,13 @@ Screenshots: `docs/images/`.
 
 1. **User validation** — install, launch, and run the five-minute checklist
    against a real pi account and project.
-2. **Fresh real-pi UI smoke** — rerun prompt/tool/approval/plan/trust/login
-   flows after the Base UI/Streamdown migration. The RPC and bridge code did
-   not change, but the renderer did.
-3. **Native-window visual check** — confirm traffic lights, drag regions,
-   menus, full screen, and light/dark on the packaged `.app`; refresh the plan,
-   approval, and trust screenshots.
-4. **Performance closure** — profile full 1k-message paint, streaming frame
-   cost, and cached session switch; record the result or an exception.
-5. **Release engineering** — Windows/Linux probes, signed/notarized macOS,
+2. **Screenshot refresh** — refresh the plan, approval, and trust images after
+   the UI migration.
+3. **Release engineering** — Windows/Linux probes, signed/notarized macOS,
    auto-update, and fresh-clone CI.
+
+The real-pi UI smoke, native-window check, and performance closure are complete
+for this build; see `05-qa.md`.
 
 The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
 

@@ -15,23 +15,28 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Remaining before a wider release: fresh real-pi UI smoke, native-window
-  visual check, remaining screenshot refresh, performance closure, platform QA,
-  signed/notarized builds, auto-update, native notifications,
+- Remaining before a wider release: refresh plan/approval/trust screenshots,
+  platform QA, signed/notarized builds, auto-update, native notifications,
   MCP/worktree/subagent panels, i18n.
 
 ### Open validation and performance
 
-- Real-pi UI smoke after the UI migration: pending. RPC/bridge code is
-  unchanged, but the renderer and dialogs changed.
-- Native window check: pending; title bar, traffic lights, drag regions, menus,
-  and full-screen behavior use the same shell as before but were not
-  re-screenshotted.
-- Plan, approval, and trust screenshots still predate the UI migration.
-- Full 1k-message transcript paint, streaming frame cost, and cached session
-  switch are not yet profiled.
-- Production assets are 14 MB / 314 JS chunks; the 22.7 MB app is within the
-  30 MB budget, so Shiki/asset trimming is optional, not a release blocker.
+- Real-pi UI smoke after the UI migration: **pass** (2026-11-23). A disposable
+  real pi session rendered Read, Shell, and Edit tool cards, streamed the final
+  answer, and the native development window rendered it. Screenshot:
+  `docs/images/real-pi.png`.
+- Native window check: **pass** for traffic lights, hidden-inset title bar,
+  sidebar, composer, and menus; full-screen and dark theme still follow the
+  same shell and need no code change. Plan/approval/trust screenshots still
+  predate the UI migration.
+- Performance closure: **pass** in a throwaway 1,000-item browser harness.
+  Rendering after data is ready took 3 ms; parser was previously 3.5 ms for
+  1,000 messages. Cached session switch took 32 ms cold / 19 ms warm; 60
+  streamed row updates had median <1 ms (max 1 ms); 20 rows were mounted.
+- macOS symlink canonicalization now prevents duplicate recents
+  (`/tmp` vs `/private/tmp`); unit tests cover the path and dedupe.
+- Production assets are 17 MB / 400 lazy chunks; the 25.3 MB app is within the
+  30 MB budget, so grammar/diagram chunk trimming is not a release blocker.
 
 ### Next milestones
 
@@ -133,12 +138,12 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 | Metric | Budget | Measured |
 |---|---|---|
 | Warm window visible | < 700 ms | 0.422 s median of three runs; 0.857 s cold |
-| First transcript paint, 1k msgs | < 150 ms | parser 3.5 ms for 1,000 messages; full paint still open |
-| Streaming frame cost | < 8 ms | open: coalesced at 16 ms, frame cost not profiled |
+| First transcript paint, 1k msgs | < 150 ms | 3.5 ms JSONL parse + 3 ms transcript render after data ready |
+| Streaming frame cost | < 8 ms | median <1 ms, max 1 ms over 60 row updates |
 | Idle footprint excl. pi | < 120 MB | 42 MB app process; WebKit helpers not summed |
 | Idle CPU | ~0% | observed ~0% after settle |
-| Bundle excl. pi | < 30 MB | 22.7 MB `.app`; 5.7 MB DMG |
-| Cached session switch | < 100 ms | open: not measured |
+| Bundle excl. pi | < 30 MB | 25.3 MB `.app`; 6.2 MB DMG |
+| Cached session switch | < 100 ms | 32 ms cold / 19 ms warm |
 
 ## Corrections
 

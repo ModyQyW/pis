@@ -370,3 +370,13 @@ check `bun pm ls <pkg>`, exercise the consuming UI (math, highlighting, icons),
 and record the split. Do not silently assume the highest version is the one the
 renderer uses. Prefer a direct version that matches the consumer when the
 duplicate has no benefit.
+
+### P-056 — macOS symlinked workspace paths create duplicate projects
+**Symptom.** Opening `/tmp/pi-mygo-p0` added one project, then opening its
+real pi session (which records `/private/tmp/pi-mygo-p0`) added a second project
+with the same name.
+**Rule.** Canonicalize workspace paths before comparison and persistence:
+`filepath.Abs`, then `filepath.EvalSymlinks`, then `os.Stat`. Deduplicate
+existing recents by canonical path on bootstrap and when adding/removing a
+project. Keep display names from the canonical basename.
+

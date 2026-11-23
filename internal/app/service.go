@@ -99,6 +99,7 @@ func New(store *settings.Store, dir string, mgr *agent.Manager) *Service {
 // background. It never blocks the first paint on a process or the network.
 func (s *Service) Bootstrap() Bootstrap {
 	cfg := s.store.Snapshot()
+	cfg.LastWorkspace = canonicalPath(cfg.LastWorkspace)
 	s.startPiDiscovery()
 	return Bootstrap{
 		AppName:    mygo.App.Name(),
@@ -205,7 +206,7 @@ func (s *Service) OpenProject(path string) (Workspace, error) {
 	err = s.store.Update(func(c *settings.Settings) error {
 		next := c.Recents[:0]
 		for _, r := range c.Recents {
-			if r.Path != abs {
+			if canonicalPath(r.Path) != abs {
 				next = append(next, r)
 			}
 		}
@@ -233,12 +234,12 @@ func (s *Service) RemoveRecent(path string) error {
 	return s.store.Update(func(c *settings.Settings) error {
 		next := c.Recents[:0]
 		for _, r := range c.Recents {
-			if r.Path != abs {
+			if canonicalPath(r.Path) != abs {
 				next = append(next, r)
 			}
 		}
 		c.Recents = next
-		if c.LastWorkspace == abs {
+		if canonicalPath(c.LastWorkspace) == abs {
 			c.LastWorkspace = ""
 		}
 		return nil
@@ -425,8 +426,14 @@ func (s *Service) piStatus() PiStatus {
 
 func recents(cfg settings.Settings) []Workspace {
 	out := make([]Workspace, 0, len(cfg.Recents))
+	seen := map[string]bool{}
 	for _, r := range cfg.Recents {
-		out = append(out, Workspace{Path: r.Path, Name: r.Name, LastOpened: r.LastOpened})
+		path := canonicalPath(r.Path)
+		if path == "" || seen[path] {
+			continue
+		}
+		seen[path] = true
+		out = append(out, Workspace{Path: path, Name: filepath.Base(path), LastOpened: r.LastOpened})
 	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].LastOpened.After(out[j].LastOpened) })
 	return out
@@ -441,6 +448,10 @@ func normalizeDir(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	// macOS exposes /tmp as a symlink to /private/tmp. pi records the real
+	// path in session files, so keep recents and workspace comparisons in the
+	// same canonical form.
+	abs = canonicalPath(abs)
 	info, err := os.Stat(abs)
 	if err != nil {
 		return "", err
@@ -449,4 +460,14 @@ func normalizeDir(path string) (string, error) {
 		return "", fmt.Errorf("%s is not a directory", abs)
 	}
 	return abs, nil
+}
+
+func canonicalPath(path string) string {
+	if path == "" {
+		return ""
+	}
+	if resolved, err := filepath.EvalSymlinks(path); err == nil {
+		return resolved
+	}
+	return path
 }
