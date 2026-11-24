@@ -2,10 +2,10 @@
 
 ## 当前状态
 
-- `0.0.1` 和 `0.0.2` 已发布。
+- `0.0.1`、`0.0.2` 和 `0.0.4` 已发布。
 - `0.0.3` 只有 draft release。它没有发布，也不提供更新。
-- `0.0.4` 是本次公开版本。
-- 最新 tag 是 `v0.0.3`。`release.sh` 建议 `0.0.4`。
+- 最新 tag 是 `v0.0.4`。
+- 后续补丁版本从 `v0.0.4` 计算。
 - macOS 使用 ad-hoc 签名。Windows 未签名。Linux 使用发行包和 `install.sh`。
 
 ## 1. 发布前检查
@@ -53,7 +53,7 @@ git status
 git push origin main
 ```
 
-发布 tag 前，`origin/main` 必须包含 `0.0.4` 源码。不得在未推送的 commit 上创建 tag。
+发布 tag 前，`origin/main` 必须包含目标版本源码。不得在未推送的 commit 上创建 tag。
 
 ## 4. 发布脚本
 
@@ -66,7 +66,7 @@ git push origin main
 3. 校验 semver。
 4. 进入构建。
 
-当前最新 tag 是 `v0.0.3`。脚本建议 `0.0.4`。
+当前最新 tag 是 `v0.0.4`。脚本建议下一个 patch 版本。
 
 非交互环境必须显式设置版本：
 
@@ -108,11 +108,11 @@ gh variable set PIS_UPDATE_GITHUB --body "ModyQyW/pis"
 `origin/main` 和本地 `main` 必须一致。然后执行：
 
 ```sh
-git tag v0.0.4
-git push origin v0.0.4
+git tag v0.0.5
+git push origin v0.0.5
 ```
 
-tag 会触发 Release workflow。
+把示例版本替换为目标版本后，tag 会触发 Release workflow。
 
 ## 7. Release workflow
 
@@ -125,12 +125,12 @@ Release workflow 执行以下步骤：
 5. 上传更新归档、delta、manifest 和校验文件。
 6. 在 `verify` job 中下载并检查产物存在。
 
-Release workflow 不会自动发布 draft。draft 不是公开 Release。draft 不进入更新 feed。
+Release workflow 不会自动发布 draft。draft 不是公开 Release。draft 不进入更新 feed。`0.0.4` 已按本流程发布。
 
 ## 8. 检查 draft
 
 ```sh
-gh release view v0.0.4 --json isDraft,assets,publishedAt,url
+gh release view vX.Y.Z --json isDraft,assets,publishedAt,url
 gh run watch <release-run-id> --exit-status
 ```
 
@@ -148,9 +148,9 @@ gh run watch <release-run-id> --exit-status
 draft 检查通过后，设置标题、说明和 latest 标记，然后发布：
 
 ```sh
-gh release edit v0.0.4 \
-  --title "PiS 0.0.4" \
-  --notes-file release-notes/0.0.4.md \
+gh release edit vX.Y.Z \
+  --title "PiS X.Y.Z" \
+  --notes-file release-notes/X.Y.Z.md \
   --latest \
   --draft=false
 ```
@@ -158,7 +158,8 @@ gh release edit v0.0.4 \
 发布后确认：
 
 ```sh
-gh release view v0.0.4 --json isDraft,isLatest,publishedAt,url
+gh release view vX.Y.Z --json isDraft,publishedAt,url
+gh release list --limit 1 --json tagName,isLatest
 ```
 
 结果必须满足：
@@ -169,7 +170,7 @@ gh release view v0.0.4 --json isDraft,isLatest,publishedAt,url
 
 ## 10. 发布后验证
 
-1. 安装 `0.0.2` 应用。
+1. 安装上一公开版本。0.0.4 的上一个公开版本是 `0.0.2`。
 2. 在应用中执行 `Check for Updates`。
 3. 确认更新目标为 `0.0.4`。
 4. 安装更新。
@@ -201,16 +202,16 @@ Windows 和 Linux 验证需要对应机器。没有机器时，记录「跳过�
 
 - 工作区干净。
 - `bun run check` 通过。
-- `CHANGELOG.md` 包含 `0.0.4`。
-- 版本为 `0.0.4`。
+- `CHANGELOG.md` 包含目标版本。
+- 版本为目标版本。
 - `origin/main` 包含发布源码。
 - `PIS_UPDATE_PUBLIC_KEY`、`MYGO_UPDATER_PRIVATE_KEY`、`PIS_UPDATE_GITHUB` 已配置。
 - bundle ID 固定为 `top.modyqyw.pis`。
 - Release workflow 通过。
 - draft 的六个架构产物存在。
 - `SHA256SUMS` 和 manifest 正确。
-- `0.0.4` 已发布，`isDraft` 为 `false`。
-- `0.0.4` 是 latest release。
-- `0.0.2 → 0.0.4` 更新通过。
+- Release 已发布，`isDraft` 为 `false`。
+- Release 是 latest release。
+- 上一公开版本到目标版本的更新通过。
 - 文档站在 Cloudflare Pages 和 Netlify 可访问。
 - 已知限制和 Gatekeeper/SmartScreen 说明已发布。

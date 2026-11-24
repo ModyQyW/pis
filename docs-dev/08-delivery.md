@@ -1,9 +1,8 @@
 # Public delivery
 
-Status: **0.0.1 and 0.0.2 published** (2026-11-24). **0.0.3 is a draft release.**
-**0.0.4 is prepared.** The update feed still serves 0.0.2 until 0.0.4 is
-published. The repository and update feed are public. The signed 0.0.1 → 0.0.2
-update installed successfully. 0.0.2 ships deltas for every target. macOS is
+Status: **0.0.1, 0.0.2, and 0.0.4 are published** (2026-11-24). **0.0.3 is a
+draft release.** The update feed serves 0.0.4. The repository and update feed
+are public. The signed 0.0.1 → 0.0.2 update installed successfully. macOS is
 ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
 Windows/Linux runtime QA is skipped because no test machines are available.
 
@@ -36,6 +35,17 @@ build/windows-arm64/pis-setup-0.0.2-arm64.exe   6.4 MB
 ```
 
 The 0.0.3 draft has 35 assets. It is not public.
+
+0.0.4 is public:
+
+- Release: <https://github.com/ModyQyW/pis/releases/tag/v0.0.4>
+- Release workflow: `45373416219`, success.
+- Assets: 35.
+- `isDraft`: `false`.
+- `isLatest`: `true`.
+- The public latest manifest returns `0.0.4`.
+- The public `0.0.2 → 0.0.4` delta exists.
+- The public DMG SHA-256 matches `SHA256SUMS`.
 
 Local 0.0.4 verification on macOS arm64:
 
@@ -195,14 +205,14 @@ Prepared:
 - [x] `bun run check` passes.
 - [x] `bun run docs:build` passes.
 - [x] Local `0.0.4` macOS arm64 app builds.
-- [ ] Final `0.0.4` source is committed and pushed.
-- [ ] `v0.0.4` tag is created and pushed.
-- [ ] Release workflow passes.
-- [ ] Six architecture artifacts, `SHA256SUMS`, manifests, and
+- [x] Final `0.0.4` source is committed and pushed.
+- [x] `v0.0.4` tag is created and pushed.
+- [x] Release workflow `45373416219` passed.
+- [x] Six architecture artifacts, `SHA256SUMS`, manifests, and
   `0.0.2 → 0.0.4` delta exist.
-- [ ] GitHub release `v0.0.4` is published. `isDraft` is `false`.
-- [ ] `v0.0.4` is the latest release.
-- [ ] `0.0.2 → 0.0.4` update check passes.
+- [x] GitHub release `v0.0.4` is published. `isDraft` is `false`.
+- [x] `v0.0.4` is the latest release.
+- [ ] `0.0.2 → 0.0.4` installed-app update check is run.
 - [ ] Cloudflare Pages and Netlify documentation deployments are verified.
 - [ ] Windows and Linux runtime/update QA is run, or recorded as skipped.
 - [ ] Final secret scan and dependency audit pass.
@@ -214,8 +224,9 @@ Documentation deployment steps are in
 
 - macOS arm64 is runtime-validated; Windows and Linux runtime QA are untested.
 - macOS is ad-hoc signed and not notarized. Windows is unsigned.
-- The 0.0.1 → 0.0.2 update is verified. The 0.0.2 → 0.0.4 update must be
-  verified after publication.
+- The 0.0.1 → 0.0.2 update is verified. The 0.0.4 public manifest and
+  `0.0.2 → 0.0.4` delta are verified. The installed-app update path is not
+  verified.
 - The 0.0.3 draft is not public and must not be used as an update source.
 - Documentation deployment to Cloudflare Pages and Netlify is not verified by
   the release workflow.

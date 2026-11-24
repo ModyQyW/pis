@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: **approved 2026-11-22; refreshed 2026-11-23**. V1 implementation through Phase 9 is complete on macOS arm64; Phase 10 (delivery and user validation) is in progress; 0.0.4 is prepared. The wider-release roadmap is in §8.
+Status: **approved 2026-11-22; refreshed 2026-11-23**. V1 implementation through Phase 9 is complete on macOS arm64; Phase 10 (delivery and user validation) is in progress; 0.0.4 is published. The wider-release roadmap is in §8.
 Read `00-research.md`, `01-decisions.md`, and `03-progress.md` before every
 phase. Update `03-progress.md` when a phase starts and ends.
 
@@ -286,7 +286,7 @@ features are implemented (notifications, MCP, worktrees, session search,
 per-file revert, Plan tab, subagent activity, inline question cards). P1 release
 engineering has CI, cross-builds, a versioned release workflow, optional
 signing, the updater window, a public feed/key, and a verified macOS
-0.0.1 → 0.0.2 update. 0.0.4 is prepared. Apple signing is optional. macOS is
+0.0.1 → 0.0.2 update. 0.0.4 is published. Apple signing is optional. macOS is
 ad-hoc signed because no Apple Developer account is available; Gatekeeper
 requires one-time approval. P2 localization is implemented for the
 English/Chinese shell, with CJK layout QA; native menu labels remain English.
@@ -299,6 +299,6 @@ English/Chinese shell, with CJK layout QA; native menu labels remain English.
 | P1 | Daily-use features | Complete: native completion notifications; MCP management; worktrees; subagent activity; session search; per-file revert; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |
 
-Phase 10 closes when the user validates the 0.0.4 artifact. The remaining
-delivery items are the 0.0.4 tag and release publication, Windows/Linux runtime
-QA, and manual deployment of the documentation to Cloudflare Pages and Netlify.
+Phase 10 closes when the user validates the 0.0.4 artifact. 0.0.4 is published.
+The remaining delivery items are Windows/Linux runtime QA and manual deployment
+of the documentation to Cloudflare Pages and Netlify.

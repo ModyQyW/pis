@@ -21,13 +21,13 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2)**
-(27.0 MB app / 6.8 MB DMG). **0.0.3 is a draft release. It is not public.**
-**0.0.4 is prepared for publication.** The release and update feed are public.
-macOS is ad-hoc signed, so Gatekeeper requires a one-time approval. English is
-the default. Chinese is available in Settings. See
-[`docs-dev/03-progress.md`](docs-dev/03-progress.md) for evidence and
-[`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
+Current public release: **[0.0.4](https://github.com/ModyQyW/pis/releases/tag/v0.0.4)**
+(27.1 MB app / 6.9 MB DMG). The update feed resolves to `0.0.4`. The `0.0.3`
+GitHub release is a draft. It is not public and does not serve updates. The
+release and update feed are public. macOS is ad-hoc signed, so Gatekeeper
+requires a one-time approval. English is the default. Chinese is available in
+Settings. See [`docs-dev/03-progress.md`](docs-dev/03-progress.md) for evidence
+and [`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
 
 ## What works
 
@@ -162,10 +162,10 @@ prototypes, is in [`docs-dev/00-research.md`](docs-dev/00-research.md).
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; PiS does not fake them.
 - Auto-update uses GitHub Releases and an Ed25519 update key. The signed
-  0.0.1 → 0.0.2 update was verified. The 0.0.3 release is a draft. The
-  0.0.2 → 0.0.4 update is not verified before publication. macOS builds are
-  ad-hoc signed, not notarized; Gatekeeper requires a one-time Open Anyway
-  approval.
+  0.0.1 → 0.0.2 update was verified. The public `0.0.4` manifest and
+  `0.0.2 → 0.0.4` delta were verified. The installed-app update path was not
+  run. The `0.0.3` release is a draft. macOS builds are ad-hoc signed, not
+  notarized; Gatekeeper requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's

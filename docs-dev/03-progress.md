@@ -15,9 +15,10 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Initial implementation: complete enough for user validation on macOS arm64.
 - Public 0.0.2 build: `build/darwin-arm64/PiS.app` (27.0 MB) and
   `pis-0.0.2-arm64.dmg` (6.8 MB); production source maps disabled.
-- 0.0.3 is a draft release. It is not published. 0.0.4 is prepared.
+- 0.0.3 is a draft release. It is not published. 0.0.4 is published.
   Local 0.0.4 macOS arm64 build: `build/darwin-arm64/PiS.app` (27.1 MB) and
   `pis-0.0.4-arm64.dmg` (6.9 MB); `CFBundleShortVersionString` is `0.0.4`.
+  Release workflow `45373416219` passed; the public release is latest.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff were exercised
   before the Base UI/Streamdown UI migration; the post-migration native session
@@ -25,9 +26,10 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Public releases: **0.0.1** and **0.0.2** published. **0.0.3 is a draft
-  release only.** **0.0.4 is prepared.** The signed 0.0.1 → 0.0.2 update
-  installed successfully in a disposable app bundle.
+- Public releases: **0.0.1**, **0.0.2**, and **0.0.4**. **0.0.3 is a draft
+  release only.** The signed 0.0.1 → 0.0.2 update installed successfully in a
+  disposable app bundle. The 0.0.4 public manifest and 0.0.2 → 0.0.4 delta are
+  verified; the installed-app update path is not verified.
   macOS arm64 clean install/launch and the real-pi integration pass. Windows/
   Linux runtime QA remains skipped because no test machines are available.
   macOS is ad-hoc signed and requires a one-time Gatekeeper approval.
@@ -263,7 +265,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 - Added Cloudflare Pages and Netlify deployment instructions. The deployment
   is manual and is not verified yet.
 - 0.0.4 removes the unused Netlify config file and publishes the prepared
-  changes. 0.0.3 remains a draft.
+  changes. 0.0.3 remains a draft. The 0.0.4 release is latest.
 - Vite+'s type-aware check exposed an untyped bridge import and a broken
   destructive-command table. The bridge now uses labeled rules and a local
   declaration for pi's extension API; `bridge.Version` is 7.
