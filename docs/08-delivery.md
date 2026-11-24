@@ -146,6 +146,10 @@ Screenshots: `docs/images/`.
   trust, approval, settings, session tree, diff, login, and both Chinese views.
   `real-pi.png` records the pre-rebrand P0 native run.
 - Rspress docs and root config typecheck pass in `./scripts/verify.sh`.
+- `govulncheck` reports no Go vulnerabilities. `bun audit` reports one low
+  transitive KaTeX advisory (nested 0.16.x) and one moderate minimatch advisory
+  under the `shadcn` dev tooling; current ranges offer no automatic fix. Track
+  them for the next dependency update.
 - Releases: [0.0.1](https://github.com/ModyQyW/pis/releases/tag/v0.0.1),
   [0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2). The 0.0.2
   release includes a signed delta from 0.0.1 for every platform.
