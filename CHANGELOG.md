@@ -1,6 +1,15 @@
 # Changelog
 
-## 0.0.3 (2026-11-24)
+## 0.0.4 (2026-11-24)
+
+- Publish the changes that were prepared in the unpublished 0.0.3 draft.
+  0.0.4 is the public release; the 0.0.3 draft is not a release.
+- Remove the unused `netlify.toml`. Netlify deployments use manual upload or
+  dashboard settings. Update the deployment and release documentation.
+- No application behavior changes from the 0.0.3 source. 0.0.4 changes the
+  version, release notes, and documentation.
+
+## 0.0.3 (2026-11-24, draft only)
 
 - Add Vite+ 1.8 (Oxlint, Oxfmt, tsrs) as the frontend format/lint/type-check
   gate; `bun run format` formats, and `bun run check` / `scripts/check.sh`
@@ -14,8 +23,7 @@
   dark-background variant.
 - Split the Rspress user guide into `docs-user/` and the research, decisions,
   progress, QA, and delivery notes into `docs-dev/`.
-- Add Cloudflare Pages and Netlify deployment instructions. Add
-  `netlify.toml` for the Netlify Git integration.
+- Add Cloudflare Pages and Netlify deployment instructions.
 - Fix smart approvals' destructive-command table (regexes were typed as rules)
   and bump the bridge version so installed bridge copies refresh.
 

@@ -122,34 +122,29 @@ bunx wrangler@latest pages deploy docs-user-build --project-name <pages-project-
 8. 重新部署。设置变更需要新部署才能生效。
 9. 执行第 4 节的验证。
 
-手动上传不读取 `netlify.toml`。每次修改文档后，重新构建并上传新产物。
+手动上传不读取 Git integration 的构建设置。每次修改文档后，重新构建并上传新产物。
 
 ### 3.2 Git 集成
 
-仓库根目录包含 `netlify.toml`：
-
-```toml
-[build]
-  command = "bun install --frozen-lockfile && bun run docs:build"
-  publish = "docs-user-build"
-
-[build.environment]
-  BUN_VERSION = "1.4.5"
-  VP_GIT_HOOKS = "0"
-```
+仓库不包含 `netlify.toml`。以下设置写在 Netlify 站点配置中。
 
 1. 在 Netlify 中连接 GitHub 仓库 `ModyQyW/pis`。
 2. 确认 Base directory 为仓库根目录。
 3. 在 Netlify 站点配置中打开 Post processing。
 4. 确认或启用 Pretty URLs。Rspress 生成的链接不带 `.html`。
-5. 确认 Build command 为 `bun install --frozen-lockfile && bun run docs:build`。
-6. 确认 Publish directory 为 `docs-user-build`。
-7. 确认环境变量 `BUN_VERSION` 为 `1.4.5`。
-8. 在 Netlify 环境变量中设置 `PIS_DOCS_SITE_URL` 为该站点的公开域名。
+5. 将 Build command 设为：
+
+```sh
+bun install --frozen-lockfile && bun run docs:build
+```
+
+6. 将 Publish directory 设为 `docs-user-build`。
+7. 将环境变量 `BUN_VERSION` 设为 `1.4.5`。
+8. 将环境变量 `PIS_DOCS_SITE_URL` 设为该站点的公开域名。
 9. 触发部署。
 10. 执行第 4 节的验证。
 
-Netlify 文档当前只列出 `bun.lockb` 的自动检测。本仓库使用 `bun.lock`。因此 Netlify 会先运行一次 `npm install`。然后 `netlify.toml` 的 build command 再运行 Bun 安装和文档构建。
+Netlify 文档当前只列出 `bun.lockb` 的自动检测。本仓库使用 `bun.lock`。因此 Netlify 会先运行一次 `npm install`。然后 Netlify 执行站点配置中的 build command。
 
 如果这次 `npm install` 失败，Netlify 不会执行 build command。此时请使用第 3.1 节的手动上传。不要为部署新增重复的 `bun.lockb`。
 
@@ -215,5 +210,5 @@ Cloudflare Pages 和 Netlify 都保留部署历史。需要回滚时，在平台
 - 本文不配置自定义域名。域名和 HTTPS 在平台控制台中设置。
 - 本文不配置访问控制。文档站是公开站点。
 - 本文不覆盖服务端函数、重定向规则和动态内容。
-- Netlify Git 集成的首次 `npm install` 由 Netlify 执行。该步骤不受 `netlify.toml` 的 build command 控制。
+- Netlify Git 集成的首次 `npm install` 由 Netlify 执行。该步骤不受站点 Build command 控制。
 - Cloudflare Pages 和 Netlify 的界面名称会变化。以平台当前界面为准。

@@ -9,15 +9,15 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Rebrand (2026-11-24): product is **PiS**, binary/slug `pis`, bundle ID
   `top.modyqyw.pis`, env prefix `PIS_`, data directory `PiS`, GitHub repository
   `ModyQyW/pis`. The S stands for strong. Source, tests, docs, release scripts,
-  and workflow identities were updated. The final 0.0.3 mark is a monochrome
+  and workflow identities were updated. The final 0.0.4 mark is a monochrome
   π + flexed arm; the empty-state screenshot is refreshed. Other screenshots
   retain the earlier PiS captures.
 - Initial implementation: complete enough for user validation on macOS arm64.
 - Public 0.0.2 build: `build/darwin-arm64/PiS.app` (27.0 MB) and
   `pis-0.0.2-arm64.dmg` (6.8 MB); production source maps disabled.
-- 0.0.3 is prepared. It is not published. Local macOS arm64 build:
-  `build/darwin-arm64/PiS.app` (27.1 MB) and
-  `pis-0.0.3-arm64.dmg` (6.9 MB); `CFBundleShortVersionString` is `0.0.3`.
+- 0.0.3 is a draft release. It is not published. 0.0.4 is prepared.
+  Local 0.0.4 macOS arm64 build: `build/darwin-arm64/PiS.app` (27.1 MB) and
+  `pis-0.0.4-arm64.dmg` (6.9 MB); `CFBundleShortVersionString` is `0.0.4`.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff were exercised
   before the Base UI/Streamdown UI migration; the post-migration native session
@@ -25,9 +25,9 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Public releases: **0.0.1** and **0.0.2** published. 0.0.3 is prepared.
-  The signed 0.0.1 → 0.0.2 update installed successfully in a disposable app
-  bundle.
+- Public releases: **0.0.1** and **0.0.2** published. **0.0.3 is a draft
+  release only.** **0.0.4 is prepared.** The signed 0.0.1 → 0.0.2 update
+  installed successfully in a disposable app bundle.
   macOS arm64 clean install/launch and the real-pi integration pass. Windows/
   Linux runtime QA remains skipped because no test machines are available.
   macOS is ad-hoc signed and requires a one-time Gatekeeper approval.
@@ -188,7 +188,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   is configured. The macOS 0.0.1 → 0.0.2 update is verified; Windows and Linux
   update checks are not run.
 - **Version**: `mygo.config.ts` reads `PIS_VERSION`; `main.go` no longer
-  hard-codes 0.1.0. Local builds default to 0.0.3.
+  hard-codes 0.1.0. Local builds default to 0.0.4.
 
 ### Transcript virtualization and dependencies
 
@@ -262,6 +262,8 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   `docs-dev/`; all README and cross-document links were updated.
 - Added Cloudflare Pages and Netlify deployment instructions. The deployment
   is manual and is not verified yet.
+- 0.0.4 removes the unused Netlify config file and publishes the prepared
+  changes. 0.0.3 remains a draft.
 - Vite+'s type-aware check exposed an untyped bridge import and a broken
   destructive-command table. The bridge now uses labeled rules and a local
   declaration for pi's extension API; `bridge.Version` is 7.

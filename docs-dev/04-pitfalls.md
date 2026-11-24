@@ -458,9 +458,9 @@ type checker found the real approval-table bug there.
 the repository uses the text `bun.lock`, while Netlify documents automatic Bun
 detection for `bun.lockb`.
 **Rule.** For the manual deployment, build locally and upload
-`docs-user-build/`. For Git integration, keep the explicit
-`bun install --frozen-lockfile && bun run docs:build` command in
-`netlify.toml` and check the deploy log. Do not add a second lockfile.
+`docs-user-build/`. For Git integration, set the explicit
+`bun install --frozen-lockfile && bun run docs:build` command in the Netlify
+site settings and check the deploy log. Do not add a second lockfile.
 
 ### P-066 — Vite+ replaces the separate tsc commands
 **Symptom.** `tsc -p frontend/tsconfig.json` and `tsc -p tsconfig.json` repeated
@@ -468,3 +468,12 @@ the type checks that `vp check` already performs. `build:web` also ran tsc.
 **Rule.** Keep one type-check gate: `bun run check:web`. The full gate is
 `bun run check`. Use a temporary type error to confirm that Vite+ follows the
 frontend and root configs. Do not add a second tsc path.
+
+
+### P-067 — A draft release does not serve updates
+**Symptom.** Release workflow run `45369540750` passed. It created `v0.0.3` as a
+draft. GitHub still reported `0.0.2` as the latest public release. The update
+feed still returned `0.0.2`.
+**Rule.** A green Release workflow does not publish a release. After the asset
+check, run `gh release edit vX.Y.Z --draft=false --latest`, then check
+`isDraft=false` and `isLatest=true`. A draft is not an update source.
