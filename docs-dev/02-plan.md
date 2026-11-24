@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: **approved 2026-11-22; refreshed 2026-11-23**. V1 implementation through Phase 9 is complete on macOS arm64; Phase 10 (delivery and user validation) is in progress. The wider-release roadmap is in §8.
+Status: **approved 2026-11-22; refreshed 2026-11-23**. V1 implementation through Phase 9 is complete on macOS arm64; Phase 10 (delivery and user validation) is in progress; 0.0.3 is prepared. The wider-release roadmap is in §8.
 Read `00-research.md`, `01-decisions.md`, and `03-progress.md` before every
 phase. Update `03-progress.md` when a phase starts and ends.
 
@@ -139,10 +139,11 @@ pis/
 │   └── util/                   paths, login shell, locks, redaction
 ├── extensions/
 │   └── pis-bridge.ts          tree nav, plan mode, approvals, usage
-├── user-docs/                  Rspress user guide
-├── dev-docs/                   research, decisions, plan, progress, pitfalls, QA
+├── netlify.toml                Netlify docs build configuration
+├── docs-user/                  Rspress user guide
+├── docs-dev/                   research, decisions, plan, progress, pitfalls, QA
 ├── resources/                  icon source and licenses
-└── scripts/                    dev, verify, perf, package helpers
+└── scripts/                    dev, check, perf, package helpers
 ```
 
 Rules:
@@ -257,16 +258,14 @@ with a known red check.
 ## 6. Verification commands
 
 ```sh
-go build ./... && go vet ./...
-go test ./...
-bun install
-bun run typecheck
-bun run test
-bun run build          # frontend + mygo build
-MYGO_E2E=1 go test ./internal/e2e   # only if applicable to our app
+bun install --frozen-lockfile
+bun run format
+bun run check
 ```
 
-Add a `scripts/verify.sh` that runs the narrow set and prints budgets.
+`bun run check` is the complete gate. It runs Go checks, Vite+ checks, bridge
+tests, frontend tests, the frontend build, and the docs build. `scripts/check.sh`
+is the implementation of that gate.
 
 ## 7. Delivery definition
 
@@ -283,15 +282,15 @@ Add a `scripts/verify.sh` that runs the narrow set and prints budgets.
 Priority is about release risk, not feature appeal. Do not claim a platform or
 provider support level beyond what has been exercised.
 
-**Status 2026-11-23:** P0 validation and performance are complete except for
-the stale plan/approval screenshots. P1 daily-use features are implemented
-(notifications, MCP, worktrees, session search, per-file revert, Plan tab,
-subagent activity, inline question cards). P1 release engineering has CI, cross-builds,
-a versioned release workflow, optional signing, and the updater window; a public
-feed/key and an actual installed-update round trip need a public release host;
-Apple signing is optional. macOS is ad-hoc signed because no Apple Developer account is available;
-Gatekeeper requires a one-time approval. P2 localization is implemented for the English/Chinese shell, with CJK
-layout QA; native menu labels remain English.
+**Status 2026-11-24:** P0 validation and performance are complete. P1 daily-use
+features are implemented (notifications, MCP, worktrees, session search,
+per-file revert, Plan tab, subagent activity, inline question cards). P1 release
+engineering has CI, cross-builds, a versioned release workflow, optional
+signing, the updater window, a public feed/key, and a verified macOS
+0.0.1 → 0.0.2 update. 0.0.3 is prepared. Apple signing is optional. macOS is
+ad-hoc signed because no Apple Developer account is available; Gatekeeper
+requires one-time approval. P2 localization is implemented for the
+English/Chinese shell, with CJK layout QA; native menu labels remain English.
 
 | Priority | Milestone | Exit criteria |
 |---|---|---|
@@ -301,7 +300,6 @@ layout QA; native menu labels remain English.
 | P1 | Daily-use features | Complete: native completion notifications; MCP management; worktrees; subagent activity; session search; per-file revert; todo panel; inline question cards. |
 | P2 | Localization | Extract user-facing strings, add a Chinese locale, and run CJK UI QA; keep English as the default. |
 
-Phase 10 closes when the user has validated the artifact and the P0
-validation is green. P1/P2 work has started in parallel where it did not
-depend on that gate; the remaining P1 release items need credentials and a
-public release host.
+Phase 10 closes when the user validates the 0.0.3 artifact. The remaining
+delivery items are the 0.0.3 tag and release review, Windows/Linux runtime QA,
+and manual deployment of the documentation to Cloudflare Pages and Netlify.

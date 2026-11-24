@@ -28,8 +28,19 @@ jobs:
           draft: true
           generate_release_notes: true
 
-  build:
+  quality:
     needs: draft
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.5
+      - run: bun install --frozen-lockfile
+      - run: bun run check:web
+
+  build:
+    needs: [draft, quality]
     name: ${{ matrix.name }}
     strategy:
       fail-fast: false

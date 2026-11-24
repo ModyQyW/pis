@@ -18,16 +18,12 @@ echo "== go test"
 go test ./...
 echo "== vite+ format, lint, and typecheck"
 bun run check:web
-echo "== frontend typecheck"
-bun run typecheck
-echo "== config typecheck"
-bun run typecheck:config
 echo "== bridge tests"
 bun run test:bridge
 echo "== frontend tests"
 bun run test
 echo "== frontend build"
 bun run build:web
-echo "== user docs build"
+echo "== docs-user build"
 bun run docs:build
 echo "== ok"

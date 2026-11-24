@@ -1,13 +1,21 @@
 import { defineConfig } from "@rspress/core";
 import { fileURLToPath } from "node:url";
 
+const siteOrigin = process.env.PIS_DOCS_SITE_URL?.trim();
+
 export default defineConfig({
-  root: "user-docs",
-  outDir: "user-docs-build",
-  globalStyles: fileURLToPath(new URL("user-docs/styles/index.css", import.meta.url)),
+  root: "docs-user",
+  outDir: "docs-user-build",
+  globalStyles: fileURLToPath(new URL("docs-user/styles/index.css", import.meta.url)),
   title: "PiS",
   description: "PiS 是一个建立在 pi 之上的桌面 Coding Agent：原生外壳、流式会话、审批与计划模式。",
-  logo: "/icon.png",
+  ...(siteOrigin ? { siteOrigin } : {}),
+  logo: {
+    light: "/icon.png",
+    dark: "/icon-dark.png",
+    width: 26,
+    height: 26,
+  },
   logoText: "PiS",
   head: [["link", { rel: "icon", href: "/icon.png" }]],
   themeConfig: {
@@ -42,6 +50,7 @@ export default defineConfig({
             { text: "架构与数据流", link: "/advanced/architecture" },
             { text: "本地开发", link: "/advanced/development" },
             { text: "构建、签名与发布", link: "/advanced/release" },
+            { text: "部署文档站", link: "/advanced/docs-deployment" },
           ],
         },
       ],

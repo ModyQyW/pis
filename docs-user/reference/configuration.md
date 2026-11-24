@@ -18,6 +18,7 @@
 | 变量 | 作用 |
 |---|---|
 | `PIS_VERSION` | 本次构建版本；release workflow 从 tag 注入 |
+| `PIS_DOCS_SITE_URL` | 文档站构建的公开 origin；用于生成绝对 sitemap URL |
 | `PIS_UPDATE_PUBLIC_KEY` | 更新公钥内容 |
 | `PIS_UPDATE_URL` | 自定义更新 feed URL |
 | `PIS_UPDATE_GITHUB` | GitHub Releases 仓库，例如 `ModyQyW/pis` |

@@ -1,23 +1,29 @@
 # Changelog
 
-## Unreleased
+## 0.0.3 (2026-11-24)
 
 - Add Vite+ 1.8 (Oxlint, Oxfmt, tsrs) as the frontend format/lint/type-check
-  gate; `bun run format` and `./scripts/verify.sh` cover Go and Vite+ checks.
+  gate; `bun run format` formats, and `bun run check` / `scripts/check.sh`
+  cover Go and Vite+ checks.
+- Remove the separate `tsc` typecheck commands; Vite+ typechecks the frontend,
+  bridge, and root configs in one pass.
 - Install a Vite+ pre-commit hook through `vp config --no-agent`; every commit
   runs the full verification gate.
-- Replace the πS mark with a π + flexed-arm icon; the development app keeps the
-  same mark with a mint status dot.
-- Split the Rspress user guide into `user-docs/` and the research, decisions,
-  progress, QA, and delivery notes into `dev-docs/`.
+- Replace the πS mark with a monochrome π + flexed-arm icon; ship white- and
+  black-background variants, defaulting to white. The development app uses the
+  dark-background variant.
+- Split the Rspress user guide into `docs-user/` and the research, decisions,
+  progress, QA, and delivery notes into `docs-dev/`.
+- Add Cloudflare Pages and Netlify deployment instructions. Add
+  `netlify.toml` for the Netlify Git integration.
 - Fix smart approvals' destructive-command table (regexes were typed as rules)
   and bump the bridge version so installed bridge copies refresh.
 
 ## 0.0.2 (2026-11-24)
 
-- Add the Rspress user guide in `user-docs/`, with guides from first launch to
+- Add the Rspress user guide in `docs-user/`, with guides from first launch to
   architecture and release work.
-- Add a root `tsconfig.json` and config typecheck to `scripts/verify.sh`.
+- Add a root `tsconfig.json` and config typecheck to the verification gate.
 - `release.sh` now prompts for a version with a suggested next patch version
   when `PIS_VERSION` is not set, and validates the result.
 - Refresh the approval screenshot and release documentation.

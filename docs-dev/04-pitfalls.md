@@ -452,3 +452,19 @@ inside pi, not the frontend.
 `internal/bridge/pi-coding-agent.d.ts` and guard dynamic tool input before
 stringifying it. Do not silence the whole bridge with an ignore pattern; the
 type checker found the real approval-table bug there.
+
+### P-065 — Netlify detects bun.lockb, not bun.lock
+**Symptom.** Netlify ran `npm install` before the docs build command because
+the repository uses the text `bun.lock`, while Netlify documents automatic Bun
+detection for `bun.lockb`.
+**Rule.** For the manual deployment, build locally and upload
+`docs-user-build/`. For Git integration, keep the explicit
+`bun install --frozen-lockfile && bun run docs:build` command in
+`netlify.toml` and check the deploy log. Do not add a second lockfile.
+
+### P-066 — Vite+ replaces the separate tsc commands
+**Symptom.** `tsc -p frontend/tsconfig.json` and `tsc -p tsconfig.json` repeated
+the type checks that `vp check` already performs. `build:web` also ran tsc.
+**Rule.** Keep one type-check gate: `bun run check:web`. The full gate is
+`bun run check`. Use a temporary type error to confirm that Vite+ follows the
+frontend and root configs. Do not add a second tsc path.

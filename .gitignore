@@ -7,5 +7,5 @@ build/
 *.key
 update-keys/
 
-user-docs-build/
+docs-user-build/
 .vite-hooks/_/

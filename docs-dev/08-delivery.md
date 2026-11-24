@@ -1,13 +1,14 @@
 # Public delivery
 
-Status: **0.0.1 and 0.0.2 published** (2026-11-24). The repository and update
-feed are public; the signed 0.0.1 → 0.0.2 update installed successfully, and
-0.0.2 ships deltas for every target. macOS
-is ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
-Windows/Linux runtime QA is still skipped because no test machines are
-available.
+Status: **0.0.1 and 0.0.2 published** (2026-11-24). **0.0.3 is prepared and not
+published.** The repository and update feed are public. The signed 0.0.1 → 0.0.2
+update installed successfully. 0.0.2 ships deltas for every target. macOS is
+ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
+Windows/Linux runtime QA is skipped because no test machines are available.
 
 ## Artifact
+
+Public 0.0.2 artifacts:
 
 ```text
 build/darwin-arm64/PiS.app                  27.0 MB
@@ -18,6 +19,16 @@ build/linux-arm64/pis-0.0.2-linux-arm64.tar.gz  8.5 MB
 build/windows-amd64/pis-setup-0.0.2-amd64.exe   7.0 MB
 build/windows-arm64/pis-setup-0.0.2-arm64.exe   6.4 MB
 ```
+
+Local 0.0.3 verification on macOS arm64:
+
+```text
+build/darwin-arm64/PiS.app                  27.1 MB
+build/darwin-arm64/pis-0.0.3-arm64.dmg       6.9 MB
+CFBundleShortVersionString                   0.0.3
+```
+
+The public 0.0.3 build is produced by the tagged release workflow.
 
 The build is ad-hoc signed, not notarized. macOS may require
 System Settings → Privacy & Security → Open Anyway on first launch.
@@ -86,11 +97,11 @@ ignored by Git. CI exposes the same inputs as repository variables/secrets
 (`PIS_UPDATE_*`, `MYGO_UPDATER_PRIVATE_KEY`, `MACOS_SIGNING_IDENTITY`,
 `MACOS_NOTARY_PROFILE`).
 
-Without a public repository or update URL, the updater menu reports that the
-build cannot update itself. An installed-update round trip on an ad-hoc signed
-macOS app has not been exercised on this machine because the public feed and
-update key are not configured; the workflow and manifests are otherwise
-supported by mygo.
+The public feed and update key are configured. The macOS arm64 update check
+returned `0.0.2`. The installer replaced a disposable 0.0.1 app bundle and the
+resulting `CFBundleShortVersionString` was `0.0.2`. This verifies the signed
+update path. Windows and Linux update checks are not run because no test
+machines are available.
 
 ## Requirements on the validation machine
 
@@ -125,12 +136,12 @@ supported by mygo.
 9. On a session with history, hover a user message → Fork from here.
 10. Quit while a run is active: a native dialog offers Cancel / Quit and Stop.
 
-Screenshots: `dev-docs/images/`.
+Screenshots: `docs-dev/images/`.
 
 ## Evidence
 
 - Go build/vet/tests pass.
-- Frontend typecheck, 13 Vitest tests, production build pass.
+- Vite+ typecheck, 13 Vitest tests, production build pass.
 - P1 UI pass: session text search, Plan tab, MCP manager, worktree manager,
   per-file revert confirmation, and notification test button exercised in a
   clean browser.
@@ -142,10 +153,10 @@ Screenshots: `dev-docs/images/`.
 - English/Chinese UI switch with CJK QA; screenshots in `zh-chat.png` and
   `zh-settings.png`. Native menu names remain English.
 - Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
-- Screenshots in `dev-docs/images/` were refreshed for PiS: home, chat, plan,
+- Screenshots in `docs-dev/images/` were refreshed for PiS: home, chat, plan,
   trust, approval, settings, session tree, diff, login, and both Chinese views.
   `real-pi.png` records the pre-rebrand P0 native run.
-- Rspress docs and root config typecheck pass in `./scripts/verify.sh`.
+- Rspress docs and Vite+ typecheck pass in `./scripts/check.sh`.
 - `govulncheck` reports no Go vulnerabilities. `bun audit` reports one low
   transitive KaTeX advisory (nested 0.16.x) and one moderate minimatch advisory
   under the `shadcn` dev tooling; current ranges offer no automatic fix. Track
@@ -154,61 +165,48 @@ Screenshots: `dev-docs/images/`.
   [0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2). The 0.0.2
   release includes a signed delta from 0.0.1 for every platform.
 
-## Release checklist (used for 0.0.1 and 0.0.2)
+## 0.0.3 release checklist
 
-1. **Repository visibility** — **done**: `ModyQyW/pis` is public. An installed
-   app cannot read private release assets, so keep the repository or a separate
-   release feed public.
-2. **Update signing key** — run `./scripts/update-keygen.sh`; store the private
-   key in a password manager; set `PIS_UPDATE_PUBLIC_KEY` as a repository
-   variable and `MYGO_UPDATER_PRIVATE_KEY` as a repository secret; set
-   `PIS_UPDATE_GITHUB` to `ModyQyW/pis` if it does not default correctly.
-3. **Platform signing** — Apple Developer ID + notarization removes the macOS
-   Gatekeeper warning; a Windows code-signing certificate removes SmartScreen
-   warnings. Both are optional, but test the warnings and document them if you
-   ship ad-hoc/unsigned builds.
-4. **Identity check** — the bundle ID `top.modyqyw.pis` is reverse-DNS for
-   `modyqyw.top`; confirm that domain is under your control. Keep the bundle ID,
-   Linux package name, and Windows package identity stable after release.
-5. **Version and notes** — update `CHANGELOG.md` for the release version,
-   confirm `PIS_VERSION` comes from the tag, and review the generated release
-   notes for credentials, internal paths, or unfinished claims.
-6. **Release dry run** — **done**: `v0.0.1` and `v0.0.2` were built, checked,
-   and published with `SHA256SUMS`, manifests, archives, and deltas. Public
-   download was proven without authentication.
-7. **Update round-trip** — **done on macOS**: the 0.0.1 app was installed and
-   the updater installed the signed 0.0.1 → 0.0.2 update into a disposable app
-   bundle; the resulting `CFBundleShortVersionString` is 0.0.2. Windows/Linux
-   update checks remain unrun.
-8. **Runtime QA** — test a clean install and an upgrade on macOS arm64/amd64,
-   Windows amd64/arm64, and Linux amd64/arm64. Cover Finder/Explorer launch,
-   pi discovery, real session streaming, trust, approvals, login, Chinese UI,
-   quit guard, and uninstall/update behavior.
-9. **Security and privacy** — scan the tree and release assets for secrets; keep
-   `*.key` and update keys out of Git; run `govulncheck` and the frontend
-   dependency audit; confirm prompts, credentials, and session contents never
-   appear in diagnostics or logs.
-10. **License and support** — keep the MIT license, list the supported pi range,
-    publish the known limits below, and provide a channel for security reports.
+Prepared in the worktree:
 
-The real-pi UI smoke, native-window check, performance closure, CI, updater
-window, P1 daily-use features (including subagent activity and inline questions), and English/Chinese UI are complete for this
-build; see `05-qa.md`.
+- [x] Repository `ModyQyW/pis` is public.
+- [x] `PIS_UPDATE_PUBLIC_KEY`, `MYGO_UPDATER_PRIVATE_KEY`, and
+  `PIS_UPDATE_GITHUB` are configured.
+- [x] `CHANGELOG.md` has a `0.0.3` section.
+- [x] `mygo.config.ts` defaults to `0.0.3`.
+- [x] `bun run check` passes.
+- [x] `bun run docs:build` passes.
+- [x] Local `0.0.3` macOS arm64 app builds.
 
-The detailed exit criteria and P1/P2 feature backlog are in `02-plan.md` §8.
+Maintainer actions:
 
-## Known limits for this version
+- [ ] Commit and push the final `0.0.3` source.
+- [ ] Deploy `docs-user-build/` to Cloudflare Pages.
+- [ ] Deploy `docs-user-build/` to Netlify.
+- [ ] Verify both public documentation URLs.
+- [ ] Create and push `v0.0.3`.
+- [ ] Review the draft release, assets, `SHA256SUMS`, manifest, and deltas.
+- [ ] Publish the release.
+- [ ] Install 0.0.2 and verify the 0.0.2 → 0.0.3 update.
+- [ ] Run Windows and Linux runtime/update QA, or record it as skipped.
+- [ ] Run the final secret scan and dependency audit.
 
-- macOS arm64 runtime-validated; Windows/Linux builds untested at runtime.
-- macOS is ad-hoc signed and not notarized; auto-update needs a public feed/key.
+Documentation deployment steps are in
+[`docs-user/advanced/docs-deployment.md`](../docs-user/advanced/docs-deployment.md).
+
+## Known limits for 0.0.3
+
+- macOS arm64 is runtime-validated; Windows and Linux runtime QA are untested.
+- macOS is ad-hoc signed and not notarized. Windows is unsigned.
+- The signed 0.0.1 → 0.0.2 update is verified. The 0.0.2 → 0.0.3 update is not
+  verified before the release.
+- Documentation deployment to Cloudflare Pages and Netlify is not verified.
 - RPC extension UI subset: no `ctx.ui.custom()` TUI components, custom editors,
-  terminal input, or theme switching. Dialogs/status/widgets/notify work.
+  terminal input, or theme switching. Dialogs, statuses, and widgets work.
 - Native menu names stay English in Chinese mode.
-- Auto-update is wired but has no public feed or signing key; the build is
-  ad-hoc signed and not notarized.
 - Approvals and plan mode are product-level guardrails, not a sandbox. Use an
   OS boundary or container when you need one.
-- The app relies on pi's session files for history display; it never writes
+- The app relies on pi's session files for history display. It never writes
   them. Some custom entries are intentionally not rendered.
 
 ## Feedback to collect

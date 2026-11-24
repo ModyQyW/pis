@@ -9,11 +9,15 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Rebrand (2026-11-24): product is **PiS**, binary/slug `pis`, bundle ID
   `top.modyqyw.pis`, env prefix `PIS_`, data directory `PiS`, GitHub repository
   `ModyQyW/pis`. The S stands for strong. Source, tests, docs, release scripts,
-  and workflow identities were updated, with a new πS icon; the feature
-  screenshots were refreshed for PiS, except the pre-rebrand real-pi P0 capture.
+  and workflow identities were updated. The final 0.0.3 mark is a monochrome
+  π + flexed arm; the empty-state screenshot is refreshed. Other screenshots
+  retain the earlier PiS captures.
 - Initial implementation: complete enough for user validation on macOS arm64.
-- Release build: `build/darwin-arm64/PiS.app` (27.0 MB) and
+- Public 0.0.2 build: `build/darwin-arm64/PiS.app` (27.0 MB) and
   `pis-0.0.2-arm64.dmg` (6.8 MB); production source maps disabled.
+- 0.0.3 is prepared. It is not published. Local macOS arm64 build:
+  `build/darwin-arm64/PiS.app` (27.1 MB) and
+  `pis-0.0.3-arm64.dmg` (6.9 MB); `CFBundleShortVersionString` is `0.0.3`.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff were exercised
   before the Base UI/Streamdown UI migration; the post-migration native session
@@ -21,8 +25,9 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Public releases: **0.0.1** and **0.0.2** published; the signed
-  0.0.1 → 0.0.2 delta installed successfully in a disposable app bundle.
+- Public releases: **0.0.1** and **0.0.2** published. 0.0.3 is prepared.
+  The signed 0.0.1 → 0.0.2 update installed successfully in a disposable app
+  bundle.
   macOS arm64 clean install/launch and the real-pi integration pass. Windows/
   Linux runtime QA remains skipped because no test machines are available.
   macOS is ad-hoc signed and requires a one-time Gatekeeper approval.
@@ -32,7 +37,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Real-pi UI smoke after the UI migration: **pass** (2026-11-23). A disposable
   real pi session rendered Read, Shell, and Edit tool cards, streamed the final
   answer, and the native development window rendered it. Screenshot:
-  `dev-docs/images/real-pi.png` (pre-rebrand capture).
+  `docs-dev/images/real-pi.png` (pre-rebrand capture).
 - Native window check: **pass** for traffic lights, hidden-inset title bar,
   sidebar, composer, and menus; full-screen and dark theme still follow the
   same shell and need no code change. Plan, trust, and approval screenshots are refreshed for PiS.
@@ -99,7 +104,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   on demand; 400 lazy assets total, dist 17 MB. No source maps in production.
   A Vite chunk-size warning remains for the lazy Markdown chunk; it does not
   delay the first paint.
-- `go test ./...`, `go vet ./...`, `bun run typecheck`, `bun run test`, and
+- `go test ./...`, `go vet ./...`, `bun run check:web`, `bun run test`, and
   `bun run build` pass. Production assets loaded in a clean browser with no
   console errors; code, table, inline math, and Mermaid rendered.
 
@@ -149,7 +154,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   answers. Vitest covers both.
 - **Notifications**: `Desktop.Notify` respects the setting, groups by session,
   and truncates text. The packaged app's Test notification raised the macOS
-  authorization prompt (verified in `dev-docs/images/settings.png` capture session).
+  authorization prompt (verified in `docs-dev/images/settings.png` capture session).
 - **Assets**: production build has 400 lazy language/diagram chunks, but a
   clean session loaded only 15 `/assets/` files on first code/Mermaid render;
   no console errors. The Markdown chunk stays 1.13 MB lazy (348 KB gzip).
@@ -157,18 +162,18 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   Chinese copy, placeholders, and a root locale subscription; Settings persists
   `language`, and `mygo.App.SetLocale` follows it for the native shell. Nine
   Vitest tests include translation lookup and placeholders; CJK screenshots are
-  in `dev-docs/images/zh-chat.png` and `zh-settings.png`.
+  in `docs-dev/images/zh-chat.png` and `zh-settings.png`.
 - **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
   cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
-  Rspress documentation builds from `user-docs/` and the root `tsconfig.json`
-  checks `mygo.config.ts` and `rspress.config.ts`.
+  Rspress documentation builds from `docs-user/`. Vite+ checks the frontend,
+  bridge, `mygo.config.ts`, `rspress.config.ts`, and `vite.config.ts`.
   Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
   v8, and action-gh-release v3. GitHub Actions run 45155511397 passed all Go,
   frontend, six cross-build, and macOS package jobs. A later CI run exposed a
   pty output-drain race on Ubuntu; the reader now drains before exit and
   `go test -count=20 ./internal/auth` passes. Rebrand CI run 45214629824 passed
   all jobs on 477d73b, and a fresh clone of that commit passed
-  `scripts/verify.sh`. The release workflow builds darwin
+  `scripts/check.sh`. The release workflow builds darwin
   arm64+amd64,
   windows amd64+arm64 (NSIS from Ubuntu), and linux amd64+arm64, then uploads
   through mygo to a draft release. A local Ubuntu 24.04 container built all
@@ -179,10 +184,11 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   a Check for Updates menu item are wired; `scripts/release.sh` validates
   version/feed/signing inputs without printing secrets, and
   `scripts/update-keygen.sh` generates the Ed25519 pair outside the repo. The
-  no-credential release build and keygen path were exercised; no public feed is
-  configured.
+  no-credential release build and keygen path were exercised. The public feed
+  is configured. The macOS 0.0.1 → 0.0.2 update is verified; Windows and Linux
+  update checks are not run.
 - **Version**: `mygo.config.ts` reads `PIS_VERSION`; `main.go` no longer
-  hard-codes 0.1.0. Local builds default to 0.0.2.
+  hard-codes 0.1.0. Local builds default to 0.0.3.
 
 ### Transcript virtualization and dependencies
 
@@ -246,13 +252,16 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
 ## Quality and docs split (2026-11-24)
 
 - Added Vite+ 1.8 as the project-local format/lint/type-check gate. `bun run
-  format` runs `go fmt` and `vp check --fix`; `scripts/verify.sh` runs both Go
+  format` runs `go fmt` and `vp fmt`; `scripts/check.sh` runs both Go
   and Vite+ checks before tests and builds.
-- Replaced the πS icon with a π + flexed-arm mark. Production, development, the
-  browser favicon, and the Rspress logo now share one source (`resources/icon.svg`);
-  the development app adds a mint status dot.
-- Split the Rspress guide into `user-docs/` and the engineering record into
-  `dev-docs/`; all README and cross-document links were updated.
+- Replaced the πS icon with a monochrome π + flexed-arm mark. Production uses
+  the white-background variant; development uses the black-background variant.
+  The browser favicon and Rspress logo share the same sources
+  (`resources/icon.svg`, `resources/icon-dark.svg`).
+- Split the Rspress guide into `docs-user/` and the engineering record into
+  `docs-dev/`; all README and cross-document links were updated.
+- Added Cloudflare Pages and Netlify deployment instructions. The deployment
+  is manual and is not verified yet.
 - Vite+'s type-aware check exposed an untyped bridge import and a broken
   destructive-command table. The bridge now uses labeled rules and a local
   declaration for pi's extension API; `bridge.Version` is 7.

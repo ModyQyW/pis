@@ -2,18 +2,14 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   fmt: {
-    printWidth: 100,
-    singleQuote: false,
-    semi: true,
-    trailingComma: "all",
     ignorePatterns: [
       "build/**",
       ".mygo/**",
       "frontend/dist/**",
       "frontend/src/mygo.ts",
-      "user-docs/**",
-      "dev-docs/**",
-      "user-docs-build/**",
+      "docs-user/**",
+      "docs-dev/**",
+      "docs-user-build/**",
       "frontend/public/**",
       "resources/**",
       "README.md",
@@ -26,9 +22,9 @@ export default defineConfig({
       ".mygo/**",
       "frontend/dist/**",
       "frontend/src/mygo.ts",
-      "user-docs/**",
-      "dev-docs/**",
-      "user-docs-build/**",
+      "docs-user/**",
+      "docs-dev/**",
+      "docs-user-build/**",
     ],
     options: {
       typeAware: true,

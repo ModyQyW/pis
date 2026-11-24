@@ -1,28 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <!-- Biceps silhouette adapted from Noto Emoji (Apache-2.0); see NOTICE.md. -->
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#26231f"/>
-      <stop offset="1" stop-color="#11100f"/>
-    </linearGradient>
-    <linearGradient id="cream" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff7e9"/>
-      <stop offset="1" stop-color="#eadbc7"/>
-    </linearGradient>
-    <linearGradient id="arm" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ffc27d"/>
-      <stop offset=".5" stop-color="#ff9a5a"/>
-      <stop offset="1" stop-color="#f0663a"/>
-    </linearGradient>
-  </defs>
-  <rect x="72" y="72" width="880" height="880" rx="204" fill="url(#bg)"/>
-  <rect x="76" y="76" width="872" height="872" rx="200" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width="4"/>
+  <rect x="72" y="72" width="880" height="880" rx="204" fill="#ffffff"/>
+  <rect x="76" y="76" width="872" height="872" rx="200" fill="none" stroke="#000000" stroke-opacity=".08" stroke-width="4"/>
   <g transform="translate(-30 -18)">
-    <g fill="none" stroke="url(#cream)" stroke-linecap="round" stroke-linejoin="round">
+    <g fill="none" stroke="#151412" stroke-linecap="round" stroke-linejoin="round">
       <path d="M250 360 H 750" stroke-width="92"/>
       <path d="M350 360 V 720" stroke-width="92"/>
     </g>
-    <g transform="translate(500 270) scale(.9) translate(0 512) scale(.1 -.1)" fill="url(#arm)">
+    <g transform="translate(500 270) scale(.9) translate(0 512) scale(.1 -.1)" fill="#151412">
       <path d="M2563 4820 c-402 -202 -798 -522 -1024 -826 -94 -125 -351 -565 -485
 -829 -231 -453 -316 -755 -408 -1445 -87 -649 -81 -785 39 -949 168 -229 548
 -362 1185 -416 102 -9 313 -29 470 -45 404 -42 534 -50 796 -50 262 0 396 11
@@ -34,6 +19,12 @@
 41 -11 110 -43 159 -13 21 -21 41 -16 45 4 4 34 24 65 45 44 29 60 47 69 75
 16 54 -4 97 -112 246 -130 178 -210 298 -249 375 -66 130 -126 180 -218 180
 -43 0 -72 -11 -189 -70z"/>
+    </g>
+        <g fill="none" stroke="#ffffff" stroke-linecap="round" opacity=".95">
+      <path d="M728 311 C 740 325 754 331 768 330" stroke-width="12"/>
+      <path d="M752 291 C 764 305 780 311 794 308" stroke-width="12"/>
+      <path d="M721 356 C 736 369 753 373 769 367" stroke-width="13"/>
+      <path d="M692 449 C 708 464 726 470 741 462" stroke-width="12"/>
     </g>
   </g>
 </svg>

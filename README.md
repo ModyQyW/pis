@@ -1,11 +1,14 @@
 <p align="center"><img src="resources/icon.png" alt="PiS icon" width="120" height="120"></p>
 
+Default mark uses a white background. The black-background variant is
+[`resources/icon-dark.png`](resources/icon-dark.png).
+
 # PiS
 
 A desktop coding agent built on [mygo](https://mygo.run) with
 [pi](https://pi.dev) as the engine. The S stands for strong.
 
-![PiS empty state](dev-docs/images/empty.png)
+![PiS empty state](docs-dev/images/empty.png)
 
 PiS is a small native shell around a rich web UI. It runs your installed
 pi over RPC, so your existing models, credentials, sessions, skills, prompt
@@ -19,11 +22,11 @@ builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessio
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
 Current public release: **[0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2)**
-(27.0 MB app / 6.8 MB DMG). The release and update feed are public; macOS is
-ad-hoc signed, so Gatekeeper requires a one-time approval. English is the
-default; Chinese is available in Settings. See
-[`dev-docs/03-progress.md`](dev-docs/03-progress.md) for evidence and
-[`dev-docs/02-plan.md`](dev-docs/02-plan.md) §8 for the roadmap.
+(27.0 MB app / 6.8 MB DMG). **0.0.3 is prepared and not published.** The release
+and update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
+one-time approval. English is the default. Chinese is available in Settings.
+See [`docs-dev/03-progress.md`](docs-dev/03-progress.md) for evidence and
+[`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
 
 ## What works
 
@@ -68,11 +71,11 @@ default; Chinese is available in Settings. See
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
   quit guard for running sessions, single small binary.
 
-More screenshots: [chat](dev-docs/images/chat.png),
-[approval](dev-docs/images/approval.png), [plan mode](dev-docs/images/plan.png),
-[trust](dev-docs/images/trust.png), [session tree](dev-docs/images/session-tree.png),
-[diff](dev-docs/images/diff.png), [login](dev-docs/images/login.png),
-[Chinese shell](dev-docs/images/zh-chat.png), [Chinese settings](dev-docs/images/zh-settings.png).
+More screenshots: [chat](docs-dev/images/chat.png),
+[approval](docs-dev/images/approval.png), [plan mode](docs-dev/images/plan.png),
+[trust](docs-dev/images/trust.png), [session tree](docs-dev/images/session-tree.png),
+[diff](docs-dev/images/diff.png), [login](docs-dev/images/login.png),
+[Chinese shell](docs-dev/images/zh-chat.png), [Chinese settings](docs-dev/images/zh-settings.png).
 
 ## Requirements
 
@@ -119,14 +122,15 @@ Before committing, format and run the full gate:
 
 ```sh
 bun run format
-./scripts/verify.sh
+./scripts/check.sh
 ```
 
-`bun run format` runs `go fmt ./...` and Vite+'s `vp check --fix`.
-`./scripts/verify.sh` runs Go formatting/build/vet/tests, Vite+ format/lint/
-typecheck, bridge and frontend tests, the frontend build, and the user-docs
-build. `bun install` installs a Vite+ pre-commit hook that runs the same gate.
-Vite+ is a project dependency; no global `vp` install is required. A real-pi integration
+`bun run format` only formats: `go fmt ./...` and Vite+'s `vp fmt`.
+`./scripts/check.sh` runs Go formatting/build/vet/tests, Vite+ format/lint/
+typecheck, bridge and frontend tests, the frontend build, and the docs-user
+build. `bun run check` is the same gate. `bun install` installs a Vite+
+pre-commit hook that runs `./scripts/check.sh`. Vite+ is a project dependency;
+no global `vp` install is required. A real-pi integration
 test is opt-in:
 
 ```sh
@@ -145,9 +149,9 @@ mygo window (Go, system webview)
      Streamdown code/Mermaid plugins, TanStack Virtual)
 ```
 
-Decisions and tradeoffs are in [`dev-docs/01-decisions.md`](dev-docs/01-decisions.md).
+Decisions and tradeoffs are in [`docs-dev/01-decisions.md`](docs-dev/01-decisions.md).
 The research that led there, including competitor strengths and measured
-prototypes, is in [`dev-docs/00-research.md`](dev-docs/00-research.md).
+prototypes, is in [`docs-dev/00-research.md`](docs-dev/00-research.md).
 
 ## Known limits
 
@@ -156,9 +160,10 @@ prototypes, is in [`dev-docs/00-research.md`](dev-docs/00-research.md).
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; PiS does not fake them.
-- Auto-update uses GitHub Releases and an Ed25519 update key; the signed
-  0.0.1 → 0.0.2 update was verified, and 0.0.2 ships deltas for every target. macOS builds are ad-hoc signed, not
-  notarized; Gatekeeper requires a one-time Open Anyway approval.
+- Auto-update uses GitHub Releases and an Ed25519 update key. The signed
+  0.0.1 → 0.0.2 update was verified. The 0.0.2 → 0.0.3 update is not verified
+  before the release. macOS builds are ad-hoc signed, not notarized; Gatekeeper
+  requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
@@ -166,15 +171,15 @@ prototypes, is in [`dev-docs/00-research.md`](dev-docs/00-research.md).
 
 ## Documentation
 
-- **User guide:** [`user-docs/`](user-docs/), built with
+- **User guide:** [`docs-user/`](docs-user/), built with
   [Rspress](https://rspress.rs/). It covers installation, daily use, approvals,
   extensions, architecture, development, release, configuration, and
   troubleshooting.
-- **Development record:** [`dev-docs/`](dev-docs/), from research and decisions
+- **Development record:** [`docs-dev/`](docs-dev/), from research and decisions
   through plan, progress, pitfalls, QA, UX, and delivery evidence.
 
-The Rspress source lives in `user-docs/`; the build output is
-`user-docs-build/` and is not committed.
+The Rspress source lives in `docs-user/`; the build output is
+`docs-user-build/` and is not committed.
 
 ```sh
 bun run docs:dev
@@ -182,17 +187,20 @@ bun run docs:build
 bun run docs:preview
 ```
 
+Deployment steps for Cloudflare Pages and Netlify are in
+[`docs-user/advanced/docs-deployment.md`](docs-user/advanced/docs-deployment.md).
+
 Development record:
 
-1. [`dev-docs/00-research.md`](dev-docs/00-research.md)
-2. [`dev-docs/01-decisions.md`](dev-docs/01-decisions.md)
-3. [`dev-docs/02-plan.md`](dev-docs/02-plan.md)
-4. [`dev-docs/03-progress.md`](dev-docs/03-progress.md)
-5. [`dev-docs/04-pitfalls.md`](dev-docs/04-pitfalls.md)
-6. [`dev-docs/05-qa.md`](dev-docs/05-qa.md)
-7. [`dev-docs/06-ux.md`](dev-docs/06-ux.md)
-8. [`dev-docs/07-grilling.md`](dev-docs/07-grilling.md)
-9. [`dev-docs/08-delivery.md`](dev-docs/08-delivery.md)
+1. [`docs-dev/00-research.md`](docs-dev/00-research.md)
+2. [`docs-dev/01-decisions.md`](docs-dev/01-decisions.md)
+3. [`docs-dev/02-plan.md`](docs-dev/02-plan.md)
+4. [`docs-dev/03-progress.md`](docs-dev/03-progress.md)
+5. [`docs-dev/04-pitfalls.md`](docs-dev/04-pitfalls.md)
+6. [`docs-dev/05-qa.md`](docs-dev/05-qa.md)
+7. [`docs-dev/06-ux.md`](docs-dev/06-ux.md)
+8. [`docs-dev/07-grilling.md`](docs-dev/07-grilling.md)
+9. [`docs-dev/08-delivery.md`](docs-dev/08-delivery.md)
 
 ## License
 
