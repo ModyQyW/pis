@@ -191,6 +191,22 @@ export const api = {
     if (!insideShell) return;
     await Agent.close(id);
   },
+  async previewApproval(sessionId: string): Promise<void> {
+    if (insideShell) return;
+    mockEmit({
+      sessionId,
+      kind: "extension-ui",
+      raw: {
+        type: "extension_ui_request",
+        id: `mock-approval-${Date.now()}`,
+        method: "select",
+        title: "Allow bash?",
+        message:
+          "Command:\nrm -rf /tmp/pis-old-cache\n\nRisk: deletes files outside the workspace.",
+        options: ["Allow once", "Allow for session", "Deny"],
+      },
+    });
+  },
   async prompt(req: PromptRequest): Promise<{ disposition: string }> {
     if (!insideShell) {
       return mockPrompt(req, mockEmit);

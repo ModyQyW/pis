@@ -16,9 +16,9 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work; the
-current artifact is a 27.0 MB app / 6.8 MB DMG. A wider release still needs a
-public update feed/key; macOS is ad-hoc signed, so Gatekeeper requires a
-one-time approval. English is the default; Chinese is available in Settings.
+current artifact is a 27.0 MB app / 6.8 MB DMG. Releases and the update feed are
+public; macOS is ad-hoc signed, so Gatekeeper requires a one-time approval.
+English is the default; Chinese is available in Settings.
 See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
 [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 
@@ -66,10 +66,10 @@ See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
   quit guard for running sessions, single small binary.
 
 More screenshots: [chat](docs/images/chat.png),
-[plan mode](docs/images/plan.png), [trust](docs/images/trust.png),
-[session tree](docs/images/session-tree.png), [diff](docs/images/diff.png),
-[login](docs/images/login.png), [Chinese shell](docs/images/zh-chat.png),
-[Chinese settings](docs/images/zh-settings.png).
+[approval](docs/images/approval.png), [plan mode](docs/images/plan.png),
+[trust](docs/images/trust.png), [session tree](docs/images/session-tree.png),
+[diff](docs/images/diff.png), [login](docs/images/login.png),
+[Chinese shell](docs/images/zh-chat.png), [Chinese settings](docs/images/zh-settings.png).
 
 ## Requirements
 
@@ -146,10 +146,9 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; PiS does not fake them.
-- Auto-update is wired through mygo's updater and the release workflow, but the
-  repository still needs a public release feed and an update signing key before
-  installed apps can update. macOS builds are ad-hoc signed, not notarized;
-  Gatekeeper requires a one-time Open Anyway approval.
+- Auto-update uses GitHub Releases and an Ed25519 update key. macOS builds are
+  ad-hoc signed, not notarized; Gatekeeper requires a one-time Open Anyway
+  approval, and the first public update round-trip is still being verified.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
@@ -166,6 +165,21 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 7. [`docs/06-ux.md`](docs/06-ux.md)
 8. [`docs/07-grilling.md`](docs/07-grilling.md)
 9. [`docs/08-delivery.md`](docs/08-delivery.md)
+
+## Documentation site
+
+The user guide in [`site-docs/`](site-docs/) is built with
+[Rspress](https://rspress.rs/):
+
+```sh
+bun run docs:dev
+bun run docs:build
+bun run docs:preview
+```
+
+The site covers installation, daily use, approvals, extensions, architecture,
+development, release, configuration, and troubleshooting. The production build
+is written to `site-build/`.
 
 ## License
 

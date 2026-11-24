@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Server,
   Settings2,
+  ShieldAlert,
   Sparkles,
 } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -765,6 +766,21 @@ export function App() {
                   effective: false,
                 });
                 setTrustOpen(true);
+              },
+            },
+            {
+              id: "preview-approval",
+              label: "Preview approval dock",
+              group: "Preview",
+              icon: ShieldAlert,
+              run: () => {
+                const state = useChat.getState();
+                const active = state.activeKey ? state.sessions[state.activeKey] : undefined;
+                if (!active?.appId) {
+                  toast("Open a chat before previewing an approval.");
+                  return;
+                }
+                void api.previewApproval(active.appId);
               },
             },
           ]

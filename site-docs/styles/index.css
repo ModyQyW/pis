@@ -1,0 +1,12 @@
+:root {
+  --rp-c-brand: #b45a24;
+  --rp-c-brand-light: #d98a55;
+  --rp-c-brand-lighter: #f2d8c7;
+  --rp-c-brand-dark: #8c4218;
+  --rp-c-brand-darker: #67300f;
+  --rp-c-brand-tint: rgba(232, 138, 75, 0.16);
+}
+
+.rp-home-hero__title {
+  letter-spacing: -0.045em;
+}

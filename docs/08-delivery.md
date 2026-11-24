@@ -1,9 +1,10 @@
 # Initial delivery
 
-Status: ready for user validation on macOS arm64 (2026-11-24). A wider release
-is blocked on a public update feed/key. macOS is ad-hoc signed and not
-notarized; Gatekeeper requires a one-time approval. The P0 real-pi,
-native-window, and performance checks are complete.
+Status: public initial release in progress (2026-11-24). The update feed and
+signing key are configured; Windows/Linux runtime QA and the live update
+round-trip remain. macOS is ad-hoc signed and not notarized; Gatekeeper requires
+a one-time approval. The P0 real-pi, native-window, and performance checks are
+complete.
 
 ## Artifact
 
@@ -142,9 +143,8 @@ Screenshots: `docs/images/`.
   `zh-settings.png`. Native menu names remain English.
 - Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
 - Screenshots in `docs/images/` were refreshed for PiS: home, chat, plan,
-  trust, settings, session tree, diff, login, and both Chinese views. The
-  approval dock awaits a native recapture. `real-pi.png` records the
-  pre-rebrand P0 native run.
+  trust, approval, settings, session tree, diff, login, and both Chinese views.
+  `real-pi.png` records the pre-rebrand P0 native run.
 
 ## Before public release
 

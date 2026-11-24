@@ -5,11 +5,41 @@ set -eu
 
 cd "$(dirname "$0")/.."
 
+suggest_version() {
+  latest=$(git tag --list 'v[0-9]*' --sort=-v:refname | sed -n '1p')
+  if [ -n "$latest" ]; then
+    core=${latest#v}
+    core=${core%%-*}
+    major=${core%%.*}
+    rest=${core#*.}
+    minor=${rest%%.*}
+    patch=${rest#*.}
+    case "$patch" in
+      ''|*[!0-9]*) patch=0 ;;
+    esac
+    printf '%s.%s.%s\n' "$major" "$minor" "$((patch + 1))"
+    return
+  fi
+  default=$(sed -n 's/.*version: process.env.PIS_VERSION ?? "\([0-9][0-9.]*\)".*/\1/p' mygo.config.ts | sed -n '1p')
+  printf '%s\n' "${default:-0.1.0}"
+}
+
 if [ -z "${PIS_VERSION:-}" ]; then
-  echo "release: set PIS_VERSION (for example 0.2.0)" >&2
-  exit 2
+  suggested=$(suggest_version)
+  if [ -t 0 ]; then
+    printf 'Release version [%s]: ' "$suggested"
+    IFS= read -r entered || entered=""
+    PIS_VERSION=${entered:-$suggested}
+  else
+    echo "release: set PIS_VERSION (suggested: $suggested)" >&2
+    exit 2
+  fi
 fi
 PIS_VERSION=${PIS_VERSION#v}
+if ! printf '%s\n' "$PIS_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$'; then
+  echo "release: version must look like 0.0.1 (got '$PIS_VERSION')" >&2
+  exit 2
+fi
 export PIS_VERSION
 
 if [ -n "${MYGO_UPDATER_PRIVATE_KEY_FILE:-}" ]; then

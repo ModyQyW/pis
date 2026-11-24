@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.1.0
+## 0.0.1 (2026-11-24)
 
-- Initial macOS arm64 build of PiS.
+- Initial public macOS, Windows, and Linux release of PiS.
 - Product identity is PiS (`pis`), with a new πS icon and refreshed desktop
   screenshots. The S stands for strong.
 - Real pi sessions, streaming transcript, tool cards, approvals, plan mode,
