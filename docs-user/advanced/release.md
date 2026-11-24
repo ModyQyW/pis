@@ -42,8 +42,8 @@ PIS_VERSION=0.0.5 ./scripts/release.sh
 3. 把 `mygo.config.ts` 的默认版本改为目标版本。
 4. 安装依赖并运行完整的 `bun run check`。
 5. 提交 `Prepare <version> release`，推送 `main`，创建并推送 `v<version>` tag。
-6. 等待 Release workflow 完成；没有运行时用 `gh workflow run` 触发。
-7. 校验 draft 中的六个平台产物、`SHA256SUMS` 和六个 updater manifest。
+6. 等待 Release workflow 完成；最近一次运行失败时先 `gh run rerun --failed`；没有运行时用 `gh workflow run` 触发。
+7. 校验 draft 中的六个平台产物、`SHA256SUMS`、六个 updater manifest，以及 `SHA256SUMS` 是否覆盖全部资产。
 8. 用 `release-notes/<version>.md` 发布 draft，并设为 latest。
 9. 校验 `isDraft=false`、`isLatest=true`、`publishedAt` 非空。
 
@@ -130,6 +130,9 @@ Release workflow 执行以下步骤：
 6. 在 `verify` job 中下载并检查产物存在。
 
 Release workflow 不会自动发布 draft。发布脚本在 workflow 成功并校验产物后执行发布。draft 不是公开 Release，也不进入更新 feed。
+
+三个平台的 build job 串行运行（`max-parallel: 1`）。每个平台都会更新同一个
+`SHA256SUMS`，并发上传会互相替换并导致 404。
 
 ## 8. 检查 draft
 

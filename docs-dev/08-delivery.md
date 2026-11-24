@@ -1,10 +1,32 @@
 # Public delivery
 
-Status: **0.0.1, 0.0.2, and 0.0.4 are published** (2026-11-24). **0.0.3 is a
-draft release.** The update feed serves 0.0.4. The repository and update feed
-are public. The signed 0.0.1 → 0.0.2 update installed successfully. macOS is
-ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
-Windows/Linux runtime QA is skipped because no test machines are available.
+Status: **0.0.1, 0.0.2, 0.0.4, and 0.0.5 are published** (2026-11-24).
+**0.0.3 is a draft release.** The update feed serves 0.0.5. The repository and
+update feed are public. The signed 0.0.1 → 0.0.2 update installed successfully.
+macOS is ad-hoc signed and not notarized; Gatekeeper requires a one-time
+approval. Windows/Linux runtime QA is skipped because no test machines are
+available.
+
+## 0.0.5 publication
+
+- Release: <https://github.com/ModyQyW/pis/releases/tag/v0.0.5>
+- Release workflow: `45417220156`. The first run failed in the Windows job
+  while three platform jobs uploaded the shared `SHA256SUMS` concurrently
+  (HTTP 404 on an asset replacement). Rerunning the failed job succeeded.
+- The workflow now runs the platform matrix serially (`max-parallel: 1`).
+- The release has 41 assets: `SHA256SUMS`, six updater manifests, and 34
+  installers, archives, deltas, and install scripts.
+- `SHA256SUMS` has 34 entries and covers every asset except itself and the six
+  updater manifests.
+- `isDraft`: `false`; `isLatest`: `true`; `publishedAt`: `2026-11-24T15:00:27Z`.
+- Local `scripts/release.sh` resume published the verified draft after the
+  rerun; the first attempt stopped because `gh release view` has no `isLatest`
+  field. The script now reads latest from `gh release list`.
+
+0.0.5 fixes pi discovery for apps opened from Finder: it resolves the login
+shell `PATH`, treats a configured pi path as authoritative, and auto-detects
+`$BUN_INSTALL/bin`. Settings adds a manual `Check for updates…` button.
+`scripts/release.sh` now performs the whole publish flow.
 
 ## 0.0.3 draft diagnosis
 

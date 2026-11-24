@@ -44,6 +44,9 @@ jobs:
     name: ${{ matrix.name }}
     strategy:
       fail-fast: false
+      # Every platform uploads a shared SHA256SUMS asset to the same draft.
+      # Concurrent uploads race on replacing it; run the matrix in order.
+      max-parallel: 1
       matrix:
         include:
           - name: macOS

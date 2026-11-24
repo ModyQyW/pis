@@ -139,6 +139,11 @@ wait_for_run() {
     done
   fi
   [ -n "$run_id" ] || fail "no Release workflow run for $tag"
+  conclusion=$(gh run view "$run_id" --json conclusion --jq '.conclusion // ""')
+  if [ "$conclusion" = "failure" ] || [ "$conclusion" = "cancelled" ] || [ "$conclusion" = "timed_out" ]; then
+    echo "release: retrying failed workflow run $run_id"
+    gh run rerun "$run_id" --failed >/dev/null
+  fi
   echo "release: waiting for workflow run $run_id"
   gh run watch "$run_id" --exit-status --interval 10 >/dev/null || fail "Release workflow $run_id failed"
 }
@@ -163,6 +168,19 @@ verify_assets() {
     "update-windows-amd64.json"; do
     printf '%s\n' "$assets" | grep -qx "$asset" || fail "draft $tag is missing $asset"
   done
+
+  sums=$(mktemp)
+  names=$(mktemp)
+  listed=$(mktemp)
+  trap 'rm -f "$sums" "$names" "$listed"' EXIT
+  gh release download "$tag" -p SHA256SUMS -O "$sums" --clobber >/dev/null ||
+    fail "could not download SHA256SUMS from draft $tag"
+  awk '{print $2}' "$sums" | sort >"$names"
+  printf '%s\n' "$assets" | grep -vx SHA256SUMS | grep -v '^update-.*\.json$' | sort >"$listed"
+  missing=$(comm -23 "$listed" "$names")
+  [ -z "$missing" ] || fail "SHA256SUMS does not cover: $missing"
+  rm -f "$sums" "$names" "$listed"
+  trap - EXIT
 }
 
 publish_release() {
@@ -243,11 +261,11 @@ publish_release() {
     --draft=false >/dev/null
 
   draft=$(gh release view "$tag" --json isDraft --jq .isDraft)
-  latest=$(gh release view "$tag" --json isLatest --jq .isLatest)
+  latest=$(gh release list --limit 1 --json tagName,isLatest --jq '.[0] | select(.isLatest) | .tagName')
   published=$(gh release view "$tag" --json publishedAt --jq .publishedAt)
   url=$(gh release view "$tag" --json url --jq .url)
   [ "$draft" = "false" ] || fail "$tag is still a draft"
-  [ "$latest" = "true" ] || fail "$tag is not the latest release"
+  [ "$latest" = "$tag" ] || fail "$tag is not the latest release"
   [ -n "$published" ] && [ "$published" != "null" ] || fail "$tag has no publication time"
   echo "release: published $tag: $url"
 }
