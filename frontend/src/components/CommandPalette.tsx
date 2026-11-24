@@ -39,10 +39,7 @@ export function CommandPalette({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return actions.filter(
-      (a) =>
-        !q ||
-        a.label.toLowerCase().includes(q) ||
-        a.group.toLowerCase().includes(q),
+      (a) => !q || a.label.toLowerCase().includes(q) || a.group.toLowerCase().includes(q),
     );
   }, [actions, query]);
 
@@ -59,15 +56,9 @@ export function CommandPalette({
     [hits, onOpenSession],
   );
 
-  const visible = useMemo(
-    () => [...filtered, ...sessionActions],
-    [filtered, sessionActions],
-  );
+  const visible = useMemo(() => [...filtered, ...sessionActions], [filtered, sessionActions]);
 
-  const groups = useMemo(
-    () => [...new Set(visible.map((a) => a.group))],
-    [visible],
-  );
+  const groups = useMemo(() => [...new Set(visible.map((a) => a.group))], [visible]);
 
   useEffect(() => {
     if (open) {
@@ -184,7 +175,9 @@ export function CommandPalette({
                                 : "text-subtle hover:bg-surface-2 hover:text-fg",
                             )}
                           >
-                            {Icon ? <Icon size={13} className="mt-0.5 shrink-0 text-faint" /> : null}
+                            {Icon ? (
+                              <Icon size={13} className="mt-0.5 shrink-0 text-faint" />
+                            ) : null}
                             <span className="min-w-0 flex-1">
                               <span className="block truncate">{t(label)}</span>
                               {detail ? (

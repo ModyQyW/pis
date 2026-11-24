@@ -39,7 +39,9 @@ export function RenameDialog({
         <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(440px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border-strong bg-surface p-4 shadow-2xl outline-none">
           <div className="flex items-center justify-between">
-            <Dialog.Title className="text-[13.5px] font-semibold">{t("Rename session")}</Dialog.Title>
+            <Dialog.Title className="text-[13.5px] font-semibold">
+              {t("Rename session")}
+            </Dialog.Title>
             <Dialog.Close asChild>
               <button
                 type="button"

@@ -18,7 +18,9 @@ export function FilePreviewDialog({
   path: string;
 }) {
   const [text, setText] = useState("");
-  const [meta, setMeta] = useState<{ truncated: boolean; binary: boolean; size: number } | null>(null);
+  const [meta, setMeta] = useState<{ truncated: boolean; binary: boolean; size: number } | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

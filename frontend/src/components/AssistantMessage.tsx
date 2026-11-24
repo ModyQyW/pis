@@ -15,9 +15,7 @@ import {
 import type { ChatItem } from "../lib/transcript";
 import { ToolCard } from "./ToolCard";
 
-const Markdown = lazy(() =>
-  import("./Markdown").then((m) => ({ default: m.Markdown })),
-);
+const Markdown = lazy(() => import("./Markdown").then((m) => ({ default: m.Markdown })));
 
 type AssistantItem = Extract<ChatItem, { kind: "assistant" }>;
 
@@ -36,10 +34,7 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
                   </div>
                 }
               >
-                <Markdown
-                  text={block.text}
-                  streaming={item.live && i === item.blocks.length - 1}
-                />
+                <Markdown text={block.text} streaming={item.live && i === item.blocks.length - 1} />
               </Suspense>
             );
           }

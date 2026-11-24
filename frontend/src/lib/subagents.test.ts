@@ -35,20 +35,29 @@ describe("extractSubagents", () => {
       call("b", "Add tests"),
     ]);
     expect(runs).toEqual([
-      { id: "a", label: "Review parser", agent: "worker", status: "complete", result: "Looks good" },
+      {
+        id: "a",
+        label: "Review parser",
+        agent: "worker",
+        status: "complete",
+        result: "Looks good",
+      },
       { id: "b", label: "Add tests", agent: "worker", status: "running" },
     ]);
   });
 
   it("includes a live call before its result exists", () => {
-    const runs = extractSubagents([], [
-      {
-        kind: "tool",
-        id: "live",
-        name: "subagent",
-        args: { description: "Investigate" },
-      },
-    ]);
+    const runs = extractSubagents(
+      [],
+      [
+        {
+          kind: "tool",
+          id: "live",
+          name: "subagent",
+          args: { description: "Investigate" },
+        },
+      ],
+    );
     expect(runs).toEqual([
       { id: "live", label: "Investigate", agent: undefined, status: "running" },
     ]);

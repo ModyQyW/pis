@@ -11,7 +11,7 @@
  *   PIS_WORKSPACE  absolute project directory
  */
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { dirname, isAbsolute, relative, resolve } from "node:path";
+import { isAbsolute, relative, resolve } from "node:path";
 import { homedir } from "node:os";
 
 const POLICY = (process.env.PIS_GUARD || "off") as "off" | "smart" | "ask" | "allow";
@@ -38,27 +38,37 @@ const PLAN_INSTRUCTIONS = `Plan mode is active.
 - Stop after presenting the plan. The user will approve it before execution.`;
 
 const DANGEROUS_BASH = [
-  /(^|\s)(sudo|doas|su)\b/,
-  /\brm\s+(-[^\s]*\s+)*-[^\s]*[rf]/,
-  /\bgit\s+(reset\s+--hard|clean\s+-[a-z]*f|checkout\s+--|restore\s+--|push\s+.*(--force|-f))/,
-  /\b(mkfs|shutdown|reboot|halt|poweroff)\b/,
-  /\bdd\s+if=/,
-  /\bchmod\s+-R|\bchown\s+-R/,
-  /\b(curl|wget)\b[^|]*\|\s*(sh|bash|zsh)\b/,
-  /\b(npm|pnpm|yarn|bun)\s+(publish|install|add|remove)\b/,
-  /\b(pip|pip3)\s+install|\bbrew\s+install|\bcargo\s+install/,
-  /:\s*\(\s*\)\s*\{/,
+  { re: /(^|\s)(sudo|doas|su)\b/, label: "privilege escalation" },
+  { re: /\brm\s+(-[^\s]*\s+)*-[^\s]*[rf]/, label: "recursive file removal" },
+  {
+    re: /\bgit\s+(reset\s+--hard|clean\s+-[a-z]*f|checkout\s+--|restore\s+--|push\s+.*(--force|-f))/,
+    label: "destructive git command",
+  },
+  { re: /\b(mkfs|shutdown|reboot|halt|poweroff)\b/, label: "system power or filesystem command" },
+  { re: /\bdd\s+if=/, label: "raw disk write" },
+  { re: /\bchmod\s+-R|\bchown\s+-R/, label: "recursive permission change" },
+  { re: /\b(curl|wget)\b[^|]*\|\s*(sh|bash|zsh)\b/, label: "remote script execution" },
+  {
+    re: /\b(npm|pnpm|yarn|bun)\s+(publish|install|add|remove)\b/,
+    label: "package installation or publish",
+  },
+  {
+    re: /\b(pip|pip3)\s+install|\bbrew\s+install|\bcargo\s+install/,
+    label: "package installation",
+  },
+  { re: /:\s*\(\s*\)\s*\{/, label: "shell fork bomb" },
 ];
 
 const MUTATING_BASH = [
-  ...DANGEROUS_BASH,
+  ...DANGEROUS_BASH.map((rule) => rule.re),
   /(^|\s)(touch|mkdir|mv|cp|tee|truncate)\b/,
   /\bsed\s+-i\b/,
   /\bgit\s+(commit|merge|rebase|cherry-pick|apply|am|tag|checkout|switch)\b/,
   /(^|[^>])>{1,2}\s*[^&\s|]+/,
 ];
 
-const SENSITIVE = /(^|\/)(\.env(\..*)?|id_rsa|id_ed25519|\.npmrc|\.pypirc|credentials|secrets|auth\.json|\.git\/config)$/i;
+const SENSITIVE =
+  /(^|\/)(\.env(\..*)?|id_rsa|id_ed25519|\.npmrc|\.pypirc|credentials|secrets|auth\.json|\.git\/config)$/i;
 
 export default function (pi: ExtensionAPI) {
   let plan = false;
@@ -108,7 +118,7 @@ export default function (pi: ExtensionAPI) {
       return;
     }
     if (on) {
-      savedTools = pi.getActiveTools();
+      savedTools = pi.getActiveTools() ?? [];
       const next = savedTools.filter((name) => READ_ONLY_TOOLS.has(name));
       pi.setActiveTools(next);
       plan = true;
@@ -152,9 +162,9 @@ export default function (pi: ExtensionAPI) {
   pi.on("session_start", (_event: any, ctx: any) => {
     ctx.ui.setStatus(GUARD_STATUS, POLICY === "off" ? undefined : POLICY);
     const entries = ctx.sessionManager?.getBranch?.() ?? [];
-    const last = [...entries].reverse().find(
-      (entry: any) => entry?.type === "custom" && entry?.customType === "pis-plan",
-    );
+    const last = [...entries]
+      .reverse()
+      .find((entry: any) => entry?.type === "custom" && entry?.customType === "pis-plan");
     if (last?.data?.plan) setPlan(true, ctx, false);
   });
 
@@ -165,19 +175,28 @@ export default function (pi: ExtensionAPI) {
       options.sections = { ...options.sections, "pis-plan": PLAN_INSTRUCTIONS };
       return;
     }
-    return { systemPrompt: `${event.systemPrompt}\n\n<pis-plan>\n${PLAN_INSTRUCTIONS}\n</pis-plan>` };
+    return {
+      systemPrompt: `${event.systemPrompt}\n\n<pis-plan>\n${PLAN_INSTRUCTIONS}\n</pis-plan>`,
+    };
   });
 
   pi.on("tool_call", async (event: any, ctx: any) => {
     const name = String(event.toolName ?? "");
     const input = (event.input ?? {}) as Record<string, unknown>;
     if (name === "bash" || name === "powershell") {
-      const command = String(input.command ?? "");
+      const command = typeof input.command === "string" ? input.command : "";
       if (plan && isMutatingBash(command)) {
-        return { block: true, reason: "Plan mode: mutating shell commands are blocked. Present a plan or turn plan mode off." };
+        return {
+          block: true,
+          reason:
+            "Plan mode: mutating shell commands are blocked. Present a plan or turn plan mode off.",
+        };
       }
     } else if (plan && (name === "edit" || name === "write" || name === "multi_edit")) {
-      return { block: true, reason: "Plan mode: file edits are blocked. Present a plan or turn plan mode off." };
+      return {
+        block: true,
+        reason: "Plan mode: file edits are blocked. Present a plan or turn plan mode off.",
+      };
     }
 
     if (POLICY === "off" || POLICY === "allow") return;
@@ -189,9 +208,9 @@ export default function (pi: ExtensionAPI) {
       reason = "approval policy asks for every tool call";
     } else {
       if (name === "bash" || name === "powershell") {
-        reason = bashRisk(String(input.command ?? ""));
+        reason = bashRisk(typeof input.command === "string" ? input.command : "");
       } else if (name === "edit" || name === "write" || name === "multi_edit") {
-        reason = pathRisk(String(input.path ?? ""));
+        reason = pathRisk(typeof input.path === "string" ? input.path : "");
       } else if (!["read", "grep", "find", "ls", "todo", "ask_user_question"].includes(name)) {
         if (/delete|remove|write|edit|exec|deploy|publish|shell|bash/i.test(name)) {
           reason = "tool may modify the environment";

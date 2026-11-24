@@ -2,12 +2,11 @@ import { defineConfig } from "@rspress/core";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig({
-  root: "site-docs",
-  outDir: "site-build",
-  globalStyles: fileURLToPath(new URL("site-docs/styles/index.css", import.meta.url)),
+  root: "user-docs",
+  outDir: "user-docs-build",
+  globalStyles: fileURLToPath(new URL("user-docs/styles/index.css", import.meta.url)),
   title: "PiS",
-  description:
-    "PiS 是一个建立在 pi 之上的桌面 Coding Agent：原生外壳、流式会话、审批与计划模式。",
+  description: "PiS 是一个建立在 pi 之上的桌面 Coding Agent：原生外壳、流式会话、审批与计划模式。",
   logo: "/icon.png",
   logoText: "PiS",
   head: [["link", { rel: "icon", href: "/icon.png" }]],

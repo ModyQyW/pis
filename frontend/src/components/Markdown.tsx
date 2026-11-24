@@ -12,13 +12,7 @@ const math = createMathPlugin({
 
 const plugins = { code, math, cjk, mermaid };
 
-function MarkdownText({
-  text,
-  streaming,
-}: {
-  text: string;
-  streaming?: boolean;
-}) {
+function MarkdownText({ text, streaming }: { text: string; streaming?: boolean }) {
   const value = useDeferredValue(text);
   return (
     <Streamdown

@@ -58,7 +58,7 @@ export function RightPanel({
     let alive = true;
     setLoading(true);
     setError(null);
-    Promise.all([
+    void Promise.all([
       api.gitStatus(workspace.path).catch((e) => {
         if (alive) setError(e instanceof Error ? e.message : String(e));
         return null;
@@ -178,7 +178,11 @@ export function RightPanel({
 
       <div className="min-h-0 flex-1 overflow-y-auto scroll-thin p-1.5">
         {!workspace ? (
-          <Empty icon={<GitBranch size={15} />} title={t("No project")} detail={t("Open a project to see changes.")} />
+          <Empty
+            icon={<GitBranch size={15} />}
+            title={t("No project")}
+            detail={t("Open a project to see changes.")}
+          />
         ) : tab === "changes" ? (
           tabChanges(status, error, loading, setDiffPath, setRevertPath)
         ) : tab === "files" ? (
@@ -210,7 +214,9 @@ export function RightPanel({
         open={Boolean(revertPath)}
         onOpenChange={(next) => !next && setRevertPath(null)}
         title={t("Revert {path}?", { path: revertPath ?? "file" })}
-        message={t("This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by PiS.")}
+        message={t(
+          "This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by PiS.",
+        )}
         confirmLabel={t("Revert file")}
         danger
         onConfirm={async () => {
@@ -296,9 +302,7 @@ function tabChanges(
               <span className="text-success">+{file.additions}</span>{" "}
               <span className="text-danger">−{file.deletions}</span>
             </span>
-            {file.staged ? (
-              <span className="size-1 rounded-full bg-brand" title="Staged" />
-            ) : null}
+            {file.staged ? <span className="size-1 rounded-full bg-brand" title="Staged" /> : null}
           </button>
           {file.status !== "??" ? (
             <button
@@ -319,7 +323,13 @@ function tabChanges(
 
 function FileList({ files, onOpen }: { files: Hit[]; onOpen: (path: string) => void }) {
   if (files.length === 0) {
-    return <Empty icon={<FileText size={15} />} title={t("No files")} detail={t("No files match this project.")} />;
+    return (
+      <Empty
+        icon={<FileText size={15} />}
+        title={t("No files")}
+        detail={t("No files match this project.")}
+      />
+    );
   }
   return (
     <ul className="space-y-0.5">
@@ -381,7 +391,6 @@ function TodoList({ todos }: { todos: TodoItem[] }) {
   );
 }
 
-
 function SubagentList({ runs }: { runs: SubagentRun[] }) {
   if (runs.length === 0) {
     return (
@@ -435,15 +444,7 @@ function Loading() {
   );
 }
 
-function Empty({
-  icon,
-  title,
-  detail,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  detail: string;
-}) {
+function Empty({ icon, title, detail }: { icon: React.ReactNode; title: string; detail: string }) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
       <div className="flex size-9 items-center justify-center rounded-xl border border-border bg-surface text-faint">

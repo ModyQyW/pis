@@ -89,7 +89,9 @@ export function LoginDialog({
       pending.current = "";
     }
     const data = t.onData((input) => void api.authWrite(authId, input).catch(() => {}));
-    const resize = t.onResize(({ cols, rows }) => void api.authResize(authId, cols, rows).catch(() => {}));
+    const resize = t.onResize(
+      ({ cols, rows }) => void api.authResize(authId, cols, rows).catch(() => {}),
+    );
     const ro = new ResizeObserver(() => {
       try {
         f.fit();
@@ -175,7 +177,9 @@ export function LoginDialog({
                 </Method>
               </div>
               <p className="mt-3 text-[10.5px] leading-4 text-faint">
-                {t("Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.")}
+                {t(
+                  "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.",
+                )}
               </p>
               <div className="mt-4 flex justify-end gap-2">
                 <a

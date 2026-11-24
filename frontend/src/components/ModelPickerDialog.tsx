@@ -121,14 +121,20 @@ export function ModelPickerDialog({
                         disabled={busy !== null}
                         className={cn(
                           "flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition-colors disabled:opacity-60",
-                          active ? "bg-brand-soft/60 text-fg" : "text-subtle hover:bg-surface-2 hover:text-fg",
+                          active
+                            ? "bg-brand-soft/60 text-fg"
+                            : "text-subtle hover:bg-surface-2 hover:text-fg",
                         )}
                       >
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[12px] font-medium">{model.name}</span>
+                          <span className="block truncate text-[12px] font-medium">
+                            {model.name}
+                          </span>
                           <span className="mt-0.5 block truncate text-[10px] text-faint">
                             {model.id}
-                            {model.contextWindow ? ` · ${Math.round(model.contextWindow / 1000)}k context` : ""}
+                            {model.contextWindow
+                              ? ` · ${Math.round(model.contextWindow / 1000)}k context`
+                              : ""}
                           </span>
                         </span>
                         {busy === model.id ? (

@@ -1,4 +1,4 @@
-import type { Bootstrap, MenuCommand, PiStatus } from "./types";
+import type { Bootstrap, PiStatus } from "./types";
 
 const now = Date.now();
 let mockLanguage: "en" | "zh" = "en";
@@ -75,5 +75,13 @@ export function mockBootstrap(): Bootstrap {
 }
 
 export const mockPiStatus: PiStatus = mockBootstrap().pi;
-export const mockMenuCommand = (_: MenuCommand): void => {};
-export { mockDiff, mockGitStatus, mockModels, mockStart, mockSummary, mockTranscript, mockTree } from "./mock-chat";
+export const mockMenuCommand = (): void => {};
+export {
+  mockDiff,
+  mockGitStatus,
+  mockModels,
+  mockStart,
+  mockSummary,
+  mockTranscript,
+  mockTree,
+} from "./mock-chat";

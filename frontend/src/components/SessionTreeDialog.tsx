@@ -70,7 +70,9 @@ export function SessionTreeDialog({
         <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(680px,calc(100vh-80px))] w-[min(640px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
-              <Dialog.Title className="text-[13.5px] font-semibold">{t("Session tree")}</Dialog.Title>
+              <Dialog.Title className="text-[13.5px] font-semibold">
+                {t("Session tree")}
+              </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
                 {t("Pick a point to continue from. The abandoned branch is kept.")}
               </Dialog.Description>
@@ -189,7 +191,7 @@ function TreeNode({
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
             <span className="text-[9.5px] font-medium uppercase tracking-[0.06em] text-faint">
-              {entry.type === "message" ? entry.role ?? "message" : entry.type.replace("_", " ")}
+              {entry.type === "message" ? (entry.role ?? "message") : entry.type.replace("_", " ")}
             </span>
             {active ? <span className="text-[9px] text-brand">current</span> : null}
             {busy === entry.id ? <Loader2 size={10} className="animate-spin" /> : null}
@@ -213,9 +215,7 @@ function TreeNode({
 
 function entryTitle(entry: Entry): string {
   if (entry.summary) return entry.summary;
-  const msg = entry.message as
-    | { role?: string; content?: unknown }
-    | undefined;
+  const msg = entry.message as { role?: string; content?: unknown } | undefined;
   if (!msg) return entry.type;
   if (typeof msg.content === "string") return msg.content.slice(0, 160);
   if (Array.isArray(msg.content)) {

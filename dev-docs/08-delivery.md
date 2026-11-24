@@ -125,7 +125,7 @@ supported by mygo.
 9. On a session with history, hover a user message → Fork from here.
 10. Quit while a run is active: a native dialog offers Cancel / Quit and Stop.
 
-Screenshots: `docs/images/`.
+Screenshots: `dev-docs/images/`.
 
 ## Evidence
 
@@ -142,7 +142,7 @@ Screenshots: `docs/images/`.
 - English/Chinese UI switch with CJK QA; screenshots in `zh-chat.png` and
   `zh-settings.png`. Native menu names remain English.
 - Release `.app` 27.0 MB, DMG 6.8 MB; no production source maps.
-- Screenshots in `docs/images/` were refreshed for PiS: home, chat, plan,
+- Screenshots in `dev-docs/images/` were refreshed for PiS: home, chat, plan,
   trust, approval, settings, session tree, diff, login, and both Chinese views.
   `real-pi.png` records the pre-rebrand P0 native run.
 - Rspress docs and root config typecheck pass in `./scripts/verify.sh`.

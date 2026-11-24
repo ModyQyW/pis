@@ -1,4 +1,13 @@
-import { ArrowUp, CornerDownLeft, FileText, Paperclip, Plus, Square, Target, X } from "lucide-react";
+import {
+  ArrowUp,
+  CornerDownLeft,
+  FileText,
+  Paperclip,
+  Plus,
+  Square,
+  Target,
+  X,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
@@ -68,7 +77,9 @@ export function Composer({
       ? (commands ?? [])
           .filter((c) => {
             const q = token.query.toLowerCase();
-            return !q || c.name.toLowerCase().includes(q) || c.description?.toLowerCase().includes(q);
+            return (
+              !q || c.name.toLowerCase().includes(q) || c.description?.toLowerCase().includes(q)
+            );
           })
           .slice(0, 9)
           .map((c) => ({
@@ -152,7 +163,10 @@ export function Composer({
         }
         const dataUrl = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => resolve(String(reader.result));
+          reader.onload = () => {
+            if (typeof reader.result === "string") resolve(reader.result);
+            else reject(new Error("image read did not return a data URL"));
+          };
           reader.onerror = () => reject(reader.error);
           reader.readAsDataURL(file);
         });
@@ -310,7 +324,9 @@ export function Composer({
                   onClick={() => chooseSuggestion(s)}
                   className={cn(
                     "flex w-full items-start gap-2 rounded-md px-1.5 py-1.5 text-left transition-colors",
-                    i === selected ? "bg-surface-2 text-fg" : "text-subtle hover:bg-surface-2 hover:text-fg",
+                    i === selected
+                      ? "bg-surface-2 text-fg"
+                      : "text-subtle hover:bg-surface-2 hover:text-fg",
                   )}
                 >
                   <FileText size={11} className="mt-1 shrink-0 text-faint" />
@@ -400,9 +416,7 @@ export function Composer({
                 }}
                 className={cn(
                   "hidden h-7 items-center gap-1.5 rounded-lg px-2 text-[11px] transition-colors hover:bg-surface-2 sm:flex",
-                  planMode
-                    ? "bg-brand-soft text-brand"
-                    : "text-subtle hover:text-fg",
+                  planMode ? "bg-brand-soft text-brand" : "text-subtle hover:text-fg",
                 )}
                 title={
                   externalPlanCommand
@@ -442,9 +456,7 @@ export function Composer({
                   disabled={!canSend}
                   className={cn(
                     "flex size-8 items-center justify-center rounded-full transition-all",
-                    canSend
-                      ? "bg-fg text-canvas hover:scale-[1.03]"
-                      : "bg-surface-3 text-faint",
+                    canSend ? "bg-fg text-canvas hover:scale-[1.03]" : "bg-surface-3 text-faint",
                   )}
                   aria-label={t("Send")}
                   title={t("Send")}

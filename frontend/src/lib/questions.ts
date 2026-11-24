@@ -43,8 +43,7 @@ export function parseQuestions(args: Record<string, unknown>): Question[] {
         if (!label) continue;
         options.push({
           label,
-          description:
-            option && strings(option["description"]) ? option["description"] : undefined,
+          description: option && strings(option["description"]) ? option["description"] : undefined,
         });
       }
     }

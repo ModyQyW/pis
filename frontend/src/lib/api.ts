@@ -25,7 +25,17 @@ import {
   type Workspace,
   type Worktree,
 } from "../mygo";
-import { mockBootstrap, mockDiff, mockGitStatus, mockModels, mockStart, mockSummary, mockTranscript, mockTree, setMockLanguage } from "./mock";
+import {
+  mockBootstrap,
+  mockDiff,
+  mockGitStatus,
+  mockModels,
+  mockStart,
+  mockSummary,
+  mockTranscript,
+  mockTree,
+  setMockLanguage,
+} from "./mock";
 
 /** True when the page is running inside the mygo shell. */
 export const insideShell = isMyGo();
@@ -274,7 +284,12 @@ export const api = {
     }
     return MCP.list(workspace);
   },
-  async mcpSetEnabled(workspace: string, name: string, enabled: boolean, local: boolean): Promise<void> {
+  async mcpSetEnabled(
+    workspace: string,
+    name: string,
+    enabled: boolean,
+    local: boolean,
+  ): Promise<void> {
     if (!insideShell) return;
     await MCP.setEnabled(workspace, name, enabled, local);
   },
@@ -344,7 +359,11 @@ export const api = {
     }
     return Files.read(workspace, path, 512 * 1024);
   },
-  async searchFiles(workspace: string, query: string, limit = 12): Promise<import("../mygo").Hit[]> {
+  async searchFiles(
+    workspace: string,
+    query: string,
+    limit = 12,
+  ): Promise<import("../mygo").Hit[]> {
     if (!insideShell) {
       const files = [
         "src/cache/watch.ts",
@@ -369,7 +388,11 @@ export const api = {
       return {
         commands: [
           { name: "review", description: "Review the current changes", source: "prompt" },
-          { name: "skill:frontend-design", description: "Apply the frontend design skill", source: "skill" },
+          {
+            name: "skill:frontend-design",
+            description: "Apply the frontend design skill",
+            source: "skill",
+          },
           { name: "subagents", description: "Administer subagents", source: "extension" },
         ],
       };
@@ -380,7 +403,11 @@ export const api = {
     if (!insideShell) {
       const id = `mock-login-${Date.now()}`;
       setTimeout(() => {
-        for (const listener of mockAuthOutput) listener({ id, data: "Provider login (mock)\r\nPaste your key or complete the browser flow.\r\n> " });
+        for (const listener of mockAuthOutput)
+          listener({
+            id,
+            data: "Provider login (mock)\r\nPaste your key or complete the browser flow.\r\n> ",
+          });
       }, 150);
       return { id, provider };
     }
@@ -388,7 +415,8 @@ export const api = {
   },
   async authWrite(id: string, data: string): Promise<void> {
     if (!insideShell) {
-      for (const listener of mockAuthOutput) listener({ id, data: data === "\r" ? "\r\nDone.\r\n" : data });
+      for (const listener of mockAuthOutput)
+        listener({ id, data: data === "\r" ? "\r\nDone.\r\n" : data });
       if (data === "\r") {
         for (const listener of mockAuthExit) listener({ id, code: 0 });
       }
@@ -472,7 +500,12 @@ function mockPrompt(req: PromptRequest, emit: (ev: Event) => void): { dispositio
         kind: "event",
         raw: {
           type: "message_start",
-          message: { role: "assistant", content: [], model: "claude-sonnet-4-5", provider: "anthropic" },
+          message: {
+            role: "assistant",
+            content: [],
+            model: "claude-sonnet-4-5",
+            provider: "anthropic",
+          },
         },
       });
     }
@@ -495,7 +528,14 @@ function mockPrompt(req: PromptRequest, emit: (ev: Event) => void): { dispositio
             provider: "anthropic",
             stopReason: "stop",
             timestamp: stamp + 1,
-            usage: { input: 100, output: 80, cacheRead: 0, cacheWrite: 0, totalTokens: 180, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } },
+            usage: {
+              input: 100,
+              output: 80,
+              cacheRead: 0,
+              cacheWrite: 0,
+              totalTokens: 180,
+              cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 },
+            },
           },
         },
       });

@@ -1,5 +1,12 @@
 import type { Entry } from "../mygo";
-import { normalizeUsage, type AgentMessage, type ContentBlock, type ImageContent, type SessionStats, type Usage } from "./pi-types";
+import {
+  normalizeUsage,
+  type AgentMessage,
+  type ContentBlock,
+  type ImageContent,
+  type SessionStats,
+  type Usage,
+} from "./pi-types";
 
 export type ToolResultView = {
   id: string;
@@ -255,15 +262,15 @@ export function buildTranscript(
     const blocks: AssistantBlock[] = live.blocks
       .filter((block): block is AssistantBlock => Boolean(block))
       .map((block) => {
-      if (block.kind === "tool") {
-        return {
-          ...block,
-          result: results.get(block.id) ?? block.result,
-          run: runs[block.id] ?? block.run,
-        };
-      }
-      return block;
-    });
+        if (block.kind === "tool") {
+          return {
+            ...block,
+            result: results.get(block.id) ?? block.result,
+            run: runs[block.id] ?? block.run,
+          };
+        }
+        return block;
+      });
     items.push({
       kind: "assistant",
       id: `live-${live.startedAt}`,

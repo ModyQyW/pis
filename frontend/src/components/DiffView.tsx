@@ -16,7 +16,12 @@ function parse(diff: string): Line[] {
 export function DiffView({ diff, className }: { diff: string; className?: string }) {
   const lines = parse(diff);
   return (
-    <div className={cn("overflow-x-auto rounded-md border border-border bg-canvas font-mono text-[11px] leading-[1.55]", className)}>
+    <div
+      className={cn(
+        "overflow-x-auto rounded-md border border-border bg-canvas font-mono text-[11px] leading-[1.55]",
+        className,
+      )}
+    >
       <div className="min-w-max py-1">
         {lines.map((line, i) => (
           <div

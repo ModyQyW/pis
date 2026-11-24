@@ -35,7 +35,9 @@ export function TrustDialog({
           </div>
 
           <p className="mt-3 text-[11.5px] leading-5 text-subtle">
-            {t("This folder contains pi resources that can run code or change how the agent behaves. Trusting it lets pi load them for sessions in this project.")}
+            {t(
+              "This folder contains pi resources that can run code or change how the agent behaves. Trusting it lets pi load them for sessions in this project.",
+            )}
           </p>
 
           <div className="mt-3 rounded-lg border border-border bg-canvas p-3">
@@ -53,7 +55,9 @@ export function TrustDialog({
           </div>
 
           <p className="mt-3 text-[10px] leading-4 text-faint">
-            {t("The decision is stored by PiS, not written to pi's trust store. Existing sessions keep their current trust until restarted.")}
+            {t(
+              "The decision is stored by PiS, not written to pi's trust store. Existing sessions keep their current trust until restarted.",
+            )}
           </p>
 
           <div className="mt-4 flex justify-end gap-2">

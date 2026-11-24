@@ -1,9 +1,11 @@
+<p align="center"><img src="resources/icon.png" alt="PiS icon" width="120" height="120"></p>
+
 # PiS
 
 A desktop coding agent built on [mygo](https://mygo.run) with
 [pi](https://pi.dev) as the engine. The S stands for strong.
 
-![PiS empty state](docs/images/empty.png)
+![PiS empty state](dev-docs/images/empty.png)
 
 PiS is a small native shell around a rich web UI. It runs your installed
 pi over RPC, so your existing models, credentials, sessions, skills, prompt
@@ -20,8 +22,8 @@ Current public release: **[0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0
 (27.0 MB app / 6.8 MB DMG). The release and update feed are public; macOS is
 ad-hoc signed, so Gatekeeper requires a one-time approval. English is the
 default; Chinese is available in Settings. See
-[`docs/03-progress.md`](docs/03-progress.md) for evidence and
-[`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
+[`dev-docs/03-progress.md`](dev-docs/03-progress.md) for evidence and
+[`dev-docs/02-plan.md`](dev-docs/02-plan.md) §8 for the roadmap.
 
 ## What works
 
@@ -66,11 +68,11 @@ default; Chinese is available in Settings. See
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
   quit guard for running sessions, single small binary.
 
-More screenshots: [chat](docs/images/chat.png),
-[approval](docs/images/approval.png), [plan mode](docs/images/plan.png),
-[trust](docs/images/trust.png), [session tree](docs/images/session-tree.png),
-[diff](docs/images/diff.png), [login](docs/images/login.png),
-[Chinese shell](docs/images/zh-chat.png), [Chinese settings](docs/images/zh-settings.png).
+More screenshots: [chat](dev-docs/images/chat.png),
+[approval](dev-docs/images/approval.png), [plan mode](dev-docs/images/plan.png),
+[trust](dev-docs/images/trust.png), [session tree](dev-docs/images/session-tree.png),
+[diff](dev-docs/images/diff.png), [login](dev-docs/images/login.png),
+[Chinese shell](dev-docs/images/zh-chat.png), [Chinese settings](dev-docs/images/zh-settings.png).
 
 ## Requirements
 
@@ -107,18 +109,25 @@ bun run build
 open "build/darwin-arm64/PiS.app"
 ```
 
-The build is ad-hoc signed and not notarized; macOS may require
-System Settings → Privacy & Security → Open Anyway. The DMG is suitable for
-local validation, not public distribution yet.
+Release builds are ad-hoc signed and not notarized; macOS may require
+System Settings → Privacy & Security → Open Anyway. Published artifacts are on
+[GitHub Releases](https://github.com/ModyQyW/pis/releases).
 
 ## Verify
 
+Before committing, format and run the full gate:
+
 ```sh
+bun run format
 ./scripts/verify.sh
 ```
 
-This runs Go build/vet/tests, frontend typecheck/tests, and the production
-frontend build. A real-pi integration test is opt-in:
+`bun run format` runs `go fmt ./...` and Vite+'s `vp check --fix`.
+`./scripts/verify.sh` runs Go formatting/build/vet/tests, Vite+ format/lint/
+typecheck, bridge and frontend tests, the frontend build, and the user-docs
+build. `bun install` installs a Vite+ pre-commit hook that runs the same gate.
+Vite+ is a project dependency; no global `vp` install is required. A real-pi integration
+test is opt-in:
 
 ```sh
 PIS_INTEGRATION=1 go test ./internal/agent -run TestStartAndInspectRealPi
@@ -136,9 +145,9 @@ mygo window (Go, system webview)
      Streamdown code/Mermaid plugins, TanStack Virtual)
 ```
 
-Decisions and tradeoffs are in [`docs/01-decisions.md`](docs/01-decisions.md).
+Decisions and tradeoffs are in [`dev-docs/01-decisions.md`](dev-docs/01-decisions.md).
 The research that led there, including competitor strengths and measured
-prototypes, is in [`docs/00-research.md`](docs/00-research.md).
+prototypes, is in [`dev-docs/00-research.md`](dev-docs/00-research.md).
 
 ## Known limits
 
@@ -157,20 +166,15 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 
 ## Documentation
 
-1. [`docs/00-research.md`](docs/00-research.md)
-2. [`docs/01-decisions.md`](docs/01-decisions.md)
-3. [`docs/02-plan.md`](docs/02-plan.md)
-4. [`docs/03-progress.md`](docs/03-progress.md)
-5. [`docs/04-pitfalls.md`](docs/04-pitfalls.md)
-6. [`docs/05-qa.md`](docs/05-qa.md)
-7. [`docs/06-ux.md`](docs/06-ux.md)
-8. [`docs/07-grilling.md`](docs/07-grilling.md)
-9. [`docs/08-delivery.md`](docs/08-delivery.md)
+- **User guide:** [`user-docs/`](user-docs/), built with
+  [Rspress](https://rspress.rs/). It covers installation, daily use, approvals,
+  extensions, architecture, development, release, configuration, and
+  troubleshooting.
+- **Development record:** [`dev-docs/`](dev-docs/), from research and decisions
+  through plan, progress, pitfalls, QA, UX, and delivery evidence.
 
-## Documentation site
-
-The user guide in [`site-docs/`](site-docs/) is built with
-[Rspress](https://rspress.rs/):
+The Rspress source lives in `user-docs/`; the build output is
+`user-docs-build/` and is not committed.
 
 ```sh
 bun run docs:dev
@@ -178,10 +182,19 @@ bun run docs:build
 bun run docs:preview
 ```
 
-The site covers installation, daily use, approvals, extensions, architecture,
-development, release, configuration, and troubleshooting. The production build
-is written to `site-build/`.
+Development record:
+
+1. [`dev-docs/00-research.md`](dev-docs/00-research.md)
+2. [`dev-docs/01-decisions.md`](dev-docs/01-decisions.md)
+3. [`dev-docs/02-plan.md`](dev-docs/02-plan.md)
+4. [`dev-docs/03-progress.md`](dev-docs/03-progress.md)
+5. [`dev-docs/04-pitfalls.md`](dev-docs/04-pitfalls.md)
+6. [`dev-docs/05-qa.md`](dev-docs/05-qa.md)
+7. [`dev-docs/06-ux.md`](dev-docs/06-ux.md)
+8. [`dev-docs/07-grilling.md`](dev-docs/07-grilling.md)
+9. [`dev-docs/08-delivery.md`](dev-docs/08-delivery.md)
 
 ## License
 
-MIT
+MIT. The icon includes a silhouette adapted from Noto Emoji; see
+[`NOTICE.md`](NOTICE.md) and [`LICENSES/Apache-2.0.txt`](LICENSES/Apache-2.0.txt).

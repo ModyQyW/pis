@@ -10,10 +10,7 @@ describe("questions", () => {
           {
             header: "Backup",
             question: "Back up first?",
-            options: [
-              { label: "Yes", description: "Archive it" },
-              { label: "No" },
-            ],
+            options: [{ label: "Yes", description: "Archive it" }, { label: "No" }],
           },
         ],
       }),

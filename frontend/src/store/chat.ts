@@ -71,7 +71,11 @@ type Store = {
   setDraft: (key: string, draft: string) => void;
   addAttachment: (key: string, attachment: Attachment) => void;
   removeAttachment: (key: string, id: string) => void;
-  respondDialog: (key: string, dialogId: string, response: Omit<ExtensionUIResponse, "id">) => Promise<void>;
+  respondDialog: (
+    key: string,
+    dialogId: string,
+    response: Omit<ExtensionUIResponse, "id">,
+  ) => Promise<void>;
   refreshTranscript: (key: string, leafId?: string) => Promise<void>;
   fork: (key: string, entryId: string) => Promise<void>;
   clone: (key: string) => Promise<void>;
@@ -175,7 +179,7 @@ export const useChat = create<Store>((set, get) => ({
     // Fast transcript first; pi starts in parallel.
     const readPromise = api.readSession(path).catch(() => null);
     const startPromise = api.startSession({ path, cwd, trusted });
-    readPromise.then((tr) => {
+    void readPromise.then((tr) => {
       if (!tr) return;
       set((state) => {
         const s = state.sessions[tempKey];
@@ -199,7 +203,7 @@ export const useChat = create<Store>((set, get) => ({
         delete next[tempKey];
         const session: ChatSession = {
           ...s,
-          entries: s.entries.length > 0 ? s.entries : transcript?.entries ?? [],
+          entries: s.entries.length > 0 ? s.entries : (transcript?.entries ?? []),
           key: info.id,
           appId: info.id,
           path: info.file || path,
@@ -338,13 +342,7 @@ export const useChat = create<Store>((set, get) => ({
     const textFiles = (s?.attachments ?? []).filter((a) => a.kind === "text" && a.text);
     if (!s?.appId || (!text.trim() && images.length === 0)) return;
     const message =
-      text +
-      textFiles
-        .map(
-          (a) =>
-            `\n\n<file name="${a.name}">\n${a.text}\n</file>`,
-        )
-        .join("");
+      text + textFiles.map((a) => `\n\n<file name="${a.name}">\n${a.text}\n</file>`).join("");
     set((state) => {
       const cur = state.sessions[key];
       if (!cur) return state;
@@ -366,7 +364,7 @@ export const useChat = create<Store>((set, get) => ({
         sessionId: s.appId,
         message,
         images: images.length ? images : undefined,
-        behavior: s.streaming ? behavior ?? "steer" : undefined,
+        behavior: s.streaming ? (behavior ?? "steer") : undefined,
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -655,7 +653,7 @@ export const useChat = create<Store>((set, get) => ({
 
   activeSession() {
     const { activeKey, sessions } = get();
-    return activeKey ? sessions[activeKey] ?? null : null;
+    return activeKey ? (sessions[activeKey] ?? null) : null;
   },
 }));
 
@@ -686,12 +684,14 @@ function updateLive(
 }
 
 function ensureLive(cur: ChatSession): LiveAssistant {
-  return cur.live ?? {
-    blocks: [],
-    startedAt: now(),
-    model: cur.model?.id,
-    provider: cur.model?.provider,
-  };
+  return (
+    cur.live ?? {
+      blocks: [],
+      startedAt: now(),
+      model: cur.model?.id,
+      provider: cur.model?.provider,
+    }
+  );
 }
 
 function reduceEvent(cur: ChatSession, event: PiEvent): ChatSession {
@@ -742,7 +742,7 @@ function reduceEvent(cur: ChatSession, event: PiEvent): ChatSession {
                 cost: usage.cost?.total ?? 0,
               }
             : cur.stats,
-          error: msg.stopReason === "error" ? msg.errorMessage ?? "model error" : cur.error,
+          error: msg.stopReason === "error" ? (msg.errorMessage ?? "model error") : cur.error,
         };
       }
       if (msg.role === "user") {
@@ -888,7 +888,11 @@ function reduceEvent(cur: ChatSession, event: PiEvent): ChatSession {
         },
       };
     case "auto_retry_end":
-      return { ...cur, retry: undefined, error: event.success ? undefined : event.finalError ?? cur.error };
+      return {
+        ...cur,
+        retry: undefined,
+        error: event.success ? undefined : (event.finalError ?? cur.error),
+      };
     case "extension_error":
       return {
         ...cur,
@@ -967,7 +971,12 @@ function applyExtensionUI(key: string, cur: ChatSession, req: ExtensionUIRequest
     }));
     return;
   }
-  if (req.method === "select" || req.method === "confirm" || req.method === "input" || req.method === "editor") {
+  if (
+    req.method === "select" ||
+    req.method === "confirm" ||
+    req.method === "input" ||
+    req.method === "editor"
+  ) {
     const dialog = req as ExtensionDialog;
     if (cur.dialogs.some((d) => d.id === dialog.id)) return;
     useChat.setState((state) => {

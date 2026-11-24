@@ -1,8 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Add Vite+ 1.8 (Oxlint, Oxfmt, tsrs) as the frontend format/lint/type-check
+  gate; `bun run format` and `./scripts/verify.sh` cover Go and Vite+ checks.
+- Install a Vite+ pre-commit hook through `vp config --no-agent`; every commit
+  runs the full verification gate.
+- Replace the πS mark with a π + flexed-arm icon; the development app keeps the
+  same mark with a mint status dot.
+- Split the Rspress user guide into `user-docs/` and the research, decisions,
+  progress, QA, and delivery notes into `dev-docs/`.
+- Fix smart approvals' destructive-command table (regexes were typed as rules)
+  and bump the bridge version so installed bridge copies refresh.
+
 ## 0.0.2 (2026-11-24)
 
-- Add the Rspress user guide in `site-docs/`, with guides from first launch to
+- Add the Rspress user guide in `user-docs/`, with guides from first launch to
   architecture and release work.
 - Add a root `tsconfig.json` and config typecheck to `scripts/verify.sh`.
 - `release.sh` now prompts for a version with a suggested next patch version

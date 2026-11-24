@@ -28,21 +28,31 @@ bun run dev:web
 
 ## 验证
 
+提交前先格式化，再运行完整检查：
+
 ```sh
+bun run format
 ./scripts/verify.sh
 ```
 
-包含：
+`bun run format` 执行 `go fmt ./...` 和 `vp check --fix`。`./scripts/verify.sh` 包含：
 
+- Go 格式检查（`gofmt -l`）
 - Go build / vet / test
-- 前端类型检查
+- Vite+ 格式、lint、类型检查（`vp check --deny-warnings`）
+- 前端 TypeScript 类型检查
 - 根目录 TypeScript 配置检查
+- bridge Bun 测试
 - 前端 Vitest
 - 生产前端构建
+- Rspress 用户文档构建
 
-单独运行：
+`bun install` 会运行 `vp config --no-agent`，在本仓库安装 Vite+ 的 Git
+hook；提交时会自动运行 `./scripts/verify.sh`。Vite+ 由 `vite-plus` 作为项目
+依赖提供，不需要全局安装 `vp`。单独运行：
 
 ```sh
+bun run check:web
 go test ./...
 bun run typecheck
 bun run typecheck:config
@@ -62,6 +72,7 @@ PIS_INTEGRATION=1 go test ./internal/agent -run TestStartAndInspectRealPi
 main.go                 应用入口、窗口、菜单、IPC 绑定
 mygo.config.ts          mygo 构建配置：名称、slug、bundle ID
 rspress.config.ts       文档站配置
+vite.config.ts          Vite+ 格式、lint、类型检查配置
 tsconfig.json           根配置类型检查
 internal/
   agent/                pi RPC 进程与事件
@@ -71,14 +82,14 @@ internal/
   files/ gitx/ mcp/     文件、Git、MCP
   sessions/             JSONL 读取
 frontend/               React UI
-site-docs/              Rspress 文档内容
-docs/                   研发文档与证据
+user-docs/              Rspress 文档内容
+dev-docs/               研发文档与证据
 scripts/                开发、验证、发布脚本
 ```
 
 ## 文档站
 
-Rspress 配置在根目录，内容在 `site-docs/`：
+Rspress 配置在根目录，内容在 `user-docs/`：
 
 ```sh
 bun run docs:dev
@@ -86,7 +97,7 @@ bun run docs:build
 bun run docs:preview
 ```
 
-构建输出 `site-build/`，不会进入 Git。
+构建输出 `user-docs-build/`，不会进入 Git。
 
 ## 代码约定
 
@@ -95,6 +106,7 @@ bun run docs:preview
 - pi 的 session/auth/trust 文件只读，不重写。
 - 新 UI 字符串要通过 `t()`；中英文键保持一致。
 - 修改 bridge 源码时同步更新 `bridge.Version`，否则旧扩展文件会被复用。
-- 配置和端口约定见 `docs/01-decisions.md` 与 `docs/04-pitfalls.md`。
+- 提交前必须运行 `bun run format` 与 `./scripts/verify.sh`；不要绕过 Vite+ 的格式或 lint 失败。
+- 配置和端口约定见 `dev-docs/01-decisions.md` 与 `dev-docs/04-pitfalls.md`。
 
 下一步：[构建、签名与发布](/advanced/release)。

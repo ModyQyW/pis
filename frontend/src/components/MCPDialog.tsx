@@ -164,7 +164,9 @@ export function MCPDialog({
                               {server.url || [server.command, ...(server.args ?? [])].join(" ")}
                             </p>
                             {server.description ? (
-                              <p className="mt-0.5 text-[10.5px] text-subtle">{server.description}</p>
+                              <p className="mt-0.5 text-[10.5px] text-subtle">
+                                {server.description}
+                              </p>
                             ) : null}
                           </div>
                           <button
@@ -237,7 +239,9 @@ export function MCPDialog({
                     </button>
                   </div>
                   <p className={cn("mt-2 text-[10px] leading-4 text-faint")}>
-                    {t("Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.")}
+                    {t(
+                      "Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.",
+                    )}
                   </p>
                 </>
               )}
@@ -249,7 +253,9 @@ export function MCPDialog({
         open={Boolean(remove)}
         onOpenChange={(next) => !next && setRemove(null)}
         title={t("Remove {name}?", { name: remove?.name ?? "MCP server" })}
-        message={t("This deletes the entry from mcp.json. It does not uninstall the server package.")}
+        message={t(
+          "This deletes the entry from mcp.json. It does not uninstall the server package.",
+        )}
         confirmLabel={t("Remove")}
         danger
         onConfirm={async () => {

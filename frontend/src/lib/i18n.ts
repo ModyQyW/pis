@@ -41,8 +41,7 @@ const zh: Record<string, string> = {
   "Choose model": "选择模型",
   Plan: "计划",
   "Enter sends · Shift+Enter newline": "Enter 发送 · Shift+Enter 换行",
-  "Pi can read, edit, and run commands in this project.":
-    "pi 可以读取、编辑并在此项目中运行命令。",
+  "Pi can read, edit, and run commands in this project.": "pi 可以读取、编辑并在此项目中运行命令。",
   Changes: "更改",
   Files: "文件",
   "Refresh panel": "刷新面板",
@@ -89,7 +88,7 @@ const zh: Record<string, string> = {
   "Create branch": "创建分支",
   "Create worktree": "创建工作树",
   "Open a project first.": "请先打开项目。",
-  "Remove": "移除",
+  Remove: "移除",
   "Remove worktree": "移除工作树",
   "Revert file": "还原文件",
   "Revert to HEAD": "还原到 HEAD",
@@ -184,7 +183,7 @@ const zh: Record<string, string> = {
     "没有可用模型。请在 pi 中连接提供商后开始。",
   Connect: "连接",
   Close: "关闭",
-  "Appearance": "外观",
+  Appearance: "外观",
   System: "系统",
   Light: "浅色",
   Dark: "深色",
@@ -221,8 +220,7 @@ const zh: Record<string, string> = {
   "Trust project": "信任项目",
   "Rename session": "重命名会话",
   "Close rename dialog": "关闭重命名对话框",
-  "The name appears in pi's session selector and PiS.":
-    "名称会显示在 pi 的会话选择器和 PiS 中。",
+  "The name appears in pi's session selector and PiS.": "名称会显示在 pi 的会话选择器和 PiS 中。",
   Cancel: "取消",
   Save: "保存",
   "Session actions": "会话操作",
@@ -272,8 +270,7 @@ const zh: Record<string, string> = {
   "Close preview": "关闭预览",
   "Reading file…": "正在读取文件…",
   "Model & thinking": "模型与思考",
-  "Models come from your pi credentials and configuration.":
-    "模型来自你的 pi 凭据和配置。",
+  "Models come from your pi credentials and configuration.": "模型来自你的 pi 凭据和配置。",
   "Close model picker": "关闭模型选择器",
   "Search models…": "搜索模型…",
   "Refresh models": "刷新模型",
@@ -322,7 +319,7 @@ export function subscribeLocale(listener: () => void): () => void {
 }
 
 export function t(source: string, vars?: Record<string, string | number>): string {
-  const template = locale === "zh" ? zh[source] ?? source : source;
+  const template = locale === "zh" ? (zh[source] ?? source) : source;
   if (!vars) return template;
   return template.replace(/\{(\w+)\}/g, (match, key: string) =>
     key in vars ? String(vars[key]) : match,

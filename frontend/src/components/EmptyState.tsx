@@ -8,7 +8,8 @@ const starters = [
   {
     icon: FileSearch,
     label: "Explain this codebase",
-    prompt: "Give me a tour of this codebase: the main entry points, the data flow, and where I should start reading.",
+    prompt:
+      "Give me a tour of this codebase: the main entry points, the data flow, and where I should start reading.",
   },
   {
     icon: Bug,
@@ -41,7 +42,9 @@ export function EmptyState({
         {t("What are we building?")}
       </h1>
       <p className="mt-3 max-w-[520px] text-[13.5px] leading-6 text-subtle">
-        {t("Pi works in your project folder with your models, skills, and extensions. Describe the outcome; it will inspect, edit, and run commands.")}
+        {t(
+          "Pi works in your project folder with your models, skills, and extensions. Describe the outcome; it will inspect, edit, and run commands.",
+        )}
       </p>
 
       <div className="mt-8 grid max-w-[620px] gap-2 sm:grid-cols-3">

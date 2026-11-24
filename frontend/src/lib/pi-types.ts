@@ -148,7 +148,7 @@ export type PiEvent =
 export type CommandInfo = {
   name: string;
   description?: string;
-  source: "extension" | "prompt" | "skill" | string;
+  source: string;
   sourceInfo?: {
     path?: string;
     source?: string;
@@ -180,17 +180,7 @@ export type ModelInfo = Model;
 export type ExtensionUIRequest = {
   type: "extension_ui_request";
   id: string;
-  method:
-    | "select"
-    | "confirm"
-    | "input"
-    | "editor"
-    | "notify"
-    | "setStatus"
-    | "setWidget"
-    | "setTitle"
-    | "set_editor_text"
-    | string;
+  method: string;
   title?: string;
   message?: string;
   options?: string[];

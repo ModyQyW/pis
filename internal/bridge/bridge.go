@@ -11,7 +11,7 @@ import (
 )
 
 // Version changes whenever the extension source changes.
-const Version = "6"
+const Version = "7"
 
 const (
 	extensionPrefix = "pis-bridge-"

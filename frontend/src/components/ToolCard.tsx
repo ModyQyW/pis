@@ -70,9 +70,7 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
             <Check size={12} className="text-success" />
           )}
           {result?.durationMs != null ? <span>{result.durationMs}ms</span> : null}
-          {hasBody ? (
-            open ? <ChevronDown size={12} /> : <ChevronRight size={12} />
-          ) : null}
+          {hasBody ? open ? <ChevronDown size={12} /> : <ChevronRight size={12} /> : null}
         </span>
       </button>
 
@@ -111,14 +109,7 @@ export function StandaloneTool({ tool }: { tool: ToolBlock }) {
   return <ToolCard tool={tool} />;
 }
 
-
-function QuestionCard({
-  tool,
-  questions,
-}: {
-  tool: ToolBlock;
-  questions: Question[];
-}) {
+function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Question[] }) {
   const answers = parseAnswers(tool.result?.details);
   return (
     <div className="my-1.5 overflow-hidden rounded-lg border border-brand/25 bg-surface/70">
@@ -159,7 +150,9 @@ function QuestionCard({
                         <span
                           className={cn(
                             "mt-0.5 flex size-3 shrink-0 items-center justify-center rounded-full border",
-                            selected ? "border-brand bg-brand text-brand-fg" : "border-border-strong",
+                            selected
+                              ? "border-brand bg-brand text-brand-fg"
+                              : "border-border-strong",
                           )}
                         >
                           {selected ? <Check size={8} /> : null}

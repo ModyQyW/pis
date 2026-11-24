@@ -23,9 +23,7 @@ function textOf(value: unknown): string {
   return value
     .map((part) => {
       const block = record(part);
-      return block?.["type"] === "text" && typeof block["text"] === "string"
-        ? block["text"]
-        : "";
+      return block?.["type"] === "text" && typeof block["text"] === "string" ? block["text"] : "";
     })
     .filter(Boolean)
     .join("\n");

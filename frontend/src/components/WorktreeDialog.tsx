@@ -86,7 +86,9 @@ export function WorktreeDialog({
 
             <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
               {!workspace ? (
-                <p className="py-6 text-center text-[11.5px] text-faint">{t("Open a project first.")}</p>
+                <p className="py-6 text-center text-[11.5px] text-faint">
+                  {t("Open a project first.")}
+                </p>
               ) : loading && list.length === 0 ? (
                 <div className="flex items-center gap-2 py-8 text-[11px] text-faint">
                   <Loader2 size={13} className="animate-spin" />
@@ -109,7 +111,9 @@ export function WorktreeDialog({
                             <span className="text-[9px] text-warning">locked</span>
                           ) : null}
                         </div>
-                        <p className="mt-0.5 truncate font-mono text-[10px] text-faint">{wt.path}</p>
+                        <p className="mt-0.5 truncate font-mono text-[10px] text-faint">
+                          {wt.path}
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -181,7 +185,9 @@ export function WorktreeDialog({
         open={Boolean(remove)}
         onOpenChange={(next) => !next && setRemove(null)}
         title={t("Remove {branch}?", { branch: remove?.branch ?? "worktree" })}
-        message={t("The worktree directory is removed. Its branch and commits remain in the repository.")}
+        message={t(
+          "The worktree directory is removed. Its branch and commits remain in the repository.",
+        )}
         confirmLabel={t("Remove")}
         danger
         onConfirm={async () => {

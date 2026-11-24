@@ -32,7 +32,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - Real-pi UI smoke after the UI migration: **pass** (2026-11-23). A disposable
   real pi session rendered Read, Shell, and Edit tool cards, streamed the final
   answer, and the native development window rendered it. Screenshot:
-  `docs/images/real-pi.png` (pre-rebrand capture).
+  `dev-docs/images/real-pi.png` (pre-rebrand capture).
 - Native window check: **pass** for traffic lights, hidden-inset title bar,
   sidebar, composer, and menus; full-screen and dark theme still follow the
   same shell and need no code change. Plan, trust, and approval screenshots are refreshed for PiS.
@@ -149,7 +149,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   answers. Vitest covers both.
 - **Notifications**: `Desktop.Notify` respects the setting, groups by session,
   and truncates text. The packaged app's Test notification raised the macOS
-  authorization prompt (verified in `docs/images/settings.png` capture session).
+  authorization prompt (verified in `dev-docs/images/settings.png` capture session).
 - **Assets**: production build has 400 lazy language/diagram chunks, but a
   clean session loaded only 15 `/assets/` files on first code/Mermaid render;
   no console errors. The Markdown chunk stays 1.13 MB lazy (348 KB gzip).
@@ -157,10 +157,10 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   Chinese copy, placeholders, and a root locale subscription; Settings persists
   `language`, and `mygo.App.SetLocale` follows it for the native shell. Nine
   Vitest tests include translation lookup and placeholders; CJK screenshots are
-  in `docs/images/zh-chat.png` and `zh-settings.png`.
+  in `dev-docs/images/zh-chat.png` and `zh-settings.png`.
 - **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
   cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
-  Rspress documentation builds from `site-docs/` and the root `tsconfig.json`
+  Rspress documentation builds from `user-docs/` and the root `tsconfig.json`
   checks `mygo.config.ts` and `rspress.config.ts`.
   Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
   v8, and action-gh-release v3. GitHub Actions run 45155511397 passed all Go,
@@ -242,3 +242,17 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   and "Esc stops" did not stop. All advertised shortcuts and Esc now work.
 - New chat after an active session showed a blank transcript instead of the
   starter cards; blank live sessions now show the same home state.
+
+## Quality and docs split (2026-11-24)
+
+- Added Vite+ 1.8 as the project-local format/lint/type-check gate. `bun run
+  format` runs `go fmt` and `vp check --fix`; `scripts/verify.sh` runs both Go
+  and Vite+ checks before tests and builds.
+- Replaced the πS icon with a π + flexed-arm mark. Production, development, the
+  browser favicon, and the Rspress logo now share one source (`resources/icon.svg`);
+  the development app adds a mint status dot.
+- Split the Rspress guide into `user-docs/` and the engineering record into
+  `dev-docs/`; all README and cross-document links were updated.
+- Vite+'s type-aware check exposed an untyped bridge import and a broken
+  destructive-command table. The bridge now uses labeled rules and a local
+  declaration for pi's extension API; `bridge.Version` is 7.

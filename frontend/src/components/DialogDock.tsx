@@ -108,25 +108,25 @@ export function DialogDock({
                 ))}
               </div>
               {!approval ? (
-              <div className="mt-2 flex gap-2">
-                <input
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.nativeEvent.isComposing) submitText();
-                  }}
-                  placeholder={t("Or type your own answer…")}
-                  className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
-                />
-                <button
-                  type="button"
-                  disabled={!text.trim()}
-                  onClick={submitText}
-                  className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
-                >
-                  {t("Send")}
-                </button>
-              </div>
+                <div className="mt-2 flex gap-2">
+                  <input
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.nativeEvent.isComposing) submitText();
+                    }}
+                    placeholder={t("Or type your own answer…")}
+                    className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
+                  />
+                  <button
+                    type="button"
+                    disabled={!text.trim()}
+                    onClick={submitText}
+                    className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                  >
+                    {t("Send")}
+                  </button>
+                </div>
               ) : null}
             </div>
           ) : (
@@ -160,7 +160,9 @@ export function DialogDock({
           )}
           {dialog.timeout ? (
             <p className="mt-2 text-[9.5px] text-faint">
-              {t("This request may resolve automatically after {seconds}s.", { seconds: Math.round(dialog.timeout / 1000) })}
+              {t("This request may resolve automatically after {seconds}s.", {
+                seconds: Math.round(dialog.timeout / 1000),
+              })}
             </p>
           ) : null}
         </div>

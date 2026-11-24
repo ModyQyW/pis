@@ -12,7 +12,8 @@ export function mockTranscript(path: string): Transcript {
       timestamp: new Date(now - 1000 * 60 * 12).toISOString(),
       message: {
         role: "user",
-        content: "The cache invalidation is wrong when a file is renamed. Can you find the cause and fix it?",
+        content:
+          "The cache invalidation is wrong when a file is renamed. Can you find the cause and fix it?",
       } satisfies AgentMessage,
     },
     {
@@ -64,7 +65,7 @@ export function mockTranscript(path: string): Transcript {
         content: [
           {
             type: "text",
-            text: "src/cache/watch.ts:48:  if (event.kind === \"rename\") {\n    invalidate(event.oldPath)\n  }\nsrc/cache/watch.ts:61:  cache.set(event.path, entry)",
+            text: 'src/cache/watch.ts:48:  if (event.kind === "rename") {\n    invalidate(event.oldPath)\n  }\nsrc/cache/watch.ts:61:  cache.set(event.path, entry)',
           },
         ],
         isError: false,
@@ -105,7 +106,7 @@ export function mockTranscript(path: string): Transcript {
         toolName: "edit",
         content: [{ type: "text", text: "Updated src/cache/watch.ts" }],
         details: {
-          diff: "@@ -45,7 +45,8 @@\n   if (event.kind === \"rename\") {\n     invalidate(event.oldPath)\n+    invalidate(event.path)\n   }",
+          diff: '@@ -45,7 +45,8 @@\n   if (event.kind === "rename") {\n     invalidate(event.oldPath)\n+    invalidate(event.path)\n   }',
           patch: "",
         },
         isError: false,
@@ -195,10 +196,21 @@ export function mockTree(): unknown {
   return {
     tree: [
       {
-        entry: { id: "u1", type: "message", message: { role: "user", content: "The cache invalidation is wrong when a file is renamed." } },
+        entry: {
+          id: "u1",
+          type: "message",
+          message: {
+            role: "user",
+            content: "The cache invalidation is wrong when a file is renamed.",
+          },
+        },
         children: [
           {
-            entry: { id: "a1", type: "message", message: { role: "assistant", content: [{ type: "text", text: "I found it." }] } },
+            entry: {
+              id: "a1",
+              type: "message",
+              message: { role: "assistant", content: [{ type: "text", text: "I found it." }] },
+            },
             children: [],
           },
         ],
@@ -218,9 +230,21 @@ export function mockModels() {
   };
   return [
     { ...base, id: "claude-sonnet-4-5", name: "Claude Sonnet 4.5", provider: "anthropic" },
-    { ...base, id: "claude-opus-4-1", name: "Claude Opus 4.1", provider: "anthropic", contextWindow: 200000 },
+    {
+      ...base,
+      id: "claude-opus-4-1",
+      name: "Claude Opus 4.1",
+      provider: "anthropic",
+      contextWindow: 200000,
+    },
     { ...base, id: "gpt-5.2", name: "GPT-5.2", provider: "openai", api: "openai-responses" },
-    { ...base, id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "google", api: "google-generative-ai" },
+    {
+      ...base,
+      id: "gemini-3-pro",
+      name: "Gemini 3 Pro",
+      provider: "google",
+      api: "google-generative-ai",
+    },
   ];
 }
 
@@ -233,9 +257,30 @@ export function mockGitStatus() {
     ahead: 1,
     behind: 0,
     files: [
-      { path: "src/cache/watch.ts", status: "M", staged: false, additions: 2, deletions: 0, binary: false },
-      { path: "tests/cache.test.ts", status: "M", staged: false, additions: 18, deletions: 1, binary: false },
-      { path: "src/cache/rename-fixture.ts", status: "??", staged: false, additions: 9, deletions: 0, binary: false },
+      {
+        path: "src/cache/watch.ts",
+        status: "M",
+        staged: false,
+        additions: 2,
+        deletions: 0,
+        binary: false,
+      },
+      {
+        path: "tests/cache.test.ts",
+        status: "M",
+        staged: false,
+        additions: 18,
+        deletions: 1,
+        binary: false,
+      },
+      {
+        path: "src/cache/rename-fixture.ts",
+        status: "??",
+        staged: false,
+        additions: 9,
+        deletions: 0,
+        binary: false,
+      },
     ],
   };
 }

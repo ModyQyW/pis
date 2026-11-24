@@ -435,3 +435,20 @@ leaves the old directory untouched instead of deleting or half-merging it;
 remove it only after the user confirms no settings need copying. A future
 migration can copy only settings, trust, and window state. Do not point two app
 identities at the same directory.
+
+### P-063 — A regex table cannot carry labels
+**Symptom.** Smart approvals called `rule.re.test(...)` and `rule.label` on an
+array of `RegExp` values. The array is executable JavaScript, so this only
+failed when a risky bash command reached the guard.
+**Rule.** Keep the regular expression and the human label in one object, and
+derive mutating-command regexes with `.map((rule) => rule.re)`. Type-check the
+bridge with Vite+; the Go test that only greps bridge text cannot catch this.
+
+### P-064 — Vite+ type-aware checks include the embedded bridge
+**Symptom.** `vp check` followed `internal/bridge/bridge.ts` and reported a
+missing `@earendil-works/pi-coding-agent` module even though the bridge runs
+inside pi, not the frontend.
+**Rule.** Declare the small external extension surface in
+`internal/bridge/pi-coding-agent.d.ts` and guard dynamic tool input before
+stringifying it. Do not silence the whole bridge with an ignore pattern; the
+type checker found the real approval-table bug there.

@@ -44,12 +44,8 @@ export function Sidebar({
         <div className="flex items-center gap-2.5 px-1">
           <BrandMark size={26} />
           <div className="min-w-0">
-            <div className="truncate text-[13px] font-semibold tracking-[-0.01em]">
-              PiS
-            </div>
-            <div className="truncate text-[10.5px] text-faint">
-              {t("desktop coding agent")}
-            </div>
+            <div className="truncate text-[13px] font-semibold tracking-[-0.01em]">PiS</div>
+            <div className="truncate text-[10.5px] text-faint">{t("desktop coding agent")}</div>
           </div>
         </div>
       </div>
@@ -110,9 +106,7 @@ export function Sidebar({
                       className={cn("mt-0.5 shrink-0", active ? "text-brand" : "text-faint")}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12.5px] font-medium">
-                        {ws.name}
-                      </span>
+                      <span className="block truncate text-[12.5px] font-medium">{ws.name}</span>
                       <span className="mt-0.5 block truncate text-[10.5px] text-faint">
                         {relativeTime(ws.lastOpened)}
                       </span>
@@ -132,7 +126,9 @@ export function Sidebar({
           </div>
           {openSessions.length === 0 && recentSessions.length === 0 ? (
             <div className="rounded-lg px-2 py-2 text-[11px] leading-4 text-faint">
-              {selected ? t("No chats yet. Start one above.") : t("Open a project to see its chats.")}
+              {selected
+                ? t("No chats yet. Start one above.")
+                : t("Open a project to see its chats.")}
             </div>
           ) : (
             <ul className="space-y-0.5">

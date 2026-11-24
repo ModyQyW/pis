@@ -111,11 +111,7 @@ export function SessionTranscript({
 
   return (
     <div className="relative h-full">
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="scroll-thin h-full overflow-y-auto"
-      >
+      <div ref={scrollRef} onScroll={handleScroll} className="scroll-thin h-full overflow-y-auto">
         <div
           ref={contentRef}
           className="relative w-full"
@@ -157,13 +153,7 @@ export function SessionTranscript({
   );
 }
 
-function TranscriptRow({
-  item,
-  onFork,
-}: {
-  item: ChatItem;
-  onFork?: (entryId: string) => void;
-}) {
+function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: string) => void }) {
   switch (item.kind) {
     case "user":
       return <UserMessage item={item} onFork={onFork} />;

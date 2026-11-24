@@ -70,20 +70,24 @@ export function App() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [trustInfo, setTrustInfo] = useState<TrustInfo | null>(null);
-  const trustResolver = useRef<((choice: { decided: boolean; trusted: boolean }) => void) | null>(null);
+  const trustResolver = useRef<((choice: { decided: boolean; trusted: boolean }) => void) | null>(
+    null,
+  );
 
   const sessions = useChat((s) => s.sessions);
   const activeKey = useChat((s) => s.activeKey);
-  const active = activeKey ? sessions[activeKey] ?? null : null;
+  const active = activeKey ? (sessions[activeKey] ?? null) : null;
   const displayWorkspace = useMemo(() => {
     if (!active?.cwd) return selected;
     return (
       boot?.recents.find((r) => r.path === active.cwd) ??
-      (selected?.path === active.cwd ? selected : {
-        path: active.cwd,
-        name: active.cwd.split("/").pop() ?? active.cwd,
-        lastOpened: new Date().toISOString(),
-      })
+      (selected?.path === active.cwd
+        ? selected
+        : {
+            path: active.cwd,
+            name: active.cwd.split("/").pop() ?? active.cwd,
+            lastOpened: new Date().toISOString(),
+          })
     );
   }, [active?.cwd, boot?.recents, selected]);
   const openSessions = useMemo(() => Object.values(sessions), [sessions]);
@@ -165,13 +169,7 @@ export function App() {
       const busy = session.streaming || session.status === "loading";
       next[session.key] = busy;
       const wasBusy = busySessions.current[session.key];
-      if (
-        enabled &&
-        wasBusy &&
-        !busy &&
-        session.status === "ready" &&
-        !document.hasFocus()
-      ) {
+      if (enabled && wasBusy && !busy && session.status === "ready" && !document.hasFocus()) {
         void api
           .notify(session.key, session.name || "PiS", session.error ? "Run failed" : "Run finished")
           .catch(() => {});
@@ -307,9 +305,7 @@ export function App() {
         try {
           await api.setTrust(info.path, trustedChoice ? "trusted" : "untrusted");
           toast.success(
-            trustedChoice
-              ? "Project trusted for new sessions"
-              : "Project set to untrusted",
+            trustedChoice ? "Project trusted for new sessions" : "Project set to untrusted",
           );
         } catch (err) {
           toast.error(err instanceof Error ? err.message : String(err));
@@ -437,20 +433,17 @@ export function App() {
     }
   }, [refreshSessions]);
 
-  const handleNavigate = useCallback(
-    async (entryId: string, summarize: boolean) => {
-      const key = useChat.getState().activeKey;
-      if (!key) return;
-      try {
-        await useChat.getState().navigateTree(key, entryId, summarize);
-        toast.success("Moved to that point in the session");
-      } catch (err) {
-        toast.error(err instanceof Error ? err.message : String(err));
-        throw err;
-      }
-    },
-    [],
-  );
+  const handleNavigate = useCallback(async (entryId: string, summarize: boolean) => {
+    const key = useChat.getState().activeKey;
+    if (!key) return;
+    try {
+      await useChat.getState().navigateTree(key, entryId, summarize);
+      toast.success("Moved to that point in the session");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+      throw err;
+    }
+  }, []);
 
   const handleFork = useCallback(
     async (entryId: string) => {
@@ -738,7 +731,7 @@ export function App() {
         icon: RefreshCw,
         run: async () => {
           const st = await api.checkPi();
-          toast(st.compatible ? `pi ${st.version} is ready` : st.error ?? "pi was not found");
+          toast(st.compatible ? `pi ${st.version} is ready` : (st.error ?? "pi was not found"));
           await load();
         },
       },
@@ -852,9 +845,7 @@ export function App() {
           selected={displayWorkspace}
           onSelect={(ws) => {
             setSelected(ws);
-            const open = Object.values(useChat.getState().sessions).find(
-              (s) => s.cwd === ws.path,
-            );
+            const open = Object.values(useChat.getState().sessions).find((s) => s.cwd === ws.path);
             useChat.getState().setActive(open?.key ?? null);
           }}
           onNewChat={() => void handleNewChat()}
@@ -946,20 +937,24 @@ export function App() {
             ) : null}
             <div className="min-h-0 flex-1 overflow-hidden">
               {active && active.status === "ready" && active.models.length === 0 ? (
-              <div className="flex items-center gap-2 border-b border-brand/20 bg-brand-soft/40 px-4 py-2 text-[11px] text-subtle">
-                <span className="min-w-0 flex-1">
-                  {t("No models are available. Connect a provider in pi to start.")}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setLoginOpen(true)}
-                  className="shrink-0 rounded-md border border-brand/30 bg-surface px-2 py-1 text-[10.5px] text-brand hover:bg-surface-2"
-                >
-                  {t("Connect")}
-                </button>
-              </div>
-            ) : null}
-            {active && (items.length > 0 || active.streaming || active.status === "loading" || active.error) ? (
+                <div className="flex items-center gap-2 border-b border-brand/20 bg-brand-soft/40 px-4 py-2 text-[11px] text-subtle">
+                  <span className="min-w-0 flex-1">
+                    {t("No models are available. Connect a provider in pi to start.")}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setLoginOpen(true)}
+                    className="shrink-0 rounded-md border border-brand/30 bg-surface px-2 py-1 text-[10.5px] text-brand hover:bg-surface-2"
+                  >
+                    {t("Connect")}
+                  </button>
+                </div>
+              ) : null}
+              {active &&
+              (items.length > 0 ||
+                active.streaming ||
+                active.status === "loading" ||
+                active.error) ? (
                 <SessionTranscript
                   session={active}
                   items={items}
@@ -967,7 +962,10 @@ export function App() {
                 />
               ) : (
                 <div className="h-full overflow-y-auto scroll-thin">
-                  <EmptyState workspace={selected} onStarter={(prompt) => setComposerDraft(prompt)} />
+                  <EmptyState
+                    workspace={selected}
+                    onStarter={(prompt) => setComposerDraft(prompt)}
+                  />
                 </div>
               )}
             </div>
@@ -984,9 +982,7 @@ export function App() {
                 dialog={active.dialogs[0]}
                 pending={active.dialogs.length}
                 onRespond={(response) =>
-                  void useChat
-                    .getState()
-                    .respondDialog(active.key, active.dialogs[0]!.id, response)
+                  void useChat.getState().respondDialog(active.key, active.dialogs[0]!.id, response)
                 }
               />
             ) : null}
@@ -1013,19 +1009,25 @@ export function App() {
                 if (key) useChat.getState().removeAttachment(key, id);
               }}
               planMode={active?.statuses["pis:plan"] === "plan"}
-              externalPlanCommand={active?.commands.find((c) =>
-                /^plan(-mode)?$/i.test(c.name),
-              )?.name}
+              externalPlanCommand={
+                active?.commands.find((c) => /^plan(-mode)?$/i.test(c.name))?.name
+              }
               onTogglePlan={() => {
                 const key = useChat.getState().activeKey;
-                if (key) void useChat.getState().togglePlan(key).catch((err) =>
-                  toast.error(err instanceof Error ? err.message : String(err)),
-                );
+                if (key)
+                  void useChat
+                    .getState()
+                    .togglePlan(key)
+                    .catch((err) => toast.error(err instanceof Error ? err.message : String(err)));
               }}
             />
           </section>
           {rightOpen ? (
-            <RightPanel workspace={displayWorkspace} session={active} onClose={() => setRightOpen(false)} />
+            <RightPanel
+              workspace={displayWorkspace}
+              session={active}
+              onClose={() => setRightOpen(false)}
+            />
           ) : null}
         </div>
       </main>
@@ -1053,11 +1055,7 @@ export function App() {
           setLoginOpen(true);
         }}
       />
-      <MCPDialog
-        open={mcpOpen}
-        onOpenChange={setMCPOpen}
-        workspace={displayWorkspace?.path}
-      />
+      <MCPDialog open={mcpOpen} onOpenChange={setMCPOpen} workspace={displayWorkspace?.path} />
       <WorktreeDialog
         open={worktreeOpen}
         onOpenChange={setWorktreeOpen}
@@ -1074,7 +1072,11 @@ export function App() {
           onDone={() => {
             void load();
             const key = useChat.getState().activeKey;
-            if (key) void useChat.getState().refreshModels(key).catch(() => {});
+            if (key)
+              void useChat
+                .getState()
+                .refreshModels(key)
+                .catch(() => {});
           }}
         />
       </Suspense>

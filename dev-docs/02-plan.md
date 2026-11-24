@@ -127,6 +127,7 @@ pis/
 │       ├── lib/                store, ipc, markdown, diff, fuzzy, format
 │       ├── styles/             tokens + Tailwind entry
 │       └── mygo.ts             generated typed client (do not edit)
+├── vite.config.ts              Vite+ format/lint/type-check config
 ├── internal/
 │   ├── agent/                  RPC process, protocol, coalescer, session runtime
 │   ├── sessions/               JSONL index, fast branch transcript, titles
@@ -138,8 +139,9 @@ pis/
 │   └── util/                   paths, login shell, locks, redaction
 ├── extensions/
 │   └── pis-bridge.ts          tree nav, plan mode, approvals, usage
-├── docs/                       research, decisions, plan, progress, pitfalls, QA
-├── resources/                  icon, licenses
+├── user-docs/                  Rspress user guide
+├── dev-docs/                   research, decisions, plan, progress, pitfalls, QA
+├── resources/                  icon source and licenses
 └── scripts/                    dev, verify, perf, package helpers
 ```
 

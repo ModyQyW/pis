@@ -55,12 +55,9 @@ export function SettingsDialog({
     try {
       const status = await api.setPiPath(path);
       onReload();
-      toast(
-        status.compatible
-          ? `Using pi ${status.version}`
-          : status.error || "pi was not found",
-        { description: status.path },
-      );
+      toast(status.compatible ? `Using pi ${status.version}` : status.error || "pi was not found", {
+        description: status.path,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -73,7 +70,9 @@ export function SettingsDialog({
     try {
       const status = await api.checkPi();
       onReload();
-      toast(status.compatible ? `pi ${status.version} is ready` : status.error || "pi was not found");
+      toast(
+        status.compatible ? `pi ${status.version} is ready` : status.error || "pi was not found",
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -182,7 +181,9 @@ export function SettingsDialog({
                 <span>
                   {tr("Show raw extension widgets")}
                   <span className="block text-[10px] text-faint">
-                    {tr("TUI widgets are off by default because they are designed for a terminal, not this layout.")}
+                    {tr(
+                      "TUI widgets are off by default because they are designed for a terminal, not this layout.",
+                    )}
                   </span>
                 </span>
               </label>
@@ -204,7 +205,9 @@ export function SettingsDialog({
                 <span>
                   {tr("Desktop notifications")}
                   <span className="block text-[10px] text-faint">
-                    {tr("Notify when a background run finishes. The setting is off if the system does not allow notifications.")}
+                    {tr(
+                      "Notify when a background run finishes. The setting is off if the system does not allow notifications.",
+                    )}
                   </span>
                 </span>
               </label>
@@ -226,7 +229,9 @@ export function SettingsDialog({
 
             <Section
               title={tr("Providers")}
-              description={tr("PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.")}
+              description={tr(
+                "PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.",
+              )}
             >
               <div className="flex items-center gap-2">
                 <button
@@ -245,12 +250,17 @@ export function SettingsDialog({
                   {tr("MCP servers…")}
                 </button>
                 <span className="text-[10.5px] text-faint">
-                  {boot.pi.compatible ? tr("Credentials live in pi's auth store") : tr("Locate pi first")}
+                  {boot.pi.compatible
+                    ? tr("Credentials live in pi's auth store")
+                    : tr("Locate pi first")}
                 </span>
               </div>
             </Section>
 
-            <Section title={tr("pi executable")} description={tr("PiS uses the pi you already have. It never installs or updates it.")}>
+            <Section
+              title={tr("pi executable")}
+              description={tr("PiS uses the pi you already have. It never installs or updates it.")}
+            >
               <div className="flex gap-2">
                 <input
                   value={path}
@@ -297,7 +307,9 @@ export function SettingsDialog({
 
             <Section
               title={tr("Approvals")}
-              description={tr("PiS can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.")}
+              description={tr(
+                "PiS can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.",
+              )}
             >
               <div className="flex flex-wrap gap-1.5">
                 {(
@@ -360,19 +372,31 @@ export function SettingsDialog({
                   {tr("Use PiS approvals")}
                   <span className="block text-[10px] text-faint">
                     {boot.guard.detected.length
-                      ? tr("Another guard is present ({names}); built-in approvals stay off unless enabled.", { names: boot.guard.detected.join(", ") })
-                      : tr("Destructive shell commands, sensitive files, and edits outside the project ask first.")}
+                      ? tr(
+                          "Another guard is present ({names}); built-in approvals stay off unless enabled.",
+                          { names: boot.guard.detected.join(", ") },
+                        )
+                      : tr(
+                          "Destructive shell commands, sensitive files, and edits outside the project ask first.",
+                        )}
                   </span>
                 </span>
               </label>
               {boot.guard.detected.length > 0 ? (
                 <p className="mt-1.5 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-[10px] leading-4 text-warning">
-                  {tr("Detected: {names}. Both guards are never enabled by default.", { names: boot.guard.detected.join(", ") })}
+                  {tr("Detected: {names}. Both guards are never enabled by default.", {
+                    names: boot.guard.detected.join(", "),
+                  })}
                 </p>
               ) : null}
             </Section>
 
-            <Section title={tr("Diagnostics")} description={tr("Paths and versions only. Prompts and credentials are never included.")}>
+            <Section
+              title={tr("Diagnostics")}
+              description={tr(
+                "Paths and versions only. Prompts and credentials are never included.",
+              )}
+            >
               <div className="rounded-lg border border-border bg-canvas p-3 font-mono text-[10.5px] leading-5 text-subtle">
                 <div className="truncate">data {diag?.dataDir ?? boot.dataDir}</div>
                 <div className="truncate">settings {diag?.settings ?? "settings.json"}</div>
@@ -422,9 +446,7 @@ function Section({
 }) {
   return (
     <section className="mb-6 last:mb-1">
-      <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
-        {title}
-      </h3>
+      <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">{title}</h3>
       {description ? (
         <p className="mt-1 max-w-[560px] text-[11px] leading-4 text-faint">{description}</p>
       ) : null}
