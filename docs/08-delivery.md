@@ -1,7 +1,8 @@
 # Public delivery
 
 Status: **0.0.1 and 0.0.2 published** (2026-11-24). The repository and update
-feed are public; the signed 0.0.1 → 0.0.2 update installed successfully. macOS
+feed are public; the signed 0.0.1 → 0.0.2 update installed successfully, and
+0.0.2 ships deltas for every target. macOS
 is ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
 Windows/Linux runtime QA is still skipped because no test machines are
 available.
@@ -172,7 +173,7 @@ Screenshots: `docs/images/`.
    and published with `SHA256SUMS`, manifests, archives, and deltas. Public
    download was proven without authentication.
 7. **Update round-trip** — **done on macOS**: the 0.0.1 app was installed and
-   the updater installed the signed 0.0.1 → 0.0.2 delta into a disposable app
+   the updater installed the signed 0.0.1 → 0.0.2 update into a disposable app
    bundle; the resulting `CFBundleShortVersionString` is 0.0.2. Windows/Linux
    update checks remain unrun.
 8. **Runtime QA** — test a clean install and an upgrade on macOS arm64/amd64,

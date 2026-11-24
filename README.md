@@ -147,8 +147,8 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; PiS does not fake them.
-- Auto-update uses GitHub Releases and an Ed25519 update key; the 0.0.1 →
-  0.0.2 signed delta update was verified. macOS builds are ad-hoc signed, not
+- Auto-update uses GitHub Releases and an Ed25519 update key; the signed
+  0.0.1 → 0.0.2 update was verified, and 0.0.2 ships deltas for every target. macOS builds are ad-hoc signed, not
   notarized; Gatekeeper requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
