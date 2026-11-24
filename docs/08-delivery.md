@@ -10,12 +10,12 @@ complete.
 
 ```text
 build/darwin-arm64/PiS.app                  27.0 MB
-build/darwin-arm64/pis-0.1.0-arm64.dmg       6.8 MB
-build/darwin-amd64/pis-0.1.0-amd64.dmg       7.5 MB
-build/linux-amd64/pis-0.1.0-linux-amd64.tar.gz  8.9 MB
-build/linux-arm64/pis-0.1.0-linux-arm64.tar.gz  8.5 MB
-build/windows-amd64/pis-setup-0.1.0-amd64.exe   7.0 MB
-build/windows-arm64/pis-setup-0.1.0-arm64.exe   6.4 MB
+build/darwin-arm64/pis-0.0.2-arm64.dmg       6.8 MB
+build/darwin-amd64/pis-0.0.2-amd64.dmg       7.5 MB
+build/linux-amd64/pis-0.0.2-linux-amd64.tar.gz  8.9 MB
+build/linux-arm64/pis-0.0.2-linux-arm64.tar.gz  8.5 MB
+build/windows-amd64/pis-setup-0.0.2-amd64.exe   7.0 MB
+build/windows-arm64/pis-setup-0.0.2-arm64.exe   6.4 MB
 ```
 
 The build is ad-hoc signed, not notarized. macOS may require
@@ -165,11 +165,11 @@ Screenshots: `docs/images/`.
 5. **Version and notes** — update `CHANGELOG.md` for the release version,
    confirm `PIS_VERSION` comes from the tag, and review the generated release
    notes for credentials, internal paths, or unfinished claims.
-6. **Release dry run** — push a `v0.1.0` tag, inspect the draft release, and
+6. **Release dry run** — push a `v0.0.2` tag, inspect the draft release, and
    verify every architecture, `SHA256SUMS`, the update manifest, and signed
    update archives. Download one asset while signed out to prove the feed is
    public.
-7. **Update round-trip** — install `v0.1.0`, publish `v0.1.1`, and use Check for
+7. **Update round-trip** — install `v0.0.1`, publish `v0.0.2`, and use Check for
    Updates on macOS, Windows, and Linux. Verify the Ed25519 signature and that
    the app relaunches with the new version. Do this before announcing a release.
 8. **Runtime QA** — test a clean install and an upgrade on macOS arm64/amd64,

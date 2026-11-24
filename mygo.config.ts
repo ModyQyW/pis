@@ -10,7 +10,7 @@ export default defineConfig({
   name: "PiS",
   slug: "pis",
   identifier: "top.modyqyw.pis",
-  version: process.env.PIS_VERSION ?? "0.1.0",
+  version: process.env.PIS_VERSION ?? "0.0.2",
   ...(updatePublicKey && (updateURL || updateGithub)
     ? {
         updates: {

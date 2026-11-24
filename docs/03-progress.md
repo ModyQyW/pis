@@ -13,7 +13,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
   screenshots were refreshed for PiS, except the pre-rebrand real-pi P0 capture.
 - Initial implementation: complete enough for user validation on macOS arm64.
 - Release build: `build/darwin-arm64/PiS.app` (27.0 MB) and
-  `pis-0.1.0-arm64.dmg` (6.8 MB); production source maps disabled.
+  `pis-0.0.2-arm64.dmg` (6.8 MB); production source maps disabled.
 - Real-pi smoke: session resume, streaming, tool cards, plan mode, smart
   approval + deny, trust dialog, provider login pty, changes/diff were exercised
   before the Base UI/Streamdown UI migration; the post-migration native session
@@ -178,7 +178,7 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   no-credential release build and keygen path were exercised; no public feed is
   configured.
 - **Version**: `mygo.config.ts` reads `PIS_VERSION`; `main.go` no longer
-  hard-codes 0.1.0. Local builds still default to 0.1.0.
+  hard-codes 0.1.0. Local builds default to 0.0.2.
 
 ### Transcript virtualization and dependencies
 

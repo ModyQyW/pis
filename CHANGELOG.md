@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.2 (2026-11-24)
+
+- Add the Rspress user guide in `site-docs/`, with guides from first launch to
+  architecture and release work.
+- Add a root `tsconfig.json` and config typecheck to `scripts/verify.sh`.
+- `release.sh` now prompts for a version with a suggested next patch version
+  when `PIS_VERSION` is not set, and validates the result.
+- Refresh the approval screenshot and release documentation.
+- No runtime behavior changes from 0.0.1.
+
 ## 0.0.1 (2026-11-24)
 
 - Initial public macOS, Windows, and Linux release of PiS.
