@@ -1,7 +1,7 @@
 # Public delivery
 
-Status: **0.0.1 and 0.0.2 published** (2026-11-24). **0.0.3 is prepared and not
-published.** The repository and update feed are public. The signed 0.0.1 → 0.0.2
+Status: **0.0.1 and 0.0.2 published** (2026-11-24). **0.0.3 is prepared, pushed,
+and not published.** The repository and update feed are public. The signed 0.0.1 → 0.0.2
 update installed successfully. 0.0.2 ships deltas for every target. macOS is
 ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
 Windows/Linux runtime QA is skipped because no test machines are available.
@@ -167,7 +167,7 @@ Screenshots: `docs-dev/images/`.
 
 ## 0.0.3 release checklist
 
-Prepared in the worktree:
+Prepared and pushed:
 
 - [x] Repository `ModyQyW/pis` is public.
 - [x] `PIS_UPDATE_PUBLIC_KEY`, `MYGO_UPDATER_PRIVATE_KEY`, and
@@ -177,10 +177,11 @@ Prepared in the worktree:
 - [x] `bun run check` passes.
 - [x] `bun run docs:build` passes.
 - [x] Local `0.0.3` macOS arm64 app builds.
+- [x] Final `0.0.3` source is committed and pushed.
+- [x] GitHub Actions CI passed for the pushed source.
 
 Maintainer actions:
 
-- [ ] Commit and push the final `0.0.3` source.
 - [ ] Deploy `docs-user-build/` to Cloudflare Pages.
 - [ ] Deploy `docs-user-build/` to Netlify.
 - [ ] Verify both public documentation URLs.
