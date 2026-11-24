@@ -427,10 +427,11 @@ emitting the exit event. A login window must not disappear before its last
 line is visible.
 
 ### P-062 — A product rename changes the app data directory
-**Symptom.** The PiS build opens with default preferences and no trust
+**Symptom.** The PiS build opened with default preferences and no trust
 decisions because mygo derives the user data path from the display name; the
-old `Pi Mygo` directory is still on disk.
+old `Pi Mygo` directory was still on disk until it was removed manually.
 **Rule.** Treat data migration as a separate, explicit decision. The rebrand
-leaves the old directory untouched instead of deleting or half-merging it; a
-future migration can copy only settings, trust, and window state. Do not point
-two app identities at the same directory.
+leaves the old directory untouched instead of deleting or half-merging it;
+remove it only after the user confirms no settings need copying. A future
+migration can copy only settings, trust, and window state. Do not point two app
+identities at the same directory.

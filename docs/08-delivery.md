@@ -146,14 +146,43 @@ Screenshots: `docs/images/`.
   approval dock awaits a native recapture. `real-pi.png` records the
   pre-rebrand P0 native run.
 
-## Next before a wider release
+## Before public release
 
-1. **User validation** — install, launch, and run the five-minute checklist
-   against a real pi account and project.
-2. **Update feed** — make the release repository public or set a public
-   `PIS_UPDATE_URL`, then set the updater public key and private-key secret.
-   Apple signing/notarization is optional; macOS can ship ad-hoc with Gatekeeper
-   approval.
+1. **Repository visibility** — make `ModyQyW/pis` public, or publish releases
+   from a public release-only repository. An installed app cannot read private
+   release assets without credentials. The repository is currently private.
+2. **Update signing key** — run `./scripts/update-keygen.sh`; store the private
+   key in a password manager; set `PIS_UPDATE_PUBLIC_KEY` as a repository
+   variable and `MYGO_UPDATER_PRIVATE_KEY` as a repository secret; set
+   `PIS_UPDATE_GITHUB` to `ModyQyW/pis` if it does not default correctly.
+3. **Platform signing** — Apple Developer ID + notarization removes the macOS
+   Gatekeeper warning; a Windows code-signing certificate removes SmartScreen
+   warnings. Both are optional, but test the warnings and document them if you
+   ship ad-hoc/unsigned builds.
+4. **Identity check** — the bundle ID `top.modyqyw.pis` is reverse-DNS for
+   `modyqyw.top`; confirm that domain is under your control. Keep the bundle ID,
+   Linux package name, and Windows package identity stable after release.
+5. **Version and notes** — update `CHANGELOG.md` for the release version,
+   confirm `PIS_VERSION` comes from the tag, and review the generated release
+   notes for credentials, internal paths, or unfinished claims.
+6. **Release dry run** — push a `v0.1.0` tag, inspect the draft release, and
+   verify every architecture, `SHA256SUMS`, the update manifest, and signed
+   update archives. Download one asset while signed out to prove the feed is
+   public.
+7. **Update round-trip** — install `v0.1.0`, publish `v0.1.1`, and use Check for
+   Updates on macOS, Windows, and Linux. Verify the Ed25519 signature and that
+   the app relaunches with the new version. Do this before announcing a release.
+8. **Runtime QA** — test a clean install and an upgrade on macOS arm64/amd64,
+   Windows amd64/arm64, and Linux amd64/arm64. Cover Finder/Explorer launch,
+   pi discovery, real session streaming, trust, approvals, login, Chinese UI,
+   quit guard, and uninstall/update behavior.
+9. **Security and privacy** — scan the tree and release assets for secrets; keep
+   `*.key` and update keys out of Git; run `govulncheck` and the frontend
+   dependency audit; confirm prompts, credentials, and session contents never
+   appear in diagnostics or logs.
+10. **License and support** — keep the MIT license, list the supported pi range,
+    publish the known limits below, and provide a channel for security reports.
+
 The real-pi UI smoke, native-window check, performance closure, CI, updater
 window, P1 daily-use features (including subagent activity and inline questions), and English/Chinese UI are complete for this
 build; see `05-qa.md`.

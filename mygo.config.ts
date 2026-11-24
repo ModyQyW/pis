@@ -9,7 +9,7 @@ const updateGithub = process.env.PIS_UPDATE_GITHUB;
 export default defineConfig({
   name: "PiS",
   slug: "pis",
-  identifier: "dev.pis.app",
+  identifier: "top.modyqyw.pis",
   version: process.env.PIS_VERSION ?? "0.1.0",
   ...(updatePublicKey && (updateURL || updateGithub)
     ? {

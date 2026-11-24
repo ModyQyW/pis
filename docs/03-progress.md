@@ -7,7 +7,7 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 
 - Research and decisions: complete (2026-11-22).
 - Rebrand (2026-11-24): product is **PiS**, binary/slug `pis`, bundle ID
-  `dev.pis.app`, env prefix `PIS_`, data directory `PiS`, GitHub repository
+  `top.modyqyw.pis`, env prefix `PIS_`, data directory `PiS`, GitHub repository
   `ModyQyW/pis`. The S stands for strong. Source, tests, docs, release scripts,
   and workflow identities were updated, with a new πS icon; the feature
   screenshots were refreshed for PiS, except the pre-rebrand real-pi P0 capture.
