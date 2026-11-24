@@ -1,7 +1,0 @@
-[build]
-command = "bun install --frozen-lockfile && bun run docs:build"
-publish = "docs-user-build"
-
-[build.environment]
-BUN_VERSION = "1.4.5"
-VP_GIT_HOOKS = "0"
