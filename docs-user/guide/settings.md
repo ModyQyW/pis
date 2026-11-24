@@ -25,6 +25,14 @@ pi auth login <provider>
 
 可以自动检测，也可以填写绝对路径。PiS 会检查版本是否在支持范围内。
 
+自动检测覆盖 `PIS_PI`、`PATH`、`$BUN_INSTALL/bin/pi`（默认 `~/.bun/bin/pi`）、
+Homebrew、npm、pnpm 和 Volta 的常见全局路径。从 Finder 或桌面启动时，
+PiS 会读取登录 shell 的 `PATH`，让 bun/npm 安装的 pi 脚本找到 node。
+
+点击「使用此路径」后，填写的路径成为唯一来源。该路径不能运行时，设置页
+显示这条路径的具体错误，不会悄悄换用其他安装。要恢复自动检测，清空输入框
+再点击「使用此路径」。
+
 ### 审批
 
 选择 Smart / Ask all / Allow all，并决定是否在检测到其他 guard 时强制启用内置审批。
@@ -59,7 +67,9 @@ PiS 不复制、不重写 pi 的 session、auth、模型或扩展配置。
 
 ## 更新
 
-应用包含 mygo updater。设置中或菜单里可以检查更新；更新源由构建时的 `PIS_UPDATE_GITHUB` 或 `PIS_UPDATE_URL` 决定。
+应用包含 mygo updater。设置面板的「更新」区域和菜单里的
+`Check for Updates…` 都能立即检查更新；后台默认每天检查一次。更新源由构建时的
+`PIS_UPDATE_GITHUB` 或 `PIS_UPDATE_URL` 决定。
 
 当前 macOS 构建是 ad-hoc 签名，更新归档由 Ed25519 密钥签名。首次安装仍可能需要 Gatekeeper 放行。
 

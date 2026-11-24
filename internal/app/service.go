@@ -16,12 +16,14 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/plugins/updater"
 
 	"pis/internal/agent"
 	"pis/internal/guard"
 	"pis/internal/piinfo"
 	"pis/internal/sessions"
 	"pis/internal/settings"
+	"pis/internal/shellpath"
 )
 
 // Workspace is a project the user can chat in.
@@ -156,9 +158,16 @@ func (s *Service) Status() PiStatus { return s.piStatus() }
 func (s *Service) CheckPi() PiStatus {
 	s.startPiDiscovery()
 	cfg := s.store.Snapshot()
+	shellpath.Apply()
 	st := piinfo.Discover(context.Background(), cfg.PiPath)
 	s.setPi(st)
 	return s.piStatus()
+}
+
+// CheckUpdates opens the update window and checks for a new release, as the
+// menu item and the Settings button do.
+func (s *Service) CheckUpdates() {
+	updater.CheckForUpdates()
 }
 
 // SetPiPath stores an explicit executable and rechecks it.
@@ -442,6 +451,7 @@ func (s *Service) startPiDiscovery() {
 	s.mu.Unlock()
 	cfg := s.store.Snapshot()
 	go func() {
+		shellpath.Apply()
 		st := piinfo.Discover(context.Background(), cfg.PiPath)
 		s.setPi(st)
 		PiStatusEvent.Broadcast(PiStatusChanged{Status: s.piStatus()})

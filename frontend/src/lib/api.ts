@@ -106,6 +106,10 @@ export const api = {
     if (!insideShell) return mockBootstrap().pi;
     return Desktop.checkPi();
   },
+  async checkUpdates(): Promise<void> {
+    if (!insideShell) return;
+    await Desktop.checkUpdates();
+  },
   async saveLayout(sidebar: number, right: number): Promise<void> {
     if (!insideShell) return;
     await Desktop.saveLayout(sidebar, right);

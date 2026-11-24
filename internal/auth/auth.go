@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/creack/pty"
+
+	"pis/internal/shellpath"
 )
 
 // Info identifies a running login terminal.
@@ -64,6 +66,7 @@ var providerRE = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
 
 // Start launches `pi auth login <provider>` (account) or with --api-key.
 func (m *Manager) Start(provider string, apiKey bool) (Info, error) {
+	shellpath.Apply()
 	provider = strings.TrimSpace(provider)
 	if !providerRE.MatchString(provider) {
 		return Info{}, errors.New("provider must be a simple id such as anthropic or openai")

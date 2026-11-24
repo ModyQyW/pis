@@ -405,6 +405,11 @@ export const Desktop = {
   /** Checks the executable again, synchronously, with the configured path. */
   checkPi: bind<[], PiStatus>("Desktop.CheckPi", () => []),
   /**
+   * CheckUpdates opens the update window and checks for a new release, as the
+   * menu item and the Settings button do.
+   */
+  checkUpdates: bind<[], void>("Desktop.CheckUpdates", () => []),
+  /**
    * ChooseProject shows a directory picker and adds the result to recents.
    * It returns a zero Workspace when the user cancels.
    */

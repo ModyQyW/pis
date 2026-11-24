@@ -392,6 +392,35 @@ export function SettingsDialog({
             </Section>
 
             <Section
+              title={tr("Updates")}
+              description={tr(
+                "Updates come from GitHub Releases. PiS checks once a day in the background.",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    try {
+                      await api.checkUpdates();
+                    } catch (err) {
+                      toast.error(err instanceof Error ? err.message : String(err));
+                    } finally {
+                      setBusy(false);
+                    }
+                  }}
+                  className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
+                >
+                  <RefreshCw size={12} />
+                  {tr("Check for updates…")}
+                </button>
+                <span className="text-[10.5px] text-faint">PiS {boot.appVersion}</span>
+              </div>
+            </Section>
+
+            <Section
               title={tr("Diagnostics")}
               description={tr(
                 "Paths and versions only. Prompts and credentials are never included.",

@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.5 (2026-11-24)
+
+- Add a manual `Check for updates…` button to Settings. The Help menu item and
+  the daily background check remain.
+- Make a configured pi path authoritative: when it fails, Settings shows that
+  path's error instead of a later auto-detected path.
+- Resolve the login-shell `PATH` before pi discovery and before starting pi.
+  Apps launched from Finder now run bun/npm-installed pi scripts that need
+  node, including `~/.bun/bin/pi`.
+- Auto-detect pi under `$BUN_INSTALL/bin` (default `~/.bun/bin`) and common
+  npm, pnpm, and Volta global locations.
+- `scripts/release.sh` publishes in one run: version, notes, full check,
+  commit, tag, push, Release workflow, draft verification, and publication.
+  `scripts/release.sh build` keeps the local build behavior used by CI.
+- Improve pi errors: a missing path, a directory, and a failing `--version`
+  now have distinct messages.
+
 ## 0.0.4 (2026-11-24)
 
 - Publish the changes that were prepared in the unpublished 0.0.3 draft.

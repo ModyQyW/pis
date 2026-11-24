@@ -65,17 +65,24 @@ func Compatible(v Version) bool {
 }
 
 // Discover finds pi. explicit is the user's configured path, if any.
-// It checks the explicit path, PIS_PI, PATH, and common install locations.
-// Login-shell PATH resolution is added by the caller when this fails.
+//
+// An explicit path is authoritative: when it cannot run, Discover reports
+// that path's error instead of silently using another installation. Without
+// one, it checks PIS_PI, PATH, and common install locations.
 func Discover(ctx context.Context, explicit string) Status {
+	explicit = strings.TrimSpace(explicit)
+	if explicit != "" {
+		st, err := check(ctx, explicit, "settings")
+		if err != nil {
+			return Status{Error: err.Error()}
+		}
+		return st
+	}
 	type candidate struct {
 		path   string
 		source string
 	}
 	var candidates []candidate
-	if explicit != "" {
-		candidates = append(candidates, candidate{explicit, "settings"})
-	}
 	if env := os.Getenv("PIS_PI"); env != "" {
 		candidates = append(candidates, candidate{env, "environment"})
 	}
@@ -86,7 +93,7 @@ func Discover(ctx context.Context, explicit string) Status {
 		candidates = append(candidates, candidate{p, "common"})
 	}
 	seen := map[string]bool{}
-	var lastErr string
+	var firstErr, lastErr string
 	for _, c := range candidates {
 		if c.path == "" || seen[c.path] {
 			continue
@@ -96,7 +103,15 @@ func Discover(ctx context.Context, explicit string) Status {
 		if err == nil {
 			return st
 		}
+		// A path that exists but cannot run is more useful than a later
+		// candidate that was never installed.
+		if _, statErr := os.Stat(c.path); statErr == nil && firstErr == "" {
+			firstErr = err.Error()
+		}
 		lastErr = err.Error()
+	}
+	if firstErr != "" {
+		lastErr = firstErr
 	}
 	if lastErr == "" {
 		lastErr = "pi was not found"
@@ -106,15 +121,41 @@ func Discover(ctx context.Context, explicit string) Status {
 
 func commonPaths() []string {
 	home, _ := os.UserHomeDir()
-	paths := []string{
-		filepath.Join(home, ".bun", "bin", "pi"),
+	var paths []string
+	// Bun installs global packages into $BUN_INSTALL/bin (default ~/.bun/bin).
+	bunInstalls := []string{os.Getenv("BUN_INSTALL")}
+	if home != "" {
+		bunInstalls = append(bunInstalls, filepath.Join(home, ".bun"))
+	}
+	for _, dir := range bunInstalls {
+		if dir != "" {
+			paths = append(paths, filepath.Join(dir, "bin", "pi"))
+		}
+	}
+	if home != "" {
+		paths = append(paths,
+			filepath.Join(home, "Library", "pnpm", "pi"),
+			filepath.Join(home, ".local", "share", "pnpm", "pi"),
+			filepath.Join(home, ".npm-global", "bin", "pi"),
+			filepath.Join(home, ".volta", "bin", "pi"),
+		)
+	}
+	paths = append(paths,
 		"/opt/homebrew/bin/pi",
 		"/usr/local/bin/pi",
-		filepath.Join(home, ".local", "bin", "pi"),
+	)
+	if home != "" {
+		paths = append(paths, filepath.Join(home, ".local", "bin", "pi"))
 	}
 	if runtime.GOOS == "windows" {
 		if appData := os.Getenv("APPDATA"); appData != "" {
 			paths = append(paths, filepath.Join(appData, "npm", "pi.cmd"))
+		}
+		if home != "" {
+			paths = append(paths,
+				filepath.Join(home, ".bun", "bin", "pi.exe"),
+				filepath.Join(home, ".bun", "bin", "pi.cmd"),
+			)
 		}
 	}
 	return paths
@@ -122,14 +163,21 @@ func commonPaths() []string {
 
 func check(ctx context.Context, path, source string) (Status, error) {
 	info, err := os.Stat(path)
-	if err != nil || info.IsDir() {
-		return Status{}, fmt.Errorf("%s is not a file", path)
+	if err != nil {
+		return Status{}, fmt.Errorf("%s: %w", path, err)
+	}
+	if info.IsDir() {
+		return Status{}, fmt.Errorf("%s is a directory, not the pi executable", path)
 	}
 	cctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	out, err := exec.CommandContext(cctx, path, "--version").CombinedOutput()
 	if err != nil {
-		return Status{}, fmt.Errorf("%s --version: %w (%s)", path, err, strings.TrimSpace(string(out)))
+		detail := strings.TrimSpace(string(out))
+		if detail != "" {
+			return Status{}, fmt.Errorf("%s --version: %w (%s)", path, err, detail)
+		}
+		return Status{}, fmt.Errorf("%s --version: %w", path, err)
 	}
 	v, ok := ParseVersion(string(out))
 	if !ok {

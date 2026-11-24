@@ -201,6 +201,10 @@ const zh: Record<string, string> = {
   Language: "语言",
   Diagnostics: "诊断",
   "Copy report": "复制报告",
+  Updates: "更新",
+  "Updates come from GitHub Releases. PiS checks once a day in the background.":
+    "更新来自 GitHub Releases。PiS 每天在后台检查一次。",
+  "Check for updates…": "检查更新…",
   "Reveal data folder": "打开数据文件夹",
   "Paths and versions only. Prompts and credentials are never included.":
     "仅包含路径和版本，不包含提示词或凭据。",

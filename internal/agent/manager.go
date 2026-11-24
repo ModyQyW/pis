@@ -14,6 +14,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"pis/internal/shellpath"
 )
 
 type session struct {
@@ -100,6 +102,7 @@ func (m *Manager) Shutdown() {
 
 // Start opens a pi session and waits until its state is readable.
 func (m *Manager) Start(ctx context.Context, req StartRequest) (SessionInfo, error) {
+	shellpath.Apply()
 	exe := m.Executable()
 	if exe == "" {
 		return SessionInfo{}, errors.New("pi was not found; set its path in Settings")

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 )
 
@@ -76,6 +77,47 @@ func TestDiscoverRejectsUnsupported(t *testing.T) {
 	}
 	st := Discover(context.Background(), path)
 	if !st.Found || st.Compatible || st.Error == "" {
+		t.Fatalf("unexpected status: %+v", st)
+	}
+}
+
+func TestDiscoverExplicitDoesNotFallBack(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell script fixture")
+	}
+	dir := t.TempDir()
+	working := filepath.Join(dir, "working-pi")
+	if err := os.WriteFile(working, []byte("#!/bin/sh\necho '1.6.0'\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("PIS_PI", working)
+	missing := filepath.Join(dir, "missing-pi")
+	st := Discover(context.Background(), missing)
+	if st.Found {
+		t.Fatalf("explicit path fell back to another pi: %+v", st)
+	}
+	if !strings.Contains(st.Error, missing) {
+		t.Fatalf("error %q does not name the configured path", st.Error)
+	}
+}
+
+func TestDiscoverFindsBunInstall(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("shell script fixture")
+	}
+	bun := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(bun, "bin"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	path := filepath.Join(bun, "bin", "pi")
+	if err := os.WriteFile(path, []byte("#!/bin/sh\necho '1.7.0'\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("BUN_INSTALL", bun)
+	t.Setenv("PIS_PI", "")
+	t.Setenv("PATH", t.TempDir())
+	st := Discover(context.Background(), "")
+	if !st.Found || !st.Compatible || st.Path != path || st.Source != "common" {
 		t.Fatalf("unexpected status: %+v", st)
 	}
 }
