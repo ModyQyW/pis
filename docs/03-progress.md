@@ -21,9 +21,11 @@ passes/fails, and when a decision changes. Keep entries short and factual.
 - UI/UX pass: Base UI + shadcn component surface, AI Elements messages,
   Streamdown Markdown with official code and Mermaid plugins, light/dark/browser
   and production-build QA.
-- Remaining before a wider release: runtime QA on Windows/Linux and the
-  0.0.1 → 0.0.2 update round-trip. macOS is ad-hoc signed and requires a
-  one-time Gatekeeper approval.
+- Public releases: **0.0.1** and **0.0.2** published; the signed
+  0.0.1 → 0.0.2 delta installed successfully in a disposable app bundle.
+  macOS arm64 clean install/launch and the real-pi integration pass. Windows/
+  Linux runtime QA remains skipped because no test machines are available.
+  macOS is ad-hoc signed and requires a one-time Gatekeeper approval.
 
 ### Open validation and performance
 
@@ -53,9 +55,9 @@ passes/fails, and when a decision changes. Keep entries short and factual.
    subagent activity list, and inline question cards.
 3. **P1 release engineering** — CI, cross-builds, versioned release workflow,
    optional signing/notarization, the updater window, and
-   `scripts/release.sh`/`update-keygen.sh` are implemented. A public update
-   feed/key still need a public release host. macOS is ad-hoc signed; Windows/
-   Linux artifacts build but have no runtime QA yet.
+   `scripts/release.sh`/`update-keygen.sh` are implemented. The public update
+   feed and key are configured. macOS is ad-hoc signed; Windows/Linux artifacts
+   build but have no runtime QA yet.
 4. **P2 localization and assets** — complete: English/Chinese UI, CJK QA, and
    official Streamdown code/Mermaid lazy chunks within the app budget.
 
@@ -158,6 +160,8 @@ Exit criteria and detailed scope are in `02-plan.md` §8.
   in `docs/images/zh-chat.png` and `zh-settings.png`.
 - **Release**: `.github/workflows/ci.yml` runs on `ubuntu-latest` for Go,
   cross-builds, frontend tests, and `macos-latest` for ad-hoc macOS packages.
+  Rspress documentation builds from `site-docs/` and the root `tsconfig.json`
+  checks `mygo.config.ts` and `rspress.config.ts`.
   Actions use checkout v7, setup-go v7, upload-artifact v7, download-artifact
   v8, and action-gh-release v3. GitHub Actions run 45155511397 passed all Go,
   frontend, six cross-build, and macOS package jobs. A later CI run exposed a

@@ -1,10 +1,10 @@
-# Initial delivery
+# Public delivery
 
-Status: public initial release in progress (2026-11-24). The update feed and
-signing key are configured; Windows/Linux runtime QA and the live update
-round-trip remain. macOS is ad-hoc signed and not notarized; Gatekeeper requires
-a one-time approval. The P0 real-pi, native-window, and performance checks are
-complete.
+Status: **0.0.1 and 0.0.2 published** (2026-11-24). The repository and update
+feed are public; the signed 0.0.1 → 0.0.2 update installed successfully. macOS
+is ad-hoc signed and not notarized; Gatekeeper requires a one-time approval.
+Windows/Linux runtime QA is still skipped because no test machines are
+available.
 
 ## Artifact
 
@@ -41,13 +41,12 @@ To configure the update key in GitHub:
 gh variable set PIS_UPDATE_PUBLIC_KEY < "$HOME/Library/Application Support/PiS/update-keys/mygo-update.pub"
 gh secret set MYGO_UPDATER_PRIVATE_KEY < "$HOME/Library/Application Support/PiS/update-keys/mygo-update.key"
 # Optional; defaults to the repository running the workflow.
-gh variable set PIS_UPDATE_GITHUB --body "owner/pis"
+gh variable set PIS_UPDATE_GITHUB --body "ModyQyW/pis"
 ```
 
-Make the repository public (or point the variable at a public release-only
-repository) before relying on updater checks. Then push a `v*` tag. The
-workflow creates a draft release; review its assets and publish it. Never
-commit the private key.
+The repository and update feed are public. Push a `v*` tag to build the next
+release. The workflow creates a draft release; review its assets and publish
+it. Never commit the private key.
 
 Build a release from GitHub Actions by pushing a `v*` tag (or dispatching an
 existing tag). The workflow creates a draft release, then builds:
@@ -145,12 +144,16 @@ Screenshots: `docs/images/`.
 - Screenshots in `docs/images/` were refreshed for PiS: home, chat, plan,
   trust, approval, settings, session tree, diff, login, and both Chinese views.
   `real-pi.png` records the pre-rebrand P0 native run.
+- Rspress docs and root config typecheck pass in `./scripts/verify.sh`.
+- Releases: [0.0.1](https://github.com/ModyQyW/pis/releases/tag/v0.0.1),
+  [0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2). The 0.0.2
+  release includes a signed delta from 0.0.1 for every platform.
 
-## Before public release
+## Release checklist (used for 0.0.1 and 0.0.2)
 
-1. **Repository visibility** — make `ModyQyW/pis` public, or publish releases
-   from a public release-only repository. An installed app cannot read private
-   release assets without credentials. The repository is currently private.
+1. **Repository visibility** — **done**: `ModyQyW/pis` is public. An installed
+   app cannot read private release assets, so keep the repository or a separate
+   release feed public.
 2. **Update signing key** — run `./scripts/update-keygen.sh`; store the private
    key in a password manager; set `PIS_UPDATE_PUBLIC_KEY` as a repository
    variable and `MYGO_UPDATER_PRIVATE_KEY` as a repository secret; set
@@ -165,13 +168,13 @@ Screenshots: `docs/images/`.
 5. **Version and notes** — update `CHANGELOG.md` for the release version,
    confirm `PIS_VERSION` comes from the tag, and review the generated release
    notes for credentials, internal paths, or unfinished claims.
-6. **Release dry run** — push a `v0.0.2` tag, inspect the draft release, and
-   verify every architecture, `SHA256SUMS`, the update manifest, and signed
-   update archives. Download one asset while signed out to prove the feed is
-   public.
-7. **Update round-trip** — install `v0.0.1`, publish `v0.0.2`, and use Check for
-   Updates on macOS, Windows, and Linux. Verify the Ed25519 signature and that
-   the app relaunches with the new version. Do this before announcing a release.
+6. **Release dry run** — **done**: `v0.0.1` and `v0.0.2` were built, checked,
+   and published with `SHA256SUMS`, manifests, archives, and deltas. Public
+   download was proven without authentication.
+7. **Update round-trip** — **done on macOS**: the 0.0.1 app was installed and
+   the updater installed the signed 0.0.1 → 0.0.2 delta into a disposable app
+   bundle; the resulting `CFBundleShortVersionString` is 0.0.2. Windows/Linux
+   update checks remain unrun.
 8. **Runtime QA** — test a clean install and an upgrade on macOS arm64/amd64,
    Windows amd64/arm64, and Linux amd64/arm64. Cover Finder/Explorer launch,
    pi discovery, real session streaming, trust, approvals, login, Chinese UI,

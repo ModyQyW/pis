@@ -16,10 +16,11 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **0.0.2** (27.0 MB app / 6.8 MB DMG). The release and
-update feed are public; macOS is ad-hoc signed, so Gatekeeper requires a
-one-time approval. English is the default; Chinese is available in Settings.
-See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
+Current public release: **[0.0.2](https://github.com/ModyQyW/pis/releases/tag/v0.0.2)**
+(27.0 MB app / 6.8 MB DMG). The release and update feed are public; macOS is
+ad-hoc signed, so Gatekeeper requires a one-time approval. English is the
+default; Chinese is available in Settings. See
+[`docs/03-progress.md`](docs/03-progress.md) for evidence and
 [`docs/02-plan.md`](docs/02-plan.md) §8 for the roadmap.
 
 ## What works
@@ -59,7 +60,7 @@ See [`docs/03-progress.md`](docs/03-progress.md) for evidence and
   switch.
 - **Release plumbing**: GitHub CI for Go/frontend/cross-build/package,
   versioned release workflow, optional signing/notarization, and the mygo
-  updater window. An update feed needs a public release host.
+  updater window. Updates use the public GitHub Releases feed.
 - **Providers**: in-app pty terminal running `pi auth login`; no credential
   storage or logging by the app.
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
@@ -146,9 +147,9 @@ prototypes, is in [`docs/00-research.md`](docs/00-research.md).
 - RPC supports extension dialogs, statuses, and widgets, but not
   `ctx.ui.custom()` TUI components or custom editors/themes. Some extensions
   degrade or offer text fallbacks; PiS does not fake them.
-- Auto-update uses GitHub Releases and an Ed25519 update key. macOS builds are
-  ad-hoc signed, not notarized; Gatekeeper requires a one-time Open Anyway
-  approval, and the first public update round-trip is still being verified.
+- Auto-update uses GitHub Releases and an Ed25519 update key; the 0.0.1 →
+  0.0.2 signed delta update was verified. macOS builds are ad-hoc signed, not
+  notarized; Gatekeeper requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
