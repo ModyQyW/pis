@@ -25,6 +25,9 @@ export function WorktreeDialog({
   const [branch, setBranch] = useState("");
   const [createBranch, setCreateBranch] = useState(true);
   const [remove, setRemove] = useState<Worktree | null>(null);
+  const [forceRemove, setForceRemove] = useState<{ worktree: Worktree; error: string } | null>(
+    null,
+  );
 
   const load = async () => {
     if (!workspace) return;
@@ -105,10 +108,10 @@ export function WorktreeDialog({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="truncate text-[11.5px] font-medium">
-                            {wt.branch || (wt.detached ? "detached" : "worktree")}
+                            {wt.branch || t(wt.detached ? "detached" : "worktree")}
                           </span>
                           {wt.locked ? (
-                            <span className="text-[9px] text-warning">locked</span>
+                            <span className="text-[9px] text-warning">{t("locked")}</span>
                           ) : null}
                         </div>
                         <p className="mt-0.5 truncate font-mono text-[10px] text-faint">
@@ -186,15 +189,40 @@ export function WorktreeDialog({
         onOpenChange={(next) => !next && setRemove(null)}
         title={t("Remove {branch}?", { branch: remove?.branch ?? "worktree" })}
         message={t(
-          "The worktree directory is removed. Its branch and commits remain in the repository.",
+          "The worktree directory is removed. Its branch and commits remain in the repository. Git refuses if the worktree has uncommitted files.",
         )}
         confirmLabel={t("Remove")}
         danger
         onConfirm={async () => {
           if (!workspace || !remove) return;
           try {
-            await api.removeWorktree(workspace, remove.path, true);
+            await api.removeWorktree(workspace, remove.path, false);
             setRemove(null);
+            await load();
+          } catch (err) {
+            setForceRemove({
+              worktree: remove,
+              error: err instanceof Error ? err.message : String(err),
+            });
+            setRemove(null);
+          }
+        }}
+      />
+      <ConfirmDialog
+        open={Boolean(forceRemove)}
+        onOpenChange={(next) => !next && setForceRemove(null)}
+        title={t("Discard uncommitted changes?")}
+        message={t(
+          "Git refused to remove this worktree: {error}\n\nForcing the removal deletes uncommitted files. The branch and committed work remain.",
+          { error: forceRemove?.error ?? "" },
+        )}
+        confirmLabel={t("Force remove")}
+        danger
+        onConfirm={async () => {
+          if (!workspace || !forceRemove) return;
+          try {
+            await api.removeWorktree(workspace, forceRemove.worktree.path, true);
+            setForceRemove(null);
             await load();
           } catch (err) {
             toast.error(err instanceof Error ? err.message : String(err));

@@ -58,7 +58,7 @@ export function ExtensionStatusRail({
           {Object.entries(widgets).map(([key, lines]) => (
             <div key={key} className="mb-1 last:mb-0">
               <div className="text-[9px] uppercase tracking-[0.06em] text-faint">{key}</div>
-              <pre className="whitespace-pre-wrap font-mono text-[10px] leading-4 text-subtle">
+              <pre className="whitespace-pre-wrap font-mono code-text-dense leading-4 text-subtle">
                 {lines.map(clean).join("\n")}
               </pre>
             </div>

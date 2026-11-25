@@ -13,6 +13,7 @@ import {
   TraceTitle,
 } from "@/components/ui/trace";
 import type { ChatItem } from "../lib/transcript";
+import { t } from "../lib/i18n";
 import { ToolCard } from "./ToolCard";
 
 const Markdown = lazy(() => import("./Markdown").then((m) => ({ default: m.Markdown })));
@@ -82,7 +83,7 @@ function ThinkingBlock({ text, redacted }: { text: string; redacted?: boolean })
             <TraceIcon>
               <Brain />
             </TraceIcon>
-            <TraceTitle>{redacted ? "Redacted thinking" : "Thinking"}</TraceTitle>
+            <TraceTitle>{redacted ? t("Redacted thinking") : t("Thinking")}</TraceTitle>
           </TraceLine>
         </TraceCollapsibleTrigger>
         <TraceCollapsibleContent className="whitespace-pre-wrap pt-1 text-[11.5px] leading-5">

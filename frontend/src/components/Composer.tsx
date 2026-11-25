@@ -43,6 +43,7 @@ export function Composer({
   planMode,
   externalPlanCommand,
   onTogglePlan,
+  sendOnEnter = true,
 }: {
   draft: string;
   onDraft: (text: string) => void;
@@ -62,6 +63,7 @@ export function Composer({
   planMode?: boolean;
   externalPlanCommand?: string;
   onTogglePlan?: () => void;
+  sendOnEnter?: boolean;
 }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const [focused, setFocused] = useState(false);
@@ -300,6 +302,7 @@ export function Composer({
                 }
               }
               if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                if (!sendOnEnter && !(e.metaKey || e.ctrlKey)) return;
                 e.preventDefault();
                 if (canSend) onSubmit();
               }
@@ -431,7 +434,11 @@ export function Composer({
 
             <div className="ml-auto flex items-center gap-2">
               <span className="hidden text-[10px] text-faint sm:inline">
-                {running ? t("Enter queues · Esc stops") : t("Enter sends · Shift+Enter newline")}
+                {running
+                  ? t("Enter queues · Esc stops")
+                  : sendOnEnter
+                    ? t("Enter sends · Shift+Enter newline")
+                    : t("⌘Enter sends · Enter newline")}
               </span>
               <div
                 className="flex size-7 items-center justify-center rounded-full border border-border text-[9px] font-medium tabular-nums text-faint"

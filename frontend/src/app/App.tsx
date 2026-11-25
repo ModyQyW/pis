@@ -17,7 +17,16 @@ import {
   ShieldAlert,
   Sparkles,
 } from "lucide-react";
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Toaster, toast } from "../lib/toast";
 
 import { BrandMark } from "../components/BrandMark";
@@ -125,6 +134,13 @@ export function App() {
     if (boot) setLocale(boot.settings.language);
   }, [boot?.settings.language, boot]);
 
+  useLayoutEffect(() => {
+    if (!boot) return;
+    const root = document.documentElement;
+    root.style.setProperty("--code-font-size", `${boot.settings.codeFontSize}px`);
+    root.style.setProperty("--ui-scale", String(boot.settings.uiFontSize / 14));
+  }, [boot]);
+
   // Development-only deep link: `mygo dev` can open a real session for QA.
   useEffect(() => {
     if (!boot || !insideShell) return;
@@ -171,7 +187,11 @@ export function App() {
       const wasBusy = busySessions.current[session.key];
       if (enabled && wasBusy && !busy && session.status === "ready" && !document.hasFocus()) {
         void api
-          .notify(session.key, session.name || "PiS", session.error ? "Run failed" : "Run finished")
+          .notify(
+            session.key,
+            session.name || "PiS",
+            session.error ? t("Run failed") : t("Run finished"),
+          )
           .catch(() => {});
       }
     }
@@ -305,7 +325,7 @@ export function App() {
         try {
           await api.setTrust(info.path, trustedChoice ? "trusted" : "untrusted");
           toast.success(
-            trustedChoice ? "Project trusted for new sessions" : "Project set to untrusted",
+            trustedChoice ? t("Project trusted for new sessions") : t("Project set to untrusted"),
           );
         } catch (err) {
           toast.error(err instanceof Error ? err.message : String(err));
@@ -318,8 +338,8 @@ export function App() {
 
   const handleNewChat = useCallback(async () => {
     if (!boot?.pi.compatible) {
-      toast.error("pi is not ready", {
-        description: boot?.pi.error ?? "Open Settings to locate a supported pi.",
+      toast.error(t("pi is not ready"), {
+        description: boot?.pi.error ?? t("Open Settings to locate a supported pi."),
       });
       return;
     }
@@ -338,7 +358,7 @@ export function App() {
     try {
       const ws = await api.chooseProject();
       if (!ws) return;
-      toast.success(`Opened ${ws.name}`);
+      toast.success(t("Opened {name}", { name: ws.name }));
       await load();
       setSelected(ws);
     } catch (err) {
@@ -350,7 +370,7 @@ export function App() {
     async (path: string) => {
       try {
         const ws = await api.openProject(path);
-        toast.success(`Opened ${ws.name}`);
+        toast.success(t("Opened {name}", { name: ws.name }));
         await load();
         setSelected(ws);
       } catch (err) {
@@ -380,13 +400,13 @@ export function App() {
     const text = active ? active.draft : draft;
     if (!text.trim() && !active?.attachments.length) return;
     if (!boot?.pi.compatible) {
-      toast.error("pi is not ready", {
-        description: boot?.pi.error ?? "Open Settings to locate a supported pi.",
+      toast.error(t("pi is not ready"), {
+        description: boot?.pi.error ?? t("Open Settings to locate a supported pi."),
       });
       return;
     }
     if (!selected) {
-      toast.error("Open a project first");
+      toast.error(t("Open a project first"));
       return;
     }
     let key = useChat.getState().activeKey;
@@ -410,14 +430,14 @@ export function App() {
   const handleCompact = useCallback(async () => {
     const id = useChat.getState().activeSession()?.appId;
     if (!id) {
-      toast("No live session to compact");
+      toast(t("No live session to compact"));
       return;
     }
     try {
       await api.compactSession(id);
-      toast.success("Context compacted");
+      toast.success(t("Context compacted"));
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Compaction failed");
+      toast.error(err instanceof Error ? err.message : t("Compaction failed"));
     }
   }, []);
 
@@ -426,7 +446,7 @@ export function App() {
     if (!key) return;
     try {
       await useChat.getState().clone(key);
-      toast.success("Branch cloned");
+      toast.success(t("Branch cloned"));
       void refreshSessions();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
@@ -438,7 +458,7 @@ export function App() {
     if (!key) return;
     try {
       await useChat.getState().navigateTree(key, entryId, summarize);
-      toast.success("Moved to that point in the session");
+      toast.success(t("Moved to that point in the session"));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
       throw err;
@@ -451,7 +471,7 @@ export function App() {
       if (!key) return;
       try {
         await useChat.getState().fork(key, entryId);
-        toast.success("Forked into a new session");
+        toast.success(t("Forked into a new session"));
         void refreshSessions();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
@@ -466,7 +486,7 @@ export function App() {
       if (!key) return;
       try {
         await useChat.getState().rename(key, name);
-        toast.success("Session renamed");
+        toast.success(t("Session renamed"));
         void refreshSessions();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
@@ -478,12 +498,12 @@ export function App() {
   const handleExport = useCallback(async () => {
     const s = useChat.getState().activeSession();
     if (!s?.path) {
-      toast("Open a session before exporting");
+      toast(t("Open a session before exporting"));
       return;
     }
     try {
       const path = await api.exportSession(s.path);
-      toast.success("Session exported", { description: path });
+      toast.success(t("Session exported"), { description: path });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
@@ -545,7 +565,7 @@ export function App() {
           setModelPickerOpen(true);
           break;
         default:
-          toast(`Unhandled menu command: ${command}`);
+          toast(t("Unhandled menu command: {command}", { command }));
       }
     },
     [activeKey, handleCompact, handleExport, handleNewChat, handleOpenProject, handleReveal, stop],
@@ -731,7 +751,11 @@ export function App() {
         icon: RefreshCw,
         run: async () => {
           const st = await api.checkPi();
-          toast(st.compatible ? `pi ${st.version} is ready` : (st.error ?? "pi was not found"));
+          toast(
+            st.compatible
+              ? t("pi {version} is ready", { version: st.version ?? "" })
+              : (st.error ?? t("pi was not found")),
+          );
           await load();
         },
       },
@@ -830,15 +854,7 @@ export function App() {
   };
 
   return (
-    <div
-      className="flex h-full bg-canvas text-fg"
-      style={
-        {
-          "--sidebar-width": `${boot.settings.sidebarWidth}px`,
-          "--right-width": `${boot.settings.rightWidth}px`,
-        } as React.CSSProperties
-      }
-    >
+    <div className="flex h-full bg-canvas text-fg">
       {sidebarOpen ? (
         <Sidebar
           boot={boot}
@@ -984,6 +1000,9 @@ export function App() {
                 onRespond={(response) =>
                   void useChat.getState().respondDialog(active.key, active.dialogs[0]!.id, response)
                 }
+                onTimeout={() =>
+                  useChat.getState().dismissDialog(active.key, active.dialogs[0]!.id)
+                }
               />
             ) : null}
             <Composer
@@ -1012,6 +1031,7 @@ export function App() {
               externalPlanCommand={
                 active?.commands.find((c) => /^plan(-mode)?$/i.test(c.name))?.name
               }
+              sendOnEnter={boot.settings.sendOnEnter}
               onTogglePlan={() => {
                 const key = useChat.getState().activeKey;
                 if (key)
@@ -1069,6 +1089,7 @@ export function App() {
         <LoginDialog
           open={loginOpen}
           onOpenChange={setLoginOpen}
+          codeFontSize={boot.settings.codeFontSize}
           onDone={() => {
             void load();
             const key = useChat.getState().activeKey;
@@ -1086,8 +1107,8 @@ export function App() {
         title={t("Delete this session?")}
         message={
           active?.path
-            ? "The session file moves to the Trash. Your project files are untouched."
-            : "There is no live session to delete."
+            ? t("The session file moves to the Trash. Your project files are untouched.")
+            : t("There is no live session to delete.")
         }
         confirmLabel={t("Move to Trash")}
         danger
@@ -1100,7 +1121,7 @@ export function App() {
           try {
             await useChat.getState().close(s.key);
             await api.deleteSession(s.path);
-            toast.success("Session moved to Trash");
+            toast.success(t("Session moved to Trash"));
             setDeleteOpen(false);
             void refreshSessions();
           } catch (err) {

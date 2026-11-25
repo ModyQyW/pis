@@ -159,7 +159,6 @@ export function mockSummary(): Summary {
     cwd: "/Users/you/Projects/atlas",
     createdAt: new Date(now - 1000 * 60 * 12).toISOString(),
     updatedAt: new Date(now - 1000 * 60 * 9).toISOString(),
-    messageCount: 6,
   };
 }
 

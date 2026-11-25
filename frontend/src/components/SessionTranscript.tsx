@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Marker, MarkerContent } from "@/components/ui/marker";
 import { Message, MessageContent, MessageFooter } from "@/components/ui/message";
 import type { ChatSession } from "../store/chat";
+import { t } from "../lib/i18n";
 import type { ChatItem } from "../lib/transcript";
 import { AssistantMessage } from "./AssistantMessage";
 import { StandaloneTool } from "./ToolCard";
@@ -94,14 +95,14 @@ export function SessionTranscript({
           {session.status === "loading" ? (
             <>
               <Loader2 size={16} className="animate-spin text-subtle" />
-              Starting pi…
+              {t("Starting pi…")}
             </>
           ) : session.status === "error" ? (
             <span className="max-w-[420px] text-center text-danger">{session.error}</span>
           ) : (
             <>
-              <span className="text-[13px] text-subtle">New chat</span>
-              <span>Ask pi to inspect, change, or explain this project.</span>
+              <span className="text-[13px] text-subtle">{t("New chat")}</span>
+              <span>{t("Ask pi to inspect, change, or explain this project.")}</span>
             </>
           )}
         </div>
@@ -144,7 +145,7 @@ export function SessionTranscript({
             virtualizer.scrollToEnd({ behavior: "smooth" });
           }}
           className="absolute bottom-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-surface text-subtle shadow-sm hover:text-fg"
-          aria-label="Scroll to latest"
+          aria-label={t("Scroll to latest")}
         >
           <ArrowDown size={13} />
         </button>
@@ -174,11 +175,13 @@ function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: st
         <Marker variant="separator" className="my-5">
           <MarkerContent className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] font-medium uppercase tracking-[0.08em]">
-              Context compacted
+              {t("Context compacted")}
             </span>
             {item.tokensBefore ? (
               <span className="text-[10px]">
-                {Math.round(item.tokensBefore / 1000)}k tokens summarized
+                {t("{count}k tokens summarized", {
+                  count: Math.round(item.tokensBefore / 1000),
+                })}
               </span>
             ) : null}
           </MarkerContent>
@@ -189,9 +192,9 @@ function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: st
         <Marker variant="border" className="my-4">
           <MarkerContent>
             <span className="mr-2 text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
-              Branch summary
+              {t("Branch summary")}
             </span>
-            <span className="text-[11.5px] leading-5">{item.summary || "Earlier branch"}</span>
+            <span className="text-[11.5px] leading-5">{item.summary || t("Earlier branch")}</span>
           </MarkerContent>
         </Marker>
       );
@@ -223,7 +226,7 @@ function UserMessage({
                   <img
                     key={i}
                     src={`data:${img.mimeType};base64,${img.data}`}
-                    alt="Attached"
+                    alt={t("Attached")}
                     className="max-h-[280px] rounded-md border border-border object-contain"
                   />
                 ))}
@@ -237,11 +240,11 @@ function UserMessage({
             size="xs"
             onClick={() => void navigator.clipboard.writeText(item.text)}
           >
-            Copy
+            {t("Copy")}
           </Button>
           {onFork ? (
             <Button variant="ghost" size="xs" onClick={() => onFork(item.id)}>
-              Fork from here
+              {t("Fork from here")}
             </Button>
           ) : null}
         </MessageFooter>

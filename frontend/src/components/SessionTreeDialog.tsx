@@ -145,7 +145,7 @@ export function SessionTreeDialog({
               className="ml-auto flex h-7 items-center gap-1.5 rounded-md border border-border px-2.5 text-[11px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
             >
               <GitBranch size={12} />
-              Clone branch
+              {t("Clone branch")}
             </button>
           </div>
         </Dialog.Content>
@@ -193,7 +193,7 @@ function TreeNode({
             <span className="text-[9.5px] font-medium uppercase tracking-[0.06em] text-faint">
               {entry.type === "message" ? (entry.role ?? "message") : entry.type.replace("_", " ")}
             </span>
-            {active ? <span className="text-[9px] text-brand">current</span> : null}
+            {active ? <span className="text-[9px] text-brand">{t("current")}</span> : null}
             {busy === entry.id ? <Loader2 size={10} className="animate-spin" /> : null}
           </span>
           <span className="mt-0.5 line-clamp-2 block text-[11px] leading-4">{title}</span>

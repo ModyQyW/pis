@@ -65,6 +65,24 @@ describe("buildTranscript", () => {
     });
     expect(items.map((i) => i.kind)).toEqual(["compaction", "assistant"]);
   });
+
+  it("renders pi's custom_message content as a note", () => {
+    const items = buildTranscript(
+      [
+        { id: "cm", type: "custom_message", message: "<task>failed</task>" },
+        {
+          id: "cm2",
+          type: "custom_message",
+          message: { role: "custom", content: [{ type: "text", text: "legacy note" }] },
+        },
+      ],
+      null,
+    );
+    expect(items).toMatchObject([
+      { kind: "note", text: "<task>failed</task>" },
+      { kind: "note", text: "legacy note" },
+    ]);
+  });
 });
 
 describe("normalizeUsage", () => {

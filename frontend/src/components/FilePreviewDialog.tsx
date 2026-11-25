@@ -60,7 +60,8 @@ export function FilePreviewDialog({
                 {path}
               </Dialog.Title>
               <Dialog.Description className="mt-0.5 text-[10px] text-faint">
-                Read-only preview{meta?.truncated ? " · truncated" : ""}
+                {t("Read-only preview")}
+                {meta?.truncated ? ` · ${t("truncated")}` : ""}
               </Dialog.Description>
             </div>
             <button
@@ -84,7 +85,7 @@ export function FilePreviewDialog({
               className="flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg"
             >
               <FolderOpen size={11} />
-              Open
+              {t("Open")}
             </button>
             <Dialog.Close asChild>
               <button
@@ -106,10 +107,10 @@ export function FilePreviewDialog({
               <div className="px-3 py-12 text-center text-[11.5px] text-danger">{error}</div>
             ) : meta?.binary ? (
               <div className="px-3 py-12 text-center text-[11.5px] text-faint">
-                Binary file · {Math.round((meta.size ?? 0) / 1024)} KB
+                {t("Binary file")} · {Math.round((meta.size ?? 0) / 1024)} KB
               </div>
             ) : (
-              <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.6] text-subtle">
+              <pre className="whitespace-pre-wrap break-words font-mono code-text-dense leading-[1.6] text-subtle">
                 {text}
               </pre>
             )}

@@ -13,36 +13,45 @@ import {
   type Bootstrap,
   type Diagnostics,
   type Event,
+  type Exit,
+  type FileView,
+  type Hit,
+  type Info,
   type MenuCommand,
+  type Model,
+  type Output,
   type PiStatus,
+  type Preferences,
   type PromptRequest,
   type SearchHit,
   type Server,
   type SessionInfo,
   type StartRequest,
+  type Status,
   type Summary,
   type Transcript,
+  type UIResponse,
   type Workspace,
   type Worktree,
 } from "../mygo";
-import {
-  mockBootstrap,
-  mockDiff,
-  mockGitStatus,
-  mockModels,
-  mockStart,
-  mockSummary,
-  mockTranscript,
-  mockTree,
-  setMockLanguage,
-} from "./mock";
 
 /** True when the page is running inside the mygo shell. */
 export const insideShell = isMyGo();
 
+// The browser preview is a development tool. A dynamic, DEV-guarded import
+// keeps its fixture data out of packaged builds.
+const MOCK = import.meta.env.DEV;
+type MockModule = typeof import("./mock");
+let mockModule: Promise<MockModule> | null = null;
+async function loadMock(): Promise<MockModule> {
+  if (!MOCK) throw new Error("mock mode is only available in development");
+  mockModule ??= import("./mock");
+  return mockModule;
+}
+
 export const api = {
   async bootstrap(): Promise<Bootstrap> {
-    if (!insideShell) return mockBootstrap();
+    if (!insideShell && MOCK) return (await loadMock()).mockBootstrap();
     return Desktop.bootstrap();
   },
   async chooseProject(): Promise<Workspace | null> {
@@ -57,7 +66,7 @@ export const api = {
     if (!insideShell) return;
     await Desktop.removeRecent(path);
   },
-  async workspaceTrust(workspace: string): Promise<import("../mygo").Info> {
+  async workspaceTrust(workspace: string): Promise<Info> {
     if (!insideShell) {
       return {
         path: workspace,
@@ -70,7 +79,7 @@ export const api = {
     }
     return Desktop.workspaceTrust(workspace);
   },
-  async setTrust(workspace: string, decision: string): Promise<import("../mygo").Info> {
+  async setTrust(workspace: string, decision: string): Promise<Info> {
     if (!insideShell) {
       return {
         path: workspace,
@@ -87,9 +96,9 @@ export const api = {
     if (!insideShell) return;
     await Desktop.setTheme(theme);
   },
-  async setPreferences(p: import("../mygo").Preferences): Promise<void> {
+  async setPreferences(p: Preferences): Promise<void> {
     if (!insideShell) {
-      if (p.language) setMockLanguage(p.language);
+      if (MOCK) (await loadMock()).setMockPreferences(p);
       return;
     }
     await Desktop.setPreferences(p);
@@ -99,20 +108,16 @@ export const api = {
     await Desktop.notify(id, title, body);
   },
   async setPiPath(path: string): Promise<PiStatus> {
-    if (!insideShell) return mockBootstrap().pi;
+    if (!insideShell && MOCK) return (await loadMock()).mockBootstrap().pi;
     return Desktop.setPiPath(path);
   },
   async checkPi(): Promise<PiStatus> {
-    if (!insideShell) return mockBootstrap().pi;
+    if (!insideShell && MOCK) return (await loadMock()).mockBootstrap().pi;
     return Desktop.checkPi();
   },
   async checkUpdates(): Promise<void> {
     if (!insideShell) return;
     await Desktop.checkUpdates();
-  },
-  async saveLayout(sidebar: number, right: number): Promise<void> {
-    if (!insideShell) return;
-    await Desktop.saveLayout(sidebar, right);
   },
   async diagnostics(): Promise<Diagnostics | null> {
     if (!insideShell) return null;
@@ -135,46 +140,42 @@ export const api = {
     return events.piStatusChanged.on((p) => listener(p.status));
   },
   async listSessions(workspace: string, limit = 50): Promise<Summary[]> {
-    if (!insideShell) return [mockSummary()];
+    if (!insideShell && MOCK) return [(await loadMock()).mockSummary()];
     return Sessions.list(workspace, limit);
   },
   async searchSessions(workspace: string, query: string, limit = 12): Promise<SearchHit[]> {
-    if (!insideShell) {
-      const hit = mockSummary();
+    if (!insideShell && MOCK) {
+      const hit = (await loadMock()).mockSummary();
       return [{ ...hit, snippet: `…${query}…`, role: "assistant" }];
     }
     return Sessions.search(workspace, query, limit);
   },
   async readSession(path: string): Promise<Transcript> {
-    if (!insideShell) return mockTranscript(path);
+    if (!insideShell && MOCK) return (await loadMock()).mockTranscript(path);
     return Sessions.read(path);
   },
   async summarySession(path: string): Promise<Summary> {
-    if (!insideShell) return mockSummary();
+    if (!insideShell && MOCK) return (await loadMock()).mockSummary();
     return Sessions.summary(path);
   },
   async readSessionAt(path: string, leafId: string): Promise<Transcript> {
-    if (!insideShell) return mockTranscript(path);
+    if (!insideShell && MOCK) return (await loadMock()).mockTranscript(path);
     return Sessions.readAt(path, leafId);
   },
   async getTree(id: string): Promise<unknown> {
-    if (!insideShell) return mockTree();
+    if (!insideShell && MOCK) return (await loadMock()).mockTree();
     return Agent.getTree(id);
   },
   async getEntries(id: string): Promise<unknown> {
     if (!insideShell) return { leafId: "a3", entries: [] };
     return Agent.getEntries(id);
   },
-  async getForkMessages(id: string): Promise<unknown> {
-    if (!insideShell) return { messages: [] };
-    return Agent.getForkMessages(id);
-  },
   async forkSession(id: string, entryId: string): Promise<SessionInfo> {
-    if (!insideShell) return mockStart({ trusted: false });
+    if (!insideShell && MOCK) return (await loadMock()).mockStart({ trusted: false });
     return Agent.fork(id, entryId);
   },
   async cloneSession(id: string): Promise<SessionInfo> {
-    if (!insideShell) return mockStart({ trusted: false });
+    if (!insideShell && MOCK) return (await loadMock()).mockStart({ trusted: false });
     return Agent.clone(id);
   },
   async navigateTree(id: string, entryId: string, summarize: boolean): Promise<void> {
@@ -198,7 +199,7 @@ export const api = {
     await Sessions.reveal(path);
   },
   async startSession(req: StartRequest): Promise<SessionInfo> {
-    if (!insideShell) return mockStart(req);
+    if (!insideShell && MOCK) return (await loadMock()).mockStart(req);
     return Agent.start(req);
   },
   async closeSession(id: string): Promise<void> {
@@ -223,20 +224,22 @@ export const api = {
   },
   async prompt(req: PromptRequest): Promise<{ disposition: string }> {
     if (!insideShell) {
+      if (!MOCK) throw new Error("mock mode is only available in development");
       return mockPrompt(req, mockEmit);
     }
     return Agent.prompt(req);
   },
   async abortSession(id: string): Promise<void> {
     if (!insideShell) {
-      if (mockStream) clearInterval(mockStream);
+      if (!MOCK) return;
+      clearInterval(mockStream);
       mockStream = undefined;
       mockEmit({ sessionId: id, kind: "event", raw: { type: "agent_settled", aborted: true } });
       return;
     }
     await Agent.abort(id);
   },
-  async respondUI(sessionId: string, resp: import("../mygo").UIResponse): Promise<void> {
+  async respondUI(sessionId: string, resp: UIResponse): Promise<void> {
     if (!insideShell) return;
     await Agent.respondUI(sessionId, resp);
   },
@@ -244,16 +247,16 @@ export const api = {
     if (!insideShell) return null;
     return Agent.compact(id);
   },
-  async getModels(id: string): Promise<import("../mygo").Model[]> {
-    if (!insideShell) return mockModels();
+  async getModels(id: string): Promise<Model[]> {
+    if (!insideShell && MOCK) return (await loadMock()).mockModels();
     return Agent.getModels(id);
   },
   async getThinkingLevels(id: string): Promise<string[]> {
     if (!insideShell) return ["off", "low", "medium", "high"];
     return Agent.getThinkingLevels(id);
   },
-  async setModel(id: string, provider: string, model: string): Promise<import("../mygo").Model> {
-    if (!insideShell) return mockModels()[0]!;
+  async setModel(id: string, provider: string, model: string): Promise<Model> {
+    if (!insideShell && MOCK) return (await loadMock()).mockModels()[0]!;
     return Agent.setModel(id, provider, model);
   },
   async setThinking(id: string, level: string): Promise<void> {
@@ -305,12 +308,12 @@ export const api = {
     if (!insideShell) return;
     await MCP.add(workspace, req);
   },
-  async gitStatus(workspace: string): Promise<import("../mygo").Status> {
-    if (!insideShell) return mockGitStatus();
+  async gitStatus(workspace: string): Promise<Status> {
+    if (!insideShell && MOCK) return (await loadMock()).mockGitStatus();
     return Git.status(workspace);
   },
   async gitDiff(workspace: string, path: string): Promise<string> {
-    if (!insideShell) return mockDiff(path);
+    if (!insideShell && MOCK) return (await loadMock()).mockDiff(path);
     return Git.diff(workspace, path);
   },
   async revertFile(workspace: string, path: string): Promise<void> {
@@ -339,7 +342,7 @@ export const api = {
     if (!insideShell) return;
     await Git.removeWorktree(workspace, path, force);
   },
-  async listFiles(workspace: string, limit = 300): Promise<import("../mygo").Hit[]> {
+  async listFiles(workspace: string, limit = 300): Promise<Hit[]> {
     if (!insideShell) {
       return [
         "src/cache/watch.ts",
@@ -351,7 +354,7 @@ export const api = {
     }
     return Files.list(workspace, limit);
   },
-  async readFile(workspace: string, path: string): Promise<import("../mygo").FileView> {
+  async readFile(workspace: string, path: string): Promise<FileView> {
     if (!insideShell) {
       return {
         path,
@@ -363,11 +366,7 @@ export const api = {
     }
     return Files.read(workspace, path, 512 * 1024);
   },
-  async searchFiles(
-    workspace: string,
-    query: string,
-    limit = 12,
-  ): Promise<import("../mygo").Hit[]> {
+  async searchFiles(workspace: string, query: string, limit = 12): Promise<Hit[]> {
     if (!insideShell) {
       const files = [
         "src/cache/watch.ts",
@@ -436,15 +435,17 @@ export const api = {
     if (!insideShell) return;
     await Auth.cancel(id);
   },
-  onAuthOutput(listener: (o: import("../mygo").Output) => void): () => void {
+  onAuthOutput(listener: (o: Output) => void): () => void {
     if (!insideShell) {
+      if (!MOCK) return () => {};
       mockAuthOutput.add(listener);
       return () => mockAuthOutput.delete(listener);
     }
     return events.authOutput.on(listener);
   },
-  onAuthExit(listener: (o: import("../mygo").Exit) => void): () => void {
+  onAuthExit(listener: (o: Exit) => void): () => void {
     if (!insideShell) {
+      if (!MOCK) return () => {};
       mockAuthExit.add(listener);
       return () => mockAuthExit.delete(listener);
     }
@@ -452,6 +453,7 @@ export const api = {
   },
   onAgentEvent(listener: (ev: Event) => void): () => void {
     if (!insideShell) {
+      if (!MOCK) return () => {};
       mockListeners.add(listener);
       return () => mockListeners.delete(listener);
     }
@@ -460,8 +462,8 @@ export const api = {
 };
 
 const mockListeners = new Set<(ev: Event) => void>();
-const mockAuthOutput = new Set<(o: import("../mygo").Output) => void>();
-const mockAuthExit = new Set<(o: import("../mygo").Exit) => void>();
+const mockAuthOutput = new Set<(o: Output) => void>();
+const mockAuthExit = new Set<(o: Exit) => void>();
 function mockEmit(ev: Event) {
   for (const listener of mockListeners) listener(ev);
 }

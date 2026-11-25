@@ -9,6 +9,9 @@ import { platformName } from "../lib/format";
 import { t as tr } from "../lib/i18n";
 import type { Bootstrap, Diagnostics, Theme } from "../lib/types";
 
+const CODE_FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+const UI_SIZES = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
 export function SettingsDialog({
   open,
   onOpenChange,
@@ -55,9 +58,14 @@ export function SettingsDialog({
     try {
       const status = await api.setPiPath(path);
       onReload();
-      toast(status.compatible ? `Using pi ${status.version}` : status.error || "pi was not found", {
-        description: status.path,
-      });
+      toast(
+        status.compatible
+          ? tr("Using pi {version}", { version: status.version ?? "" })
+          : status.error || tr("pi was not found"),
+        {
+          description: status.path,
+        },
+      );
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -71,8 +79,22 @@ export function SettingsDialog({
       const status = await api.checkPi();
       onReload();
       toast(
-        status.compatible ? `pi ${status.version} is ready` : status.error || "pi was not found",
+        status.compatible
+          ? tr("pi {version} is ready", { version: status.version ?? "" })
+          : status.error || tr("pi was not found"),
       );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const savePref = async (p: Parameters<typeof api.setPreferences>[0]) => {
+    setBusy(true);
+    try {
+      await api.setPreferences(p);
+      onReload();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
@@ -95,9 +117,9 @@ export function SettingsDialog({
       .join("\n");
     try {
       await navigator.clipboard.writeText(report);
-      toast.success("Support report copied");
+      toast.success(tr("Support report copied"));
     } catch {
-      toast.error("Could not access the clipboard");
+      toast.error(tr("Could not access the clipboard"));
     }
   };
 
@@ -225,6 +247,61 @@ export function SettingsDialog({
               >
                 {tr("Test notification")}
               </button>
+            </Section>
+
+            <Section
+              title={tr("Text and input")}
+              description={tr(
+                "Code size covers Markdown code blocks, diffs, tool output, and previews. Interface size scales the whole window.",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-subtle">
+                <label className="flex items-center gap-2">
+                  <span>{tr("Code font size")}</span>
+                  <select
+                    value={boot.settings.codeFontSize}
+                    disabled={busy}
+                    onChange={(e) => void savePref({ codeFontSize: Number(e.target.value) })}
+                    className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                  >
+                    {CODE_FONT_SIZES.map((size) => (
+                      <option key={size} value={size}>
+                        {size}px
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex items-center gap-2">
+                  <span>{tr("Interface size")}</span>
+                  <select
+                    value={boot.settings.uiFontSize}
+                    disabled={busy}
+                    onChange={(e) => void savePref({ uiFontSize: Number(e.target.value) })}
+                    className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                  >
+                    {UI_SIZES.map((size) => (
+                      <option key={size} value={size}>
+                        {Math.round((size / 14) * 100)}%
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex items-start gap-2 leading-4">
+                  <input
+                    type="checkbox"
+                    checked={boot.settings.sendOnEnter}
+                    disabled={busy}
+                    onChange={(e) => void savePref({ sendOnEnter: e.target.checked })}
+                    className="mt-0.5 size-3.5 accent-[var(--brand)]"
+                  />
+                  <span>
+                    {tr("Send on Enter")}
+                    <span className="block text-[10px] text-faint">
+                      {tr("Off: ⌘Enter sends and Enter adds a line.")}
+                    </span>
+                  </span>
+                </label>
+              </div>
             </Section>
 
             <Section

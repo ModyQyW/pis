@@ -246,11 +246,15 @@ export function buildTranscript(
         });
         break;
       case "custom_message": {
-        const msg = entry.message as AgentMessage | undefined;
-        if (msg && (msg.role === "user" || msg.role === "custom")) {
-          const content = messageContent(msg);
-          items.push({ kind: "note", id: entry.id, text: contentText(content) });
-        }
+        // pi writes {customType, content, display} with no role wrapper. Older
+        // files may carry a full message object instead.
+        const raw = entry.message;
+        const msg =
+          raw && typeof raw === "object" && "role" in raw
+            ? (raw as AgentMessage)
+            : ({ role: "custom", content: raw ?? "" } as AgentMessage);
+        const text = contentText(messageContent(msg));
+        if (text) items.push({ kind: "note", id: entry.id, text });
         break;
       }
       default:

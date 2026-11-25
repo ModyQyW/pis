@@ -76,6 +76,7 @@ type Store = {
     dialogId: string,
     response: Omit<ExtensionUIResponse, "id">,
   ) => Promise<void>;
+  dismissDialog: (key: string, dialogId: string) => void;
   refreshTranscript: (key: string, leafId?: string) => Promise<void>;
   fork: (key: string, entryId: string) => Promise<void>;
   clone: (key: string) => Promise<void>;
@@ -95,6 +96,10 @@ const now = () => Date.now();
 
 const DRAFT_PREFIX = "pis:draft:";
 const LAST_SESSION = "pis:last-session";
+
+// Session ids are unique per pi process. Once a session is closed, late
+// events are dropped instead of piling up in `orphan`.
+const closedSessions = new Set<string>();
 
 function draftKey(session: ChatSession): string {
   return DRAFT_PREFIX + (session.path || session.appId || session.key);
@@ -196,9 +201,11 @@ export const useChat = create<Store>((set, get) => ({
     try {
       const info = await startPromise;
       const transcript = await readPromise;
+      let kept = false;
       set((state) => {
         const s = state.sessions[tempKey];
         if (!s) return state;
+        kept = true;
         const next: Record<string, ChatSession> = { ...state.sessions };
         delete next[tempKey];
         const session: ChatSession = {
@@ -235,6 +242,10 @@ export const useChat = create<Store>((set, get) => ({
           activeKey: state.activeKey === tempKey ? info.id : state.activeKey,
         };
       });
+      if (!kept) {
+        closeLateStart(info.id);
+        return;
+      }
       void loadModelData(set, info.id);
       void api.getCommands(info.id).then((raw) => {
         const commands = (raw as { commands?: CommandInfo[] } | null)?.commands ?? [];
@@ -270,9 +281,11 @@ export const useChat = create<Store>((set, get) => ({
     }));
     try {
       const info = await api.startSession({ cwd, trusted });
+      let kept = false;
       set((state) => {
         const s = state.sessions[tempKey];
         if (!s) return state;
+        kept = true;
         const next = { ...state.sessions };
         delete next[tempKey];
         next[info.id] = {
@@ -301,6 +314,10 @@ export const useChat = create<Store>((set, get) => ({
           activeKey: state.activeKey === tempKey ? info.id : state.activeKey,
         };
       });
+      if (!kept) {
+        closeLateStart(info.id);
+        return;
+      }
       void loadModelData(set, info.id);
       void api.getCommands(info.id).then((raw) => {
         const commands = (raw as { commands?: CommandInfo[] } | null)?.commands ?? [];
@@ -325,12 +342,17 @@ export const useChat = create<Store>((set, get) => ({
   async close(key) {
     const s = get().sessions[key];
     if (!s) return;
-    if (s.appId) await api.closeSession(s.appId).catch(() => {});
+    if (s.appId) {
+      closedSessions.add(s.appId);
+      await api.closeSession(s.appId).catch(() => {});
+    }
     set((state) => {
       const next = { ...state.sessions };
       delete next[key];
+      const orphan = { ...state.orphan };
+      if (s.appId) delete orphan[s.appId];
       const keys = Object.keys(next);
-      return { sessions: next, activeKey: keys[0] ?? null };
+      return { sessions: next, activeKey: keys[0] ?? null, orphan };
     });
   },
 
@@ -343,6 +365,7 @@ export const useChat = create<Store>((set, get) => ({
     if (!s?.appId || (!text.trim() && images.length === 0)) return;
     const message =
       text + textFiles.map((a) => `\n\n<file name="${a.name}">\n${a.text}\n</file>`).join("");
+    const previous = { draft: s.draft, attachments: s.attachments };
     set((state) => {
       const cur = state.sessions[key];
       if (!cur) return state;
@@ -367,11 +390,16 @@ export const useChat = create<Store>((set, get) => ({
         behavior: s.streaming ? (behavior ?? "steer") : undefined,
       });
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
+      const failure = err instanceof Error ? err.message : String(err);
       set((state) => {
         const cur = state.sessions[key];
         if (!cur) return state;
-        return { sessions: { ...state.sessions, [key]: { ...cur, error: message } } };
+        // A rejected prompt must not swallow what the user wrote.
+        const draft = cur.draft.trim() ? cur.draft : previous.draft;
+        const attachments = cur.attachments.length ? cur.attachments : previous.attachments;
+        const next = { ...cur, draft, attachments, error: failure };
+        if (!cur.draft.trim() && draft) saveDraft(next, draft);
+        return { sessions: { ...state.sessions, [key]: next } };
       });
     }
   },
@@ -525,6 +553,16 @@ export const useChat = create<Store>((set, get) => ({
     }
   },
 
+  dismissDialog(key, dialogId) {
+    set((state) => {
+      const cur = state.sessions[key];
+      if (!cur) return state;
+      const dialogs = cur.dialogs.filter((d) => d.id !== dialogId);
+      if (dialogs.length === cur.dialogs.length) return state;
+      return { sessions: { ...state.sessions, [key]: { ...cur, dialogs } } };
+    });
+  },
+
   async refreshModels(key) {
     const s = get().sessions[key];
     if (!s?.appId) return;
@@ -578,6 +616,7 @@ export const useChat = create<Store>((set, get) => ({
   },
 
   applyEvent(ev) {
+    if (closedSessions.has(ev.sessionId)) return;
     const state = get();
     let key = Object.keys(state.sessions).find((k) => state.sessions[k]?.appId === ev.sessionId);
     if (!key) {
@@ -990,6 +1029,18 @@ function applyExtensionUI(key: string, cur: ChatSession, req: ExtensionUIRequest
       };
     });
   }
+}
+
+// A start that finishes after the user closed the tab must not leave an
+// invisible pi process or a growing orphan queue.
+function closeLateStart(appId: string) {
+  closedSessions.add(appId);
+  useChat.setState((state) => {
+    const orphan = { ...state.orphan };
+    delete orphan[appId];
+    return { orphan };
+  });
+  void api.closeSession(appId).catch(() => {});
 }
 
 async function loadModelData(

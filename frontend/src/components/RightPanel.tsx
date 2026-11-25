@@ -225,7 +225,7 @@ export function RightPanel({
             await api.revertFile(workspace.path, revertPath);
             setRevertPath(null);
             setRefresh((v) => v + 1);
-            toast.success("File reverted");
+            toast.success(t("File reverted"));
           } catch (err) {
             toast.error(err instanceof Error ? err.message : String(err));
           }
@@ -295,14 +295,18 @@ function tabChanges(
                 {file.path}
               </span>
               {file.oldPath ? (
-                <span className="block truncate text-[9.5px] text-faint">from {file.oldPath}</span>
+                <span className="block truncate text-[9.5px] text-faint">
+                  {t("from {path}", { path: file.oldPath })}
+                </span>
               ) : null}
             </span>
             <span className="shrink-0 text-[10px] tabular-nums text-faint">
               <span className="text-success">+{file.additions}</span>{" "}
               <span className="text-danger">−{file.deletions}</span>
             </span>
-            {file.staged ? <span className="size-1 rounded-full bg-brand" title="Staged" /> : null}
+            {file.staged ? (
+              <span className="size-1 rounded-full bg-brand" title={t("Staged")} />
+            ) : null}
           </button>
           {file.status !== "??" ? (
             <button
@@ -310,7 +314,7 @@ function tabChanges(
               onClick={() => onRevert(file.path)}
               className="flex size-6 shrink-0 items-center justify-center rounded text-faint opacity-0 transition-opacity hover:bg-danger/10 hover:text-danger group-hover:opacity-100"
               aria-label={`Revert ${file.path}`}
-              title="Revert to HEAD"
+              title={t("Revert to HEAD")}
             >
               <Undo2 size={11} />
             </button>
@@ -383,7 +387,9 @@ function TodoList({ todos }: { todos: TodoItem[] }) {
             {todo.text}
           </span>
           {todo.active ? (
-            <span className="shrink-0 text-[9px] uppercase tracking-wide text-brand">now</span>
+            <span className="shrink-0 text-[9px] uppercase tracking-wide text-brand">
+              {t("now")}
+            </span>
           ) : null}
         </li>
       ))}

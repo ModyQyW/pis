@@ -2,7 +2,7 @@ import * as Dialog from "@/components/ui/dialog-compat";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import { KeyRound, Loader2, LogIn, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
@@ -15,10 +15,12 @@ export function LoginDialog({
   open,
   onOpenChange,
   onDone,
+  codeFontSize,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDone: () => void;
+  codeFontSize: number;
 }) {
   const [provider, setProvider] = useState("anthropic");
   const [apiKey, setApiKey] = useState(false);
@@ -29,6 +31,10 @@ export function LoginDialog({
   const term = useRef<Terminal | null>(null);
   const fit = useRef<FitAddon | null>(null);
   const pending = useRef("");
+  const openRef = useRef(open);
+  useLayoutEffect(() => {
+    openRef.current = open;
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
@@ -68,7 +74,7 @@ export function LoginDialog({
     const styles = getComputedStyle(document.documentElement);
     const t = new Terminal({
       fontFamily: styles.getPropertyValue("--font-mono").trim() || "monospace",
-      fontSize: 12,
+      fontSize: codeFontSize,
       lineHeight: 1.35,
       cursorBlink: true,
       theme: {
@@ -109,13 +115,17 @@ export function LoginDialog({
       term.current = null;
       fit.current = null;
     };
-  }, [open, authId]);
+  }, [open, authId, codeFontSize]);
 
   const start = async () => {
     if (!provider.trim()) return;
     setStarting(true);
     try {
       const info = await api.startAuth(provider.trim(), apiKey);
+      if (!openRef.current) {
+        await api.authCancel(info.id).catch(() => {});
+        return;
+      }
       setAuthId(info.id);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));

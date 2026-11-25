@@ -81,7 +81,7 @@ export function DiffDialog({
               className="flex h-7 items-center gap-1.5 rounded-md border border-border px-2 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg"
             >
               <FolderOpen size={11} />
-              Reveal
+              {t("Reveal")}
             </button>
             <Dialog.Close asChild>
               <button

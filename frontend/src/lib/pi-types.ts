@@ -1,6 +1,6 @@
-import type { Entry, Model, SessionInfo, SessionState } from "../mygo";
+import type { Entry, Model, SessionInfo } from "../mygo";
 
-export type { Entry, Model, SessionInfo, SessionState };
+export type { Entry, Model, SessionInfo };
 
 export type TextContent = { type: "text"; text: string };
 export type ThinkingContent = { type: "thinking"; thinking: string; redacted?: boolean };

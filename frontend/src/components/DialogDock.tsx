@@ -1,5 +1,5 @@
 import { ArrowRight, CircleAlert, HelpCircle, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { t } from "../lib/i18n";
 import type { ExtensionDialog, ExtensionUIResponse } from "../lib/pi-types";
@@ -8,12 +8,24 @@ export function DialogDock({
   dialog,
   pending,
   onRespond,
+  onTimeout,
 }: {
   dialog: ExtensionDialog;
   pending: number;
   onRespond: (response: Omit<ExtensionUIResponse, "id">) => void;
+  onTimeout?: () => void;
 }) {
   const [text, setText] = useState(dialog.prefill ?? "");
+  // pi resolves a dialog with a timeout on its own; the dock must not linger.
+  const expired = useRef(onTimeout);
+  useEffect(() => {
+    expired.current = onTimeout;
+  }, [onTimeout]);
+  useEffect(() => {
+    if (!dialog.timeout) return;
+    const timer = setTimeout(() => expired.current?.(), dialog.timeout);
+    return () => clearTimeout(timer);
+  }, [dialog.id, dialog.timeout]);
   const options = (dialog.options ?? []).filter(
     (option) => !/type something\.?$/i.test(option.trim()),
   );

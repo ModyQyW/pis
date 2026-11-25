@@ -100,7 +100,9 @@ export function MCPDialog({
 
             <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
               {!workspace ? (
-                <p className="py-6 text-center text-[11.5px] text-faint">Open a project first.</p>
+                <p className="py-6 text-center text-[11.5px] text-faint">
+                  {t("Open a project first.")}
+                </p>
               ) : (
                 <>
                   <div className="flex items-center justify-between">

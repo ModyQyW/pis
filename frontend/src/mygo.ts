@@ -198,7 +198,6 @@ export interface PiStatusChanged {
 export interface Preferences {
   showWidgets?: boolean;
   notifications?: boolean;
-  reduceMotion?: boolean;
   codeFontSize?: number;
   uiFontSize?: number;
   sendOnEnter?: boolean;
@@ -235,7 +234,6 @@ export interface SearchHit {
   cwd: string;
   createdAt: string;
   updatedAt: string;
-  messageCount: number;
   snippet: string;
   role?: string;
 }
@@ -270,27 +268,9 @@ export interface SessionInfo {
   startedAt: string;
 }
 
-/** SessionState is get_state's useful subset. */
-export interface SessionState {
-  model: Model | null;
-  thinkingLevel: string;
-  isStreaming: boolean;
-  isCompacting: boolean;
-  sessionFile: string;
-  sessionId: string;
-  sessionName: string;
-  autoCompactionEnabled: boolean;
-  messageCount: number;
-  pendingMessageCount: number;
-  steeringMode: string;
-  followUpMode: string;
-}
-
 export interface Settings {
   version: number;
   theme: Theme;
-  sidebarWidth: number;
-  rightWidth: number;
   lastWorkspace?: string;
   recents: Recent[];
   trust: Record<string, TrustDecision>;
@@ -298,11 +278,9 @@ export interface Settings {
   piPath?: string;
   showWidgets: boolean;
   notifications: boolean;
-  reduceMotion: boolean;
   codeFontSize: number;
   uiFontSize: number;
   sendOnEnter: boolean;
-  checkUpdates: boolean;
   language: string;
 }
 
@@ -347,7 +325,6 @@ export interface Summary {
   cwd: string;
   createdAt: string;
   updatedAt: string;
-  messageCount: number;
 }
 
 export type Theme = string;
@@ -426,8 +403,6 @@ export const Desktop = {
   openExternal: bind<[string], void>("Desktop.OpenExternal", (raw: string) => [raw]),
   /** OpenProject validates and records a workspace. */
   openProject: bind<[string], Workspace>("Desktop.OpenProject", (path: string) => [path]),
-  /** Ping is a typed round-trip used by the frontend bootstrap check. */
-  ping: bind<[], string>("Desktop.Ping", () => []),
   /** RemoveRecent forgets a workspace without deleting any files. */
   removeRecent: bind<[string], void>("Desktop.RemoveRecent", (path: string) => [path]),
   /**
@@ -435,8 +410,6 @@ export const Desktop = {
    * it as a command.
    */
   reveal: bind<[string], void>("Desktop.Reveal", (path: string) => [path]),
-  /** SaveLayout persists sidebar/panel widths. */
-  saveLayout: bind<[number, number], void>("Desktop.SaveLayout", (sidebar: number, right: number) => [sidebar, right]),
   /** SetPiPath stores an explicit executable and rechecks it. */
   setPiPath: bind<[string], PiStatus>("Desktop.SetPiPath", (path: string) => [path]),
   /** SetPreferences applies non-nil preference fields. */
@@ -448,8 +421,6 @@ export const Desktop = {
    * trust store is never written.
    */
   setTrust: bind<[string, string], Info>("Desktop.SetTrust", (workspace: string, decision: string) => [workspace, decision]),
-  /** Status returns the current pi status without starting a check. */
-  status: bind<[], PiStatus>("Desktop.Status", () => []),
   /** WorkspaceTrust reports whether project-local pi resources may load. */
   workspaceTrust: bind<[string], Info>("Desktop.WorkspaceTrust", (workspace: string) => [workspace]),
 } as const;
@@ -476,14 +447,8 @@ export const Agent = {
   getCommands: bind<[string], unknown>("Agent.GetCommands", (id: string) => [id]),
   /** GetEntries returns the append-only entries and the active leaf. */
   getEntries: bind<[string], unknown>("Agent.GetEntries", (id: string) => [id]),
-  /** GetForkMessages returns the user messages available for forking. */
-  getForkMessages: bind<[string], unknown>("Agent.GetForkMessages", (id: string) => [id]),
-  /** GetMessages returns pi's authoritative conversation. */
-  getMessages: bind<[string], unknown[]>("Agent.GetMessages", (id: string) => [id]),
   /** GetModels returns the models pi can currently use. */
   getModels: bind<[string], Model[]>("Agent.GetModels", (id: string) => [id]),
-  /** GetState refreshes and returns state. */
-  getState: bind<[string], SessionState>("Agent.GetState", (id: string) => [id]),
   /** GetStats returns token, cost, and context usage. */
   getStats: bind<[string], unknown>("Agent.GetStats", (id: string) => [id]),
   /** GetThinkingLevels returns the levels the current model supports. */
@@ -492,8 +457,6 @@ export const Agent = {
   getTree: bind<[string], unknown>("Agent.GetTree", (id: string) => [id]),
   /** Info returns one session. */
   info: bind<[string], SessionInfo>("Agent.Info", (id: string) => [id]),
-  /** List returns live sessions, newest first. */
-  list: bind<[], SessionInfo[]>("Agent.List", () => []),
   /** NavigateTree moves the active leaf through the bridge extension. */
   navigateTree: bind<[string, string, boolean], void>("Agent.NavigateTree", (id: string, entryID: string, summarize: boolean) => [id, entryID, summarize]),
   /** Prompt sends a message and returns pi's disposition. */

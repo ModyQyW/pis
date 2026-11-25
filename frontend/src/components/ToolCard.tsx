@@ -50,7 +50,7 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
-            <span className="text-[11.5px] font-medium">{labelFor(tool.name)}</span>
+            <span className="text-[11.5px] font-medium">{t(labelFor(tool.name))}</span>
             {target ? (
               <span className="truncate font-mono text-[10.5px] text-subtle">{target}</span>
             ) : null}
@@ -78,7 +78,7 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
         <div className="border-t border-border/70 px-2.5 py-2">
           {diff ? <DiffView diff={diff} /> : null}
           {!diff && output ? (
-            <pre className="max-h-[420px] overflow-auto scroll-thin whitespace-pre-wrap break-words rounded-md border border-border bg-canvas px-2.5 py-2 font-mono text-[10.5px] leading-[1.55] text-subtle">
+            <pre className="max-h-[420px] overflow-auto scroll-thin whitespace-pre-wrap break-words rounded-md border border-border bg-canvas px-2.5 py-2 font-mono code-text-dense leading-[1.55] text-subtle">
               {output}
             </pre>
           ) : null}
@@ -95,7 +95,7 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
             </div>
           ) : null}
           {!output && !diff && !result?.images.length && Object.keys(tool.args).length ? (
-            <pre className="max-h-[260px] overflow-auto scroll-thin whitespace-pre-wrap rounded-md border border-border bg-canvas px-2.5 py-2 font-mono text-[10.5px] leading-[1.55] text-subtle">
+            <pre className="max-h-[260px] overflow-auto scroll-thin whitespace-pre-wrap rounded-md border border-border bg-canvas px-2.5 py-2 font-mono code-text-dense leading-[1.55] text-subtle">
               {JSON.stringify(tool.args, null, 2)}
             </pre>
           ) : null}

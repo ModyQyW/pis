@@ -18,7 +18,7 @@ export function DiffView({ diff, className }: { diff: string; className?: string
   return (
     <div
       className={cn(
-        "overflow-x-auto rounded-md border border-border bg-canvas font-mono text-[11px] leading-[1.55]",
+        "overflow-x-auto rounded-md border border-border bg-canvas font-mono code-text-dense leading-[1.55]",
         className,
       )}
     >
