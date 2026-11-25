@@ -24,11 +24,12 @@ jobs:
           cache: true
       - name: Check Go formatting
         run: test -z "$(gofmt -l $(git ls-files '*.go'))"
-      - name: Go packages
-        run: echo "PKGS=$(go list ./... | grep -v /node_modules/)" >> "$GITHUB_ENV"
-      - run: go build $PKGS
-      - run: go vet $PKGS
-      - run: go test $PKGS
+      - name: Go build, vet, and test
+        run: |
+          packages=$(go list ./... | grep -v /node_modules/)
+          go build $packages
+          go vet $packages
+          go test $packages
 
   cross-build:
     runs-on: ubuntu-latest
