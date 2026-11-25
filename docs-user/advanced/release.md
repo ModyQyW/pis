@@ -10,11 +10,13 @@
 
 ## 1. 发布前准备
 
-发布内容仍由维护者决定。提交代码改动后，补齐两项：
+提交代码改动并保持工作区干净。脚本会自动把上一个 `v*` tag 到 `HEAD` 的提交
+整理成目标版本的 CHANGELOG 小节，过滤掉脚本自己的 `Prepare <version> release`
+和 `Record <version> publication` 提交，并据此生成
+`release-notes/<version>.md`（带 compare 链接）。
 
-- `CHANGELOG.md` 包含目标版本的小节。
-- `release-notes/<version>.md` 包含用户可读的发布说明。文件缺失时，
-  脚本会从 `CHANGELOG.md` 生成一份并补上 compare 链接。
+如果目标版本的 CHANGELOG 小节或 release notes 已经手写，脚本会保留手写内容。
+脚本会打印生成的 CHANGELOG 小节，提交前可以核对。
 
 脚本会自行执行 `bun install --frozen-lockfile` 和 `bun run check`。
 `check` 覆盖 Go build、vet、test、Vite+ 格式、lint、类型检查、bridge
@@ -25,22 +27,28 @@
 在干净、已推送的 `main` 上执行：
 
 ```sh
-./scripts/release.sh 0.0.5
+./scripts/release.sh
 ```
 
-或非交互地指定版本：
+脚本会打印最近的 tag、建议的下一个 patch 版本，并等待输入：
+
+```text
+release: latest tag v0.0.5; suggested next version 0.0.6
+Version [0.0.6] (Enter accepts, or type another version):
+```
+
+直接回车使用建议值，也可以输入其他版本。非交互环境显式指定版本：
 
 ```sh
-PIS_VERSION=0.0.5 ./scripts/release.sh
+PIS_VERSION=0.0.6 ./scripts/release.sh
 ```
 
-不传版本时，脚本从最近的 `v*` tag 推导下一个 patch 版本，并在终端提示确认。
 脚本按顺序完成：
 
 1. 校验 `main`、干净工作区、`gh` 登录状态，并快进到 `origin/main`。
-2. 校验 `CHANGELOG.md` 的目标版本小节；缺少 release notes 时从 CHANGELOG 生成。
-3. 把 `mygo.config.ts` 的默认版本改为目标版本。
-4. 安装依赖并运行完整的 `bun run check`。
+2. 安装依赖并运行完整的 `bun run check`。
+3. 生成 `CHANGELOG.md` 的目标版本小节；缺少 release notes 时从 CHANGELOG 生成。
+4. 把 `mygo.config.ts` 的默认版本改为目标版本。
 5. 提交 `Prepare <version> release`，推送 `main`，创建并推送 `v<version>` tag。
 6. 等待 Release workflow 完成；最近一次运行失败时先 `gh run rerun --failed`；没有运行时用 `gh workflow run` 触发。
 7. 校验 draft 中的六个平台产物、`SHA256SUMS`、六个 updater manifest，以及 `SHA256SUMS` 是否覆盖全部资产。

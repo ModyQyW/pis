@@ -1,8 +1,9 @@
 #!/bin/sh
 # Publish a release end to end, or build installers locally.
 #
-# publish (default): bump the default version, verify the release notes,
-# run the full check, commit, tag, push, wait for the Release workflow,
+# publish (default): suggest the next version (or take one), run the full
+# check, generate the CHANGELOG section and release notes from the commits
+# since the last tag, commit, tag, push, wait for the Release workflow,
 # verify the draft assets, and publish the release. PIS_VERSION skips the
 # prompt; without a terminal it is required.
 #
@@ -18,9 +19,10 @@ usage() {
 Usage: scripts/release.sh [publish] [version]
        scripts/release.sh build [mygo build flags]
 
-publish runs the whole release: version, checks, commit, tag, push, the
-Release workflow, draft verification, and publication. Set PIS_VERSION to
-skip the prompt and pass a version as the first argument in a terminal.
+publish runs the whole release: version, checks, generated CHANGELOG,
+commit, tag, push, the Release workflow, draft verification, and
+publication. Set PIS_VERSION to skip the prompt, or pass a version as the
+first argument.
 build runs `go tool mygo build` with the remaining flags, as the Release
 workflow does.
 EOF
@@ -31,8 +33,12 @@ fail() {
   exit 1
 }
 
+latest_tag() {
+  git tag --list 'v[0-9]*' --sort=-v:refname | sed -n '1p'
+}
+
 suggest_version() {
-  latest=$(git tag --list 'v[0-9]*' --sort=-v:refname | sed -n '1p')
+  latest=$(latest_tag)
   if [ -n "$latest" ]; then
     core=${latest#v}
     core=${core%%-*}
@@ -51,10 +57,16 @@ suggest_version() {
 }
 
 resolve_version() {
+  suggested=$(suggest_version)
   if [ -z "${PIS_VERSION:-}" ]; then
-    suggested=$(suggest_version)
     if [ -t 0 ]; then
-      printf 'Release version [%s]: ' "$suggested"
+      latest=$(latest_tag)
+      if [ -n "$latest" ]; then
+        printf 'release: latest tag %s; suggested next version %s\n' "$latest" "$suggested"
+      else
+        printf 'release: suggested version %s\n' "$suggested"
+      fi
+      printf 'Version [%s] (Enter accepts, or type another version): ' "$suggested"
       IFS= read -r entered || entered=""
       PIS_VERSION=${entered:-$suggested}
     else
@@ -64,6 +76,9 @@ resolve_version() {
   PIS_VERSION=${PIS_VERSION#v}
   if ! printf '%s\n' "$PIS_VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$'; then
     fail "version must look like 0.0.1 (got '$PIS_VERSION')"
+  fi
+  if [ "$mode" = "publish" ]; then
+    echo "release: version $PIS_VERSION (suggested $suggested)"
   fi
   export PIS_VERSION
 }
@@ -107,11 +122,15 @@ need() {
 
 release_notes_from_changelog() {
   notes=$1
+  mkdir -p release-notes
   awk -v v="$PIS_VERSION" '
     $0 ~ "^## " v "([ (]|$)" { inside = 1; next }
     inside && /^## / { exit }
     inside { print }
-  ' CHANGELOG.md | sed '/./,$!d' >"$notes"
+  ' CHANGELOG.md | awk '
+    NF { started = 1; while (blanks > 0) { print ""; blanks-- } print; next }
+    started { blanks++ }
+  ' >"$notes"
   if [ ! -s "$notes" ]; then
     rm -f "$notes"
     fail "CHANGELOG.md has no $PIS_VERSION section and release-notes/$PIS_VERSION.md is missing"
@@ -121,6 +140,45 @@ release_notes_from_changelog() {
     printf '\nFull Changelog: https://github.com/%s/compare/%s...v%s\n' "$repo" "$previous" "$PIS_VERSION" >>"$notes"
   fi
   echo "release: generated release-notes/$PIS_VERSION.md from CHANGELOG.md"
+}
+
+generate_changelog() {
+  if grep -Eq "^## ${PIS_VERSION}([ (]|$)" CHANGELOG.md; then
+    echo "release: CHANGELOG.md already has a $PIS_VERSION section"
+    return
+  fi
+  [ "$(sed -n '1p' CHANGELOG.md)" = "# Changelog" ] ||
+    fail "CHANGELOG.md must start with '# Changelog'"
+
+  previous=$(latest_tag)
+  if [ -n "$previous" ]; then
+    range="$previous..HEAD"
+  else
+    range="HEAD"
+  fi
+  entries=$(git log --no-merges --reverse --pretty=format:'- %s' "$range" |
+    grep -Ev '^- (Prepare|Record) [0-9]+\.[0-9]+\.[0-9]+ (release|publication)$' |
+    awk '!seen[$0]++' || true)
+  [ -n "$entries" ] || fail "no commits to describe since ${previous:-the first commit}"
+
+  section=$(mktemp)
+  {
+    printf '## %s (%s)\n\n' "$PIS_VERSION" "$(date +%F)"
+    printf '%s\n\n' "$entries"
+  } >"$section"
+
+  tmp=$(mktemp)
+  {
+    sed -n '1p' CHANGELOG.md
+    printf '\n'
+    cat "$section"
+    sed -n '2,$p' CHANGELOG.md | sed '/./,$!d'
+  } >"$tmp"
+  mv "$tmp" CHANGELOG.md
+
+  echo "release: generated the $PIS_VERSION section in CHANGELOG.md from $range:"
+  cat "$section"
+  rm -f "$section"
 }
 
 wait_for_run() {
@@ -203,10 +261,8 @@ publish_release() {
     fi
   fi
 
-  resolve_version
   tag=v$PIS_VERSION
   notes=release-notes/$PIS_VERSION.md
-
   resume=0
   if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
     [ "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)" ] ||
@@ -216,8 +272,12 @@ publish_release() {
   fi
 
   if [ "$resume" -eq 0 ]; then
-    grep -Eq "^## ${PIS_VERSION}([ (]|$)" CHANGELOG.md ||
-      fail "CHANGELOG.md has no $PIS_VERSION section"
+    echo "release: installing dependencies"
+    bun install --frozen-lockfile
+    echo "release: running the full check"
+    bun run check
+
+    generate_changelog
     [ -f "$notes" ] || release_notes_from_changelog "$notes"
 
     tmp=$(mktemp)
@@ -225,11 +285,6 @@ publish_release() {
     mv "$tmp" mygo.config.ts
     grep -q "PIS_VERSION ?? \"$PIS_VERSION\"" mygo.config.ts ||
       fail "could not set the default version in mygo.config.ts"
-
-    echo "release: installing dependencies"
-    bun install --frozen-lockfile
-    echo "release: running the full check"
-    bun run check
 
     git add CHANGELOG.md mygo.config.ts release-notes
     if ! git diff --cached --quiet; then
