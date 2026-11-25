@@ -2,6 +2,19 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.6 (2026-11-25)
+
+- Add English and Chinese UI strings across the shell, dialogs, composer, and settings.
+- Add a bilingual user guide and developer docs; remove the development archive.
+- Add a Chinese README and CHANGELOG, and make the CHANGELOG the only GitHub release record.
+- Keep project trust aligned with pi by checking ancestor `.agents/skills` resources.
+- Reject symlinked file reads that escape the workspace.
+- Filter subagent sessions from the session list, cache sidebar summaries, and cap search reads.
+- Bound pi JSONL records, propagate fork/clone cancellation, preserve unknown MCP fields, and reject duplicate servers.
+- Restore rejected drafts, dismiss expired extension dialogs, and confirm forced worktree removal.
+- Build, vet, and test only module Go packages; npm packages can ship Go code.
+- Serialize release uploads, verify SHA256SUMS coverage, and require the Chinese CHANGELOG section before publishing.
+
 ## 0.0.5 (2026-11-24)
 
 - Add a manual `Check for updates…` button to Settings. The Help menu item and
