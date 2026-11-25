@@ -12,7 +12,7 @@
     "docs:dev": "rspress dev",
     "docs:build": "rspress build",
     "docs:preview": "rspress preview",
-    "format": "go fmt ./... && vp fmt",
+    "format": "go fmt $(go list ./... | grep -v /node_modules/) && vp fmt",
     "generate": "go tool mygo generate",
     "prepare": "vp config --no-agent",
     "test": "vitest run --config frontend/vitest.config.ts",

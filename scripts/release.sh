@@ -2,10 +2,10 @@
 # Publish a release end to end, or build installers locally.
 #
 # publish (default): suggest the next version (or take one), run the full
-# check, generate the CHANGELOG section and release notes from the commits
-# since the last tag, commit, tag, push, wait for the Release workflow,
-# verify the draft assets, and publish the release. PIS_VERSION skips the
-# prompt; without a terminal it is required.
+# check, generate the CHANGELOG section from the commits since the last tag,
+# commit, tag, push, wait for the Release workflow, verify the draft assets,
+# and publish the release with that CHANGELOG section as the notes.
+# PIS_VERSION skips the prompt; without a terminal it is required.
 #
 # build: run `go tool mygo build` with the remaining flags. The release
 # workflow uses this mode; signing, notarization, and update archives stay
@@ -120,9 +120,8 @@ need() {
   command -v "$1" >/dev/null 2>&1 || fail "$1 is required"
 }
 
-release_notes_from_changelog() {
+changelog_section() {
   notes=$1
-  mkdir -p release-notes
   awk -v v="$PIS_VERSION" '
     $0 ~ "^## " v "([ (]|$)" { inside = 1; next }
     inside && /^## / { exit }
@@ -131,15 +130,16 @@ release_notes_from_changelog() {
     NF { started = 1; while (blanks > 0) { print ""; blanks-- } print; next }
     started { blanks++ }
   ' >"$notes"
-  if [ ! -s "$notes" ]; then
-    rm -f "$notes"
-    fail "CHANGELOG.md has no $PIS_VERSION section and release-notes/$PIS_VERSION.md is missing"
-  fi
-  previous=$(git tag --list 'v*' --sort=-v:refname | sed -n '1p')
+  [ -s "$notes" ] || fail "CHANGELOG.md has no $PIS_VERSION section"
+  previous=$(git tag --list 'v*' --sort=-v:refname | grep -vx "v$PIS_VERSION" | sed -n '1p')
   if [ -n "$previous" ]; then
     printf '\nFull Changelog: https://github.com/%s/compare/%s...v%s\n' "$repo" "$previous" "$PIS_VERSION" >>"$notes"
   fi
-  echo "release: generated release-notes/$PIS_VERSION.md from CHANGELOG.md"
+}
+
+check_changelog_translation() {
+  grep -Eq "^## ${PIS_VERSION}([ (（]|$)" CHANGELOG.zh.md ||
+    fail "CHANGELOG.zh.md has no $PIS_VERSION section; add the Chinese section before release"
 }
 
 generate_changelog() {
@@ -250,7 +250,8 @@ publish_release() {
   repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
   branch=$(git rev-parse --abbrev-ref HEAD)
   [ "$branch" = "main" ] || fail "publish from main (current branch: $branch)"
-  [ -z "$(git status --porcelain)" ] || fail "working tree is dirty; commit or stash changes first"
+  unexpected=$(git status --porcelain | grep -Ev '^( M|M |MM) CHANGELOG\.zh\.md$' || true)
+  [ -z "$unexpected" ] || fail "working tree has changes outside CHANGELOG.zh.md; commit or stash them first"
 
   git fetch origin main --tags >/dev/null
   if ! git merge-base --is-ancestor origin/main HEAD; then
@@ -262,7 +263,6 @@ publish_release() {
   fi
 
   tag=v$PIS_VERSION
-  notes=release-notes/$PIS_VERSION.md
   resume=0
   if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
     [ "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)" ] ||
@@ -272,13 +272,13 @@ publish_release() {
   fi
 
   if [ "$resume" -eq 0 ]; then
+    check_changelog_translation
     echo "release: installing dependencies"
     bun install --frozen-lockfile
     echo "release: running the full check"
     bun run check
 
     generate_changelog
-    [ -f "$notes" ] || release_notes_from_changelog "$notes"
 
     tmp=$(mktemp)
     sed -E "s/(version: process\.env\.PIS_VERSION \?\? \")[0-9]+\.[0-9]+\.[0-9]+\"/\1$PIS_VERSION\"/" mygo.config.ts >"$tmp"
@@ -286,7 +286,7 @@ publish_release() {
     grep -q "PIS_VERSION ?? \"$PIS_VERSION\"" mygo.config.ts ||
       fail "could not set the default version in mygo.config.ts"
 
-    git add CHANGELOG.md mygo.config.ts release-notes
+    git add CHANGELOG.md CHANGELOG.zh.md mygo.config.ts
     if ! git diff --cached --quiet; then
       git commit -m "Prepare $PIS_VERSION release" >/dev/null
     fi
@@ -297,7 +297,7 @@ publish_release() {
     git push origin "$tag"
     echo "release: pushed $tag"
   else
-    [ -f "$notes" ] || fail "release-notes/$PIS_VERSION.md is missing"
+    check_changelog_translation
   fi
 
   if gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null | grep -qx false; then
@@ -307,6 +307,10 @@ publish_release() {
 
   wait_for_run "$tag"
   verify_assets "$tag" "$PIS_VERSION"
+
+  notes=$(mktemp)
+  trap 'rm -f "$notes"' EXIT
+  changelog_section "$notes"
 
   echo "release: publishing $tag"
   gh release edit "$tag" \

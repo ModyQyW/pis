@@ -10,12 +10,19 @@ if [ -n "$unformatted" ]; then
   exit 1
 fi
 
+# npm packages can ship Go code; it is not part of this module.
+packages=$(go list ./... | grep -v '/node_modules/' || true)
+if [ -z "$packages" ]; then
+  echo "no Go packages found"
+  exit 1
+fi
+
 echo "== go build"
-go build ./...
+go build $packages
 echo "== go vet"
-go vet ./...
+go vet $packages
 echo "== go test"
-go test ./...
+go test $packages
 echo "== vite+ format, lint, and typecheck"
 bun run check:web
 echo "== bridge tests"
