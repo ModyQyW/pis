@@ -53,8 +53,11 @@ type AddRequest struct {
 	Local       bool     `json:"local"`
 }
 
+// configFile keeps the whole document so a write preserves top-level keys
+// this app does not know about.
 type configFile struct {
-	Servers map[string]json.RawMessage `json:"mcpServers"`
+	doc     map[string]json.RawMessage
+	Servers map[string]json.RawMessage
 }
 
 type entry struct {
@@ -182,6 +185,9 @@ func Add(workspace string, req AddRequest) error {
 	if err != nil {
 		return err
 	}
+	if _, exists := cfg.Servers[name]; exists {
+		return fmt.Errorf("MCP server %q already exists", name)
+	}
 	fields := map[string]any{}
 	if strings.TrimSpace(req.URL) != "" {
 		fields["url"] = strings.TrimSpace(req.URL)
@@ -218,7 +224,7 @@ func targetPath(workspace string, local bool) (string, error) {
 }
 
 func readConfig(path string) (configFile, error) {
-	cfg := configFile{Servers: map[string]json.RawMessage{}}
+	cfg := configFile{doc: map[string]json.RawMessage{}, Servers: map[string]json.RawMessage{}}
 	data, err := os.ReadFile(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return cfg, nil
@@ -226,8 +232,16 @@ func readConfig(path string) (configFile, error) {
 	if err != nil {
 		return cfg, err
 	}
-	if err := json.Unmarshal(data, &cfg); err != nil {
+	if err := json.Unmarshal(data, &cfg.doc); err != nil {
 		return cfg, fmt.Errorf("%s: %w", path, err)
+	}
+	if cfg.doc == nil {
+		cfg.doc = map[string]json.RawMessage{}
+	}
+	if raw, ok := cfg.doc["mcpServers"]; ok {
+		if err := json.Unmarshal(raw, &cfg.Servers); err != nil {
+			return cfg, fmt.Errorf("%s: %w", path, err)
+		}
 	}
 	if cfg.Servers == nil {
 		cfg.Servers = map[string]json.RawMessage{}
@@ -239,7 +253,15 @@ func writeConfig(path string, cfg configFile) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
-	data, err := json.MarshalIndent(cfg, "", "  ")
+	servers, err := json.Marshal(cfg.Servers)
+	if err != nil {
+		return err
+	}
+	if cfg.doc == nil {
+		cfg.doc = map[string]json.RawMessage{}
+	}
+	cfg.doc["mcpServers"] = servers
+	data, err := json.MarshalIndent(cfg.doc, "", "  ")
 	if err != nil {
 		return err
 	}

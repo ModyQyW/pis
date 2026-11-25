@@ -85,20 +85,61 @@ func startProcess(opts processOptions) (*process, error) {
 }
 
 func (p *process) readStdout(r io.Reader) {
+	readRecords(r, maxRecordBytes, func(line []byte) {
+		p.dispatch(line)
+	}, func() {
+		if p.opts.onRecord != nil {
+			p.opts.onRecord([]byte(`{"type":"error","error":"pi record exceeded limit"}`))
+		}
+	})
+}
+
+// readRecords emits newline-terminated lines up to max payload bytes. A line
+// over the limit is skipped without being buffered in full, so a huge record
+// cannot grow memory before it is rejected. A final line without a newline is
+// emitted at EOF.
+func readRecords(r io.Reader, max int, emit func([]byte), tooLong func()) {
 	reader := bufio.NewReaderSize(r, 64*1024)
+	var line []byte
+	skip := false
+	flush := func() {
+		if skip {
+			if tooLong != nil {
+				tooLong()
+			}
+		} else if trimmed := trimLine(line); len(trimmed) > 0 && emit != nil {
+			emit(trimmed)
+		}
+		line = nil
+		skip = false
+	}
 	for {
-		line, err := reader.ReadBytes('\n')
-		if len(line) > 0 {
-			line = trimLine(line)
-			if len(line) > 0 {
-				if len(line) > maxRecordBytes {
-					p.opts.onRecord([]byte(`{"type":"error","error":"pi record exceeded limit"}`))
+		chunk, err := reader.ReadSlice('\n')
+		if len(chunk) > 0 {
+			ends := chunk[len(chunk)-1] == '\n'
+			payload := len(chunk)
+			if ends {
+				payload--
+			}
+			if !skip {
+				if len(line)+payload > max {
+					skip = true
+					line = nil
 				} else {
-					p.dispatch(line)
+					line = append(line, chunk...)
 				}
 			}
+			if ends {
+				flush()
+			}
+		}
+		if err == bufio.ErrBufferFull {
+			continue
 		}
 		if err != nil {
+			if len(line) > 0 || skip {
+				flush()
+			}
 			return
 		}
 	}

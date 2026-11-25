@@ -10,7 +10,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -366,46 +365,6 @@ func (m *Manager) RunningCount() int {
 	return n
 }
 
-// List returns live sessions, newest first.
-func (m *Manager) List() []SessionInfo {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	out := make([]SessionInfo, 0, len(m.sessions))
-	for _, s := range m.sessions {
-		out = append(out, s.info)
-	}
-	sort.SliceStable(out, func(i, j int) bool { return out[i].StartedAt.After(out[j].StartedAt) })
-	return out
-}
-
-// GetState refreshes and returns state.
-func (m *Manager) GetState(ctx context.Context, id string) (SessionState, error) {
-	state, err := m.fetchState(ctx, id, 15*time.Second)
-	if err == nil {
-		m.applyState(id, state)
-	}
-	return state, err
-}
-
-// GetMessages returns pi's authoritative conversation.
-func (m *Manager) GetMessages(ctx context.Context, id string) ([]RawJSON, error) {
-	resp, err := m.call(ctx, id, map[string]any{"type": "get_messages"}, 30*time.Second)
-	if err != nil {
-		return nil, err
-	}
-	var data struct {
-		Messages []json.RawMessage `json:"messages"`
-	}
-	if err := json.Unmarshal(resp.Data, &data); err != nil {
-		return nil, err
-	}
-	out := make([]RawJSON, len(data.Messages))
-	for i, msg := range data.Messages {
-		out[i] = RawJSON(msg)
-	}
-	return out, nil
-}
-
 // GetCommands returns pi's extension commands, prompt templates, and skills.
 func (m *Manager) GetCommands(ctx context.Context, id string) (RawJSON, error) {
 	resp, err := m.call(ctx, id, map[string]any{"type": "get_commands"}, 20*time.Second)
@@ -442,32 +401,39 @@ func (m *Manager) GetEntries(ctx context.Context, id string) (RawJSON, error) {
 	return RawJSON(resp.Data), nil
 }
 
-// GetForkMessages returns the user messages available for forking.
-func (m *Manager) GetForkMessages(ctx context.Context, id string) (RawJSON, error) {
-	resp, err := m.call(ctx, id, map[string]any{"type": "get_fork_messages"}, 20*time.Second)
-	if err != nil {
-		return nil, err
-	}
-	return RawJSON(resp.Data), nil
-}
-
 // Fork creates a new independent session from an earlier user message.
 func (m *Manager) Fork(ctx context.Context, id, entryID string) (SessionInfo, error) {
 	if entryID == "" {
 		return SessionInfo{}, errors.New("empty entry id")
 	}
-	if _, err := m.call(ctx, id, map[string]any{"type": "fork", "entryId": entryID}, 60*time.Second); err != nil {
+	resp, err := m.call(ctx, id, map[string]any{"type": "fork", "entryId": entryID}, 60*time.Second)
+	if err != nil {
 		return SessionInfo{}, err
+	}
+	if cancelled(resp) {
+		return SessionInfo{}, errors.New("the fork was cancelled by an extension")
 	}
 	return m.refreshInfo(ctx, id)
 }
 
 // Clone duplicates the active branch into a new session.
 func (m *Manager) Clone(ctx context.Context, id string) (SessionInfo, error) {
-	if _, err := m.call(ctx, id, map[string]any{"type": "clone"}, 60*time.Second); err != nil {
+	resp, err := m.call(ctx, id, map[string]any{"type": "clone"}, 60*time.Second)
+	if err != nil {
 		return SessionInfo{}, err
 	}
+	if cancelled(resp) {
+		return SessionInfo{}, errors.New("the clone was cancelled by an extension")
+	}
 	return m.refreshInfo(ctx, id)
+}
+
+// cancelled reports pi's "an extension stopped this" result for fork/clone.
+func cancelled(resp Response) bool {
+	var data struct {
+		Cancelled bool `json:"cancelled"`
+	}
+	return json.Unmarshal(resp.Data, &data) == nil && data.Cancelled
 }
 
 // NavigateTree moves the active leaf through the bridge extension.

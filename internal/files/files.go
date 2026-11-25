@@ -277,6 +277,10 @@ func (s *Service) Read(workspace, rel string, maxBytes int) (FileView, error) {
 	if err != nil {
 		return FileView{}, err
 	}
+	root := abs
+	if resolved, err := filepath.EvalSymlinks(abs); err == nil {
+		root = resolved
+	}
 	if rel == "" || filepath.IsAbs(rel) {
 		return FileView{}, errors.New("invalid path")
 	}
@@ -284,7 +288,13 @@ func (s *Service) Read(workspace, rel string, maxBytes int) (FileView, error) {
 	if clean == ".." || strings.HasPrefix(clean, ".."+string(filepath.Separator)) {
 		return FileView{}, errors.New("path escapes the workspace")
 	}
-	full := filepath.Join(abs, clean)
+	full, err := filepath.EvalSymlinks(filepath.Join(abs, clean))
+	if err != nil {
+		return FileView{}, errors.New("file not found")
+	}
+	if !within(root, full) {
+		return FileView{}, errors.New("path escapes the workspace")
+	}
 	info, err := os.Stat(full)
 	if err != nil || info.IsDir() {
 		return FileView{}, errors.New("file not found")
@@ -310,4 +320,13 @@ func (s *Service) Read(workspace, rel string, maxBytes int) (FileView, error) {
 	}
 	view.Text = string(data)
 	return view, nil
+}
+
+// within reports whether target is root or below it. Both must be resolved.
+func within(root, target string) bool {
+	rel, err := filepath.Rel(root, target)
+	if err != nil {
+		return false
+	}
+	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)))
 }

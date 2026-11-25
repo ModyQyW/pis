@@ -64,6 +64,39 @@ func TestStatusAndDiffRealRepo(t *testing.T) {
 	}
 }
 
+func TestStatusReportsRenamedFileStats(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	dir := t.TempDir()
+	git(t, dir, "init", "-q")
+	if err := os.WriteFile(filepath.Join(dir, "old.txt"), []byte("one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	git(t, dir, "add", "old.txt")
+	git(t, dir, "commit", "-qm", "init")
+	git(t, dir, "mv", "old.txt", "new.txt")
+	if err := os.WriteFile(filepath.Join(dir, "new.txt"), []byte("one\ntwo\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	status, err := New().Status(context.Background(), dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var renamed *File
+	for i := range status.Files {
+		if status.Files[i].Path == "new.txt" {
+			renamed = &status.Files[i]
+		}
+	}
+	if renamed == nil || renamed.Status != "R" || renamed.OldPath != "old.txt" {
+		t.Fatalf("files = %#v", status.Files)
+	}
+	if renamed.Additions != 1 {
+		t.Fatalf("rename additions = %d, want 1 (files: %#v)", renamed.Additions, status.Files)
+	}
+}
+
 func TestWorktreeLifecycle(t *testing.T) {
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git not installed")
@@ -109,6 +142,33 @@ func TestWorktreeLifecycle(t *testing.T) {
 	}
 	if len(list) != 1 {
 		t.Fatalf("after remove = %#v", list)
+	}
+}
+
+func TestRemoveWorktreeRefusesUncommittedChanges(t *testing.T) {
+	if _, err := exec.LookPath("git"); err != nil {
+		t.Skip("git not installed")
+	}
+	dir := t.TempDir()
+	git(t, dir, "init", "-q", "-b", "main")
+	if err := os.WriteFile(filepath.Join(dir, "a.txt"), []byte("one\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	git(t, dir, "add", "a.txt")
+	git(t, dir, "commit", "-qm", "init")
+
+	linked := filepath.Join(t.TempDir(), "dirty")
+	if err := New().AddWorktree(context.Background(), dir, linked, "dirty", true); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(linked, "a.txt"), []byte("changed\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := New().RemoveWorktree(context.Background(), dir, linked, false); err == nil {
+		t.Fatal("removing a dirty worktree without force must fail")
+	}
+	if err := New().RemoveWorktree(context.Background(), dir, linked, true); err != nil {
+		t.Fatal(err)
 	}
 }
 

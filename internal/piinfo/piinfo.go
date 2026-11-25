@@ -4,7 +4,6 @@ package piinfo
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -191,6 +190,3 @@ func check(ctx context.Context, path, source string) (Status, error) {
 	st.Compatible = true
 	return st, nil
 }
-
-// ErrNotFound is returned by helpers that require pi.
-var ErrNotFound = errors.New("pi was not found")

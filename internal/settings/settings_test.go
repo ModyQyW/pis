@@ -43,7 +43,7 @@ func TestUpdateRoundTripAndValidation(t *testing.T) {
 	}
 	if err := store.Update(func(c *Settings) error {
 		c.Theme = ThemeDark
-		c.SidebarWidth = 999
+		c.CodeFontSize = 999
 		c.Permissions.Policy = PolicyAsk
 		return nil
 	}); err != nil {
@@ -57,8 +57,26 @@ func TestUpdateRoundTripAndValidation(t *testing.T) {
 	if cfg.Theme != ThemeDark || cfg.Permissions.Policy != PolicyAsk {
 		t.Fatalf("round trip lost values: %+v", cfg)
 	}
-	if cfg.SidebarWidth < 220 {
-		t.Fatalf("merge should clamp width, got %d", cfg.SidebarWidth)
+	if cfg.CodeFontSize < 10 || cfg.CodeFontSize > 22 {
+		t.Fatalf("merge should clamp code font size, got %d", cfg.CodeFontSize)
+	}
+}
+
+func TestSendOnEnterDefaultsForOldFile(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte(`{"version":1,"theme":"dark"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	store, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := store.Snapshot()
+	if !cfg.SendOnEnter {
+		t.Fatal("a version 1 file must keep Enter as the send key")
+	}
+	if cfg.Version != Version {
+		t.Fatalf("version = %d, want %d", cfg.Version, Version)
 	}
 }
 

@@ -20,6 +20,3 @@ func (r *RawJSON) UnmarshalJSON(b []byte) error {
 	*r = append((*r)[:0], b...)
 	return nil
 }
-
-// IsZero helps omit empty raw values.
-func (r RawJSON) IsZero() bool { return len(r) == 0 }

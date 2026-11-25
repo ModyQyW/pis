@@ -76,22 +76,48 @@ func Inspect(workspace, agentDir string, app map[string]settings.TrustDecision) 
 }
 
 func resources(dir string) []string {
+	home, _ := os.UserHomeDir()
+	userSkills := ""
+	if home != "" {
+		userSkills = filepath.Clean(filepath.Join(home, ".agents", "skills"))
+	}
 	var out []string
 	for _, rel := range resourcePaths {
 		path := filepath.Join(dir, rel)
-		if info, err := os.Stat(path); err == nil {
-			if info.IsDir() {
-				// An empty extension/skills directory does not need trust.
-				entries, err := os.ReadDir(path)
-				if err == nil && len(entries) == 0 {
-					continue
-				}
-			}
+		if rel == ".agents/skills" && filepath.Clean(path) == userSkills {
+			continue
+		}
+		if present(path) {
 			out = append(out, rel)
+		}
+	}
+	// pi also gates .agents/skills from any ancestor directory.
+	for current := filepath.Dir(dir); ; current = filepath.Dir(current) {
+		skills := filepath.Clean(filepath.Join(current, ".agents", "skills"))
+		if skills != userSkills && present(skills) {
+			out = append(out, skills)
+		}
+		parent := filepath.Dir(current)
+		if parent == current {
+			break
 		}
 	}
 	sort.Strings(out)
 	return out
+}
+
+// present reports a resource that would actually load. An empty directory
+// has nothing for pi to load, so it does not need a decision.
+func present(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	if !info.IsDir() {
+		return true
+	}
+	entries, err := os.ReadDir(path)
+	return err == nil && len(entries) > 0
 }
 
 func piDecision(workspace, trustFile string) (bool, bool) {

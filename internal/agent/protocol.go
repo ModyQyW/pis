@@ -63,9 +63,6 @@ type SessionState struct {
 	SessionName    string `json:"sessionName"`
 	AutoCompaction bool   `json:"autoCompactionEnabled"`
 	MessageCount   int    `json:"messageCount"`
-	PendingCount   int    `json:"pendingMessageCount"`
-	SteeringMode   string `json:"steeringMode"`
-	FollowUpMode   string `json:"followUpMode"`
 }
 
 // SessionInfo is the app's view of one live pi process.

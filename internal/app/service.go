@@ -148,12 +148,6 @@ func (s *Service) refreshGuardPolicy() {
 	s.agent.SetGuardPolicy(EffectiveGuardPolicy(cfg, guard.Detected(sessions.AgentDir())))
 }
 
-// Ping is a typed round-trip used by the frontend bootstrap check.
-func (s *Service) Ping() string { return "pong" }
-
-// Status returns the current pi status without starting a check.
-func (s *Service) Status() PiStatus { return s.piStatus() }
-
 // Checks the executable again, synchronously, with the configured path.
 func (s *Service) CheckPi() PiStatus {
 	s.startPiDiscovery()
@@ -284,24 +278,10 @@ func ApplyTheme(t settings.Theme) {
 	}
 }
 
-// SaveLayout persists sidebar/panel widths.
-func (s *Service) SaveLayout(sidebar, right int) error {
-	return s.store.Update(func(c *settings.Settings) error {
-		if sidebar >= 220 && sidebar <= 480 {
-			c.SidebarWidth = sidebar
-		}
-		if right >= 280 && right <= 720 {
-			c.RightWidth = right
-		}
-		return nil
-	})
-}
-
 // SetPreferences persists small UI preferences in one call.
 type Preferences struct {
 	ShowWidgets   *bool   `json:"showWidgets,omitempty"`
 	Notifications *bool   `json:"notifications,omitempty"`
-	ReduceMotion  *bool   `json:"reduceMotion,omitempty"`
 	CodeFontSize  *int    `json:"codeFontSize,omitempty"`
 	UIFontSize    *int    `json:"uiFontSize,omitempty"`
 	SendOnEnter   *bool   `json:"sendOnEnter,omitempty"`
@@ -319,9 +299,6 @@ func (s *Service) SetPreferences(p Preferences) error {
 		}
 		if p.Notifications != nil {
 			c.Notifications = *p.Notifications
-		}
-		if p.ReduceMotion != nil {
-			c.ReduceMotion = *p.ReduceMotion
 		}
 		if p.CodeFontSize != nil && *p.CodeFontSize >= 10 && *p.CodeFontSize <= 22 {
 			c.CodeFontSize = *p.CodeFontSize

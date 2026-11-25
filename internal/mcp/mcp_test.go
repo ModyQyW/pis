@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
@@ -91,6 +92,57 @@ func TestLocalOverrideForUserServer(t *testing.T) {
 	}
 	if len(servers) != 1 || servers[0].Enabled || servers[0].URL != "https://example.com" {
 		t.Fatalf("override = %#v", servers)
+	}
+}
+
+func TestAddRejectsExistingServer(t *testing.T) {
+	agentDir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
+	workspace := t.TempDir()
+	write(t, filepath.Join(agentDir, "mcp.json"), `{"mcpServers":{"docs":{"url":"https://example.com","headers":{"Authorization":"secret"}}}}`)
+
+	err := Add(workspace, AddRequest{Name: "docs", Command: "npx"})
+	if err == nil {
+		t.Fatal("adding an existing server must fail")
+	}
+	servers, err := List(workspace)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(servers) != 1 || servers[0].URL != "https://example.com" {
+		t.Fatalf("existing entry was replaced: %#v", servers)
+	}
+}
+
+func TestWritePreservesUnknownTopLevelKeys(t *testing.T) {
+	agentDir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
+	workspace := t.TempDir()
+	path := filepath.Join(agentDir, "mcp.json")
+	write(t, path, `{"mcpServers":{"docs":{"url":"https://example.com"}},"custom":{"keep":true}}`)
+
+	if err := SetEnabled(workspace, "docs", false, false); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var doc map[string]json.RawMessage
+	if err := json.Unmarshal(data, &doc); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := doc["custom"]; !ok {
+		t.Fatalf("unknown top-level key was dropped: %s", data)
+	}
+	var servers map[string]struct {
+		Enabled *bool `json:"enabled"`
+	}
+	if err := json.Unmarshal(doc["mcpServers"], &servers); err != nil {
+		t.Fatal(err)
+	}
+	if servers["docs"].Enabled == nil || *servers["docs"].Enabled {
+		t.Fatalf("enabled did not persist: %s", data)
 	}
 }
 

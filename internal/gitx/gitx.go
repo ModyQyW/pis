@@ -173,9 +173,15 @@ func numstat(ctx context.Context, dir string) map[string][3]int {
 			continue
 		}
 		path := parts[2]
-		if path == "" && i+1 < len(records) {
-			path = records[i+1]
-			i++
+		if path == "" {
+			// With -z a rename is: "add\tdel\t\0old\0new\0". The new path
+			// is the one status reports, so stats must use it.
+			if i+2 < len(records) {
+				path = records[i+2]
+				i += 2
+			} else {
+				continue
+			}
 		}
 		add, del := 0, 0
 		binary := 0
@@ -224,11 +230,19 @@ func (s *Service) Diff(ctx context.Context, workspace, path string) (string, err
 	}
 	// Untracked: show the whole file as an addition.
 	full := filepath.Join(dir, path)
-	info, statErr := os.Stat(full)
+	root := dir
+	if resolved, err := filepath.EvalSymlinks(dir); err == nil {
+		root = resolved
+	}
+	resolved, err := filepath.EvalSymlinks(full)
+	if err != nil || !withinDir(root, resolved) {
+		return out, nil
+	}
+	info, statErr := os.Stat(resolved)
 	if statErr != nil || info.IsDir() || info.Size() > 2<<20 {
 		return out, nil
 	}
-	data, readErr := os.ReadFile(full)
+	data, readErr := os.ReadFile(resolved)
 	if readErr != nil || bytes.IndexByte(data, 0) >= 0 {
 		return out, nil
 	}
@@ -270,4 +284,13 @@ func safeRel(path string) bool {
 	}
 	clean := filepath.Clean(path)
 	return clean != ".." && !strings.HasPrefix(clean, ".."+string(filepath.Separator))
+}
+
+// withinDir reports whether target is root or below it. Both must be resolved.
+func withinDir(root, target string) bool {
+	rel, err := filepath.Rel(root, target)
+	if err != nil {
+		return false
+	}
+	return rel == "." || (rel != ".." && !strings.HasPrefix(rel, ".."+string(filepath.Separator)))
 }

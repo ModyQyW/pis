@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"pis/internal/jsonx"
@@ -23,15 +24,18 @@ const maxIndexBytes = 4 << 20
 // maxTranscriptBytes bounds a single display read.
 const maxTranscriptBytes = 128 << 20
 
+// maxSearchBytes bounds how much of one session a palette search reads.
+// Search is interactive, so it stops early instead of reading whole files.
+const maxSearchBytes = 2 << 20
+
 // Summary is one row in the session list.
 type Summary struct {
-	Path         string    `json:"path"`
-	ID           string    `json:"id"`
-	Title        string    `json:"title"`
-	Cwd          string    `json:"cwd"`
-	CreatedAt    time.Time `json:"createdAt"`
-	UpdatedAt    time.Time `json:"updatedAt"`
-	MessageCount int       `json:"messageCount"`
+	Path      string    `json:"path"`
+	ID        string    `json:"id"`
+	Title     string    `json:"title"`
+	Cwd       string    `json:"cwd"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // Entry is one displayable entry on the active branch.
@@ -172,7 +176,11 @@ func List(cwd string, limit int) ([]Summary, error) {
 				continue
 			}
 			seen[path] = true
-			sum, err := scanFile(path, abs, ent)
+			info, err := ent.Info()
+			if err != nil {
+				continue
+			}
+			sum, err := scanFileCached(path, abs, info)
 			if err != nil || sum.ID == "" {
 				continue
 			}
@@ -186,16 +194,12 @@ func List(cwd string, limit int) ([]Summary, error) {
 	return all, nil
 }
 
-func scanFile(path, cwd string, ent os.DirEntry) (Summary, error) {
+func scanFile(path, cwd string, info os.FileInfo) (Summary, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return Summary{}, err
 	}
 	defer f.Close()
-	info, err := ent.Info()
-	if err != nil {
-		return Summary{}, err
-	}
 	sum := Summary{Path: path, UpdatedAt: info.ModTime()}
 	reader := bufio.NewReaderSize(f, 64*1024)
 	var read int64
@@ -265,6 +269,42 @@ func scanFile(path, cwd string, ent os.DirEntry) (Summary, error) {
 	return sum, nil
 }
 
+type summaryCacheEntry struct {
+	mod  time.Time
+	size int64
+	sum  Summary
+}
+
+const summaryCacheLimit = 4096
+
+// summaryCache keeps sidebar rows across refreshes. The workspace is part of
+// the key because List filters one shared session directory by header cwd.
+var summaryCache = struct {
+	sync.Mutex
+	entries map[string]summaryCacheEntry
+}{entries: map[string]summaryCacheEntry{}}
+
+func scanFileCached(path, cwd string, info os.FileInfo) (Summary, error) {
+	key := path + "\x00" + cwd
+	summaryCache.Lock()
+	entry, ok := summaryCache.entries[key]
+	summaryCache.Unlock()
+	if ok && entry.mod.Equal(info.ModTime()) && entry.size == info.Size() {
+		return entry.sum, nil
+	}
+	sum, err := scanFile(path, cwd, info)
+	if err != nil {
+		return Summary{}, err
+	}
+	summaryCache.Lock()
+	if len(summaryCache.entries) >= summaryCacheLimit {
+		clear(summaryCache.entries)
+	}
+	summaryCache.entries[key] = summaryCacheEntry{mod: info.ModTime(), size: info.Size(), sum: sum}
+	summaryCache.Unlock()
+	return sum, nil
+}
+
 // SearchHit is one session whose active branch contains the query.
 type SearchHit struct {
 	Summary
@@ -295,7 +335,7 @@ func Search(cwd, query string, limit int) ([]SearchHit, error) {
 			}
 			continue
 		}
-		tr, err := Read(sum.Path)
+		tr, err := readAt(sum.Path, "", maxSearchBytes)
 		if err != nil {
 			continue
 		}
@@ -375,6 +415,10 @@ func Read(path string) (Transcript, error) {
 // when leafID is empty. It is used after tree navigation, which changes the
 // leaf without appending an entry.
 func ReadAt(path, leafID string) (Transcript, error) {
+	return readAt(path, leafID, maxTranscriptBytes)
+}
+
+func readAt(path, leafID string, maxBytes int64) (Transcript, error) {
 	abs, err := filepath.Abs(path)
 	if err != nil {
 		return Transcript{}, err
@@ -393,7 +437,7 @@ func ReadAt(path, leafID string) (Transcript, error) {
 	for {
 		line, err := reader.ReadBytes('\n')
 		total += int64(len(line))
-		if total > maxTranscriptBytes {
+		if total > maxBytes {
 			out.Truncated = true
 			break
 		}
@@ -603,14 +647,8 @@ func ReadSummary(path string) (Summary, error) {
 	if err != nil {
 		return Summary{}, err
 	}
-	ent := fileInfoDirEntry{info}
-	return scanFile(path, readCwd(path), ent)
+	return scanFileCached(path, readCwd(path), info)
 }
-
-type fileInfoDirEntry struct{ os.FileInfo }
-
-func (f fileInfoDirEntry) Type() os.FileMode          { return f.FileInfo.Mode().Type() }
-func (f fileInfoDirEntry) Info() (os.FileInfo, error) { return f.FileInfo, nil }
 
 func readCwd(path string) string {
 	f, err := os.Open(path)
@@ -625,9 +663,6 @@ func readCwd(path string) string {
 	_ = json.Unmarshal(line, &header)
 	return header.Cwd
 }
-
-// ErrNotFound is returned when a session file cannot be read.
-var ErrNotFound = errors.New("session not found")
 
 // AllowedPath reports whether path is a JSONL file under a pi session
 // directory. It is a defense-in-depth check for UI requests, not a sandbox.

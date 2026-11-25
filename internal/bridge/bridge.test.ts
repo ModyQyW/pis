@@ -68,3 +68,44 @@ describe("bridge guard", () => {
     expect(result.reason).toContain("Plan mode");
   });
 });
+
+describe("bridge plan and path rules", () => {
+  it("blocks git push in plan mode", async () => {
+    const { handlers, commands } = await loadBridge();
+    const ctx = context(() => {});
+    await commands.get("pis-plan")!("on", ctx);
+    const result = await handlers.get("tool_call")!(
+      { toolName: "bash", input: { command: "git push origin main" } },
+      ctx,
+    );
+    expect(result.block).toBe(true);
+    expect(result.reason).toContain("Plan mode");
+  });
+
+  it("asks before relative and $HOME paths outside the workspace", async () => {
+    const { handlers } = await loadBridge();
+    for (const command of ["cat ../../etc/passwd", "cat $HOME/.ssh/id_rsa"]) {
+      let prompt = "";
+      const result = await handlers.get("tool_call")!(
+        { toolName: "bash", input: { command } },
+        context((title) => {
+          prompt = title;
+        }),
+      );
+      expect(prompt).toContain("outside the workspace");
+      expect(result.reason).toBe("Denied by the user.");
+    }
+  });
+
+  it("asks before reading a sensitive file inside the workspace", async () => {
+    const { handlers } = await loadBridge();
+    let prompt = "";
+    await handlers.get("tool_call")!(
+      { toolName: "bash", input: { command: "cat .env" } },
+      context((title) => {
+        prompt = title;
+      }),
+    );
+    expect(prompt).toContain("sensitive");
+  });
+});

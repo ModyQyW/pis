@@ -13,7 +13,7 @@ import (
 )
 
 // Version is the current settings schema version.
-const Version = 1
+const Version = 2
 
 // Theme is the application appearance.
 type Theme string
@@ -52,13 +52,10 @@ const (
 	TrustUntrusted TrustDecision = "untrusted"
 )
 
-// Settings is the on-disk shape. Fields are additive; unknown fields survive
-// a load/save round trip only if they are part of this struct.
+// Settings is the on-disk shape.
 type Settings struct {
 	Version       int                      `json:"version"`
 	Theme         Theme                    `json:"theme"`
-	SidebarWidth  int                      `json:"sidebarWidth"`
-	RightWidth    int                      `json:"rightWidth"`
 	LastWorkspace string                   `json:"lastWorkspace,omitempty"`
 	Recents       []Recent                 `json:"recents"`
 	Trust         map[string]TrustDecision `json:"trust"`
@@ -66,11 +63,9 @@ type Settings struct {
 	PiPath        string                   `json:"piPath,omitempty"`
 	ShowWidgets   bool                     `json:"showWidgets"`
 	Notifications bool                     `json:"notifications"`
-	ReduceMotion  bool                     `json:"reduceMotion"`
 	CodeFontSize  int                      `json:"codeFontSize"`
 	UIFontSize    int                      `json:"uiFontSize"`
 	SendOnEnter   bool                     `json:"sendOnEnter"`
-	CheckUpdates  bool                     `json:"checkUpdates"`
 	Language      string                   `json:"language"`
 }
 
@@ -88,8 +83,6 @@ func Defaults() Settings {
 	return Settings{
 		Version:       Version,
 		Theme:         ThemeSystem,
-		SidebarWidth:  280,
-		RightWidth:    360,
 		Recents:       []Recent{},
 		Trust:         map[string]TrustDecision{},
 		Permissions:   Permissions{Policy: PolicySmart},
@@ -98,7 +91,6 @@ func Defaults() Settings {
 		CodeFontSize:  13,
 		UIFontSize:    14,
 		SendOnEnter:   true,
-		CheckUpdates:  false,
 		Language:      "en",
 	}
 }
@@ -136,17 +128,15 @@ func Open(dir string) (*Store, error) {
 // merge fills missing fields and keeps valid values. A zero version is an
 // older/unknown file; defaults win for safety.
 func merge(def, cfg Settings) Settings {
-	if cfg.Version <= 0 {
-		cfg.Version = def.Version
+	if cfg.Version < Version {
+		// sendOnEnter arrived in version 2; older files must keep sending.
+		if cfg.Version < 2 {
+			cfg.SendOnEnter = def.SendOnEnter
+		}
+		cfg.Version = Version
 	}
 	if cfg.Theme != ThemeLight && cfg.Theme != ThemeDark {
 		cfg.Theme = def.Theme
-	}
-	if cfg.SidebarWidth < 220 || cfg.SidebarWidth > 480 {
-		cfg.SidebarWidth = def.SidebarWidth
-	}
-	if cfg.RightWidth < 280 || cfg.RightWidth > 720 {
-		cfg.RightWidth = def.RightWidth
 	}
 	if cfg.Permissions.Policy != PolicyAsk && cfg.Permissions.Policy != PolicyAllow {
 		cfg.Permissions.Policy = def.Permissions.Policy

@@ -43,9 +43,9 @@ func TestStartAndInspectRealPi(t *testing.T) {
 	if info.Model == nil {
 		t.Log("no model selected; that is valid for a fresh unauthenticated state")
 	}
-	state, err := m.GetState(ctx, info.ID)
+	state, err := m.fetchState(ctx, info.ID, 15*time.Second)
 	if err != nil {
-		t.Fatalf("GetState: %v", err)
+		t.Fatalf("get_state: %v", err)
 	}
 	if state.SessionID == "" {
 		t.Fatalf("empty session id: %+v", state)

@@ -61,9 +61,9 @@ const DANGEROUS_BASH = [
 
 const MUTATING_BASH = [
   ...DANGEROUS_BASH.map((rule) => rule.re),
-  /(^|\s)(touch|mkdir|mv|cp|tee|truncate)\b/,
+  /(^|\s)(touch|mkdir|mv|cp|rm|ln|tee|truncate)\b/,
   /\bsed\s+-i\b/,
-  /\bgit\s+(commit|merge|rebase|cherry-pick|apply|am|tag|checkout|switch)\b/,
+  /\bgit\s+(commit|merge|rebase|cherry-pick|apply|am|tag|checkout|switch|push|stash|add|rm|mv|branch\s+-[dD])\b/,
   /(^|[^>])>{1,2}\s*[^&\s|]+/,
 ];
 
@@ -81,15 +81,21 @@ export default function (pi: ExtensionAPI) {
     return `${toolName}\u0000${command || path || JSON.stringify(input)}`;
   };
 
+  const expandPath = (p: string) =>
+    p
+      .replace(/^\$\{HOME\}/, homedir())
+      .replace(/^\$HOME/, homedir())
+      .replace(/^~(?=$|\/)/, homedir());
+
   const insideWorkspace = (p: string) => {
-    const full = resolve(WORKSPACE, p.replace(/^~(?=$|\/)/, homedir()));
+    const full = resolve(WORKSPACE, expandPath(p));
     const rel = relative(WORKSPACE, full);
     return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel));
   };
 
   const pathRisk = (p: string) => {
     if (!p) return null;
-    const full = resolve(WORKSPACE, p.replace(/^~(?=$|\/)/, homedir()));
+    const full = resolve(WORKSPACE, expandPath(p));
     if (!insideWorkspace(p)) return "path is outside the workspace";
     if (SENSITIVE.test(full)) return "path looks sensitive (credentials or secrets)";
     return null;
@@ -100,9 +106,14 @@ export default function (pi: ExtensionAPI) {
     for (const rule of DANGEROUS_BASH) {
       if (rule.re.test(command)) return `destructive shell command: ${rule.label}`;
     }
-    for (const token of command.match(/(?:^|\s)(~?\/[^\s;|&)]+)/g) ?? []) {
-      const p = token.trim();
-      if (p && !insideWorkspace(p)) return `command reaches outside the workspace: ${p}`;
+    for (const raw of command.match(/(?:^|\s)([^\s;|&()<>]+)/g) ?? []) {
+      const token = raw.trim().replace(/^['"]|['"]$/g, "");
+      if (!token || token.startsWith("-") || token.includes("://")) continue;
+      if (!token.includes("/") && !token.startsWith(".") && !token.startsWith("~")) continue;
+      if (!insideWorkspace(token)) return `command reaches outside the workspace: ${token}`;
+      if (SENSITIVE.test(resolve(WORKSPACE, expandPath(token)))) {
+        return `command touches a sensitive file: ${token}`;
+      }
     }
     return null;
   };

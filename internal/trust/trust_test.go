@@ -3,6 +3,7 @@ package trust
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"pis/internal/settings"
@@ -44,5 +45,43 @@ func TestInspectHonorsPiAncestor(t *testing.T) {
 	info := Inspect(sub, agent, nil)
 	if info.Source != "pi" || !info.Effective {
 		t.Fatalf("unexpected: %+v", info)
+	}
+}
+
+func TestInspectRequiresTrustForAncestorSkills(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, ".agents", "skills", "example"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	sub := filepath.Join(root, "packages", "app")
+	if err := os.MkdirAll(sub, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	info := Inspect(sub, t.TempDir(), nil)
+	if !info.RequiresTrust {
+		t.Fatalf("ancestor skills must require trust: %+v", info)
+	}
+	found := false
+	for _, resource := range info.Resources {
+		if strings.Contains(resource, ".agents/skills") {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("resources = %v", info.Resources)
+	}
+}
+
+func TestInspectIgnoresUserSkillsAtHome(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	if err := os.MkdirAll(filepath.Join(home, ".agents", "skills", "example"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	info := Inspect(home, t.TempDir(), nil)
+	if info.RequiresTrust {
+		t.Fatalf("the user's own skills are global: %+v", info)
 	}
 }
