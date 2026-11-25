@@ -1,15 +1,29 @@
 import { defineConfig } from "@rspress/core";
 import { fileURLToPath } from "node:url";
 
-const siteOrigin = process.env.PIS_DOCS_SITE_URL?.trim();
-
 export default defineConfig({
   root: "docs-user",
   outDir: "docs-user-build",
   globalStyles: fileURLToPath(new URL("docs-user/styles/index.css", import.meta.url)),
+  lang: "en",
   title: "PiS",
-  description: "PiS 是一个建立在 pi 之上的桌面 Coding Agent：原生外壳、流式会话、审批与计划模式。",
-  ...(siteOrigin ? { siteOrigin } : {}),
+  description: "PiS is a desktop coding agent shell for pi.",
+  locales: [
+    {
+      lang: "en",
+      label: "English",
+      title: "PiS",
+      description:
+        "PiS is a desktop coding agent shell for pi: native window, streaming sessions, approvals, and plan mode.",
+    },
+    {
+      lang: "zh",
+      label: "简体中文",
+      title: "PiS",
+      description: "PiS 是 pi 的桌面外壳：原生窗口、流式会话、审批与计划模式。",
+    },
+  ],
+  siteOrigin: "https://pis.modyqyw.top",
   logo: {
     light: "/icon.png",
     dark: "/icon-dark.png",
@@ -19,53 +33,8 @@ export default defineConfig({
   logoText: "PiS",
   head: [["link", { rel: "icon", href: "/icon.png" }]],
   themeConfig: {
-    nav: [
-      { text: "指南", link: "/guide/getting-started" },
-      { text: "进阶", link: "/advanced/architecture" },
-      { text: "参考", link: "/reference/configuration" },
-      { text: "GitHub", link: "https://github.com/ModyQyW/pis" },
-    ],
-    sidebar: {
-      "/guide/": [
-        {
-          text: "开始使用",
-          items: [
-            { text: "安装与第一次运行", link: "/guide/getting-started" },
-            { text: "日常使用", link: "/guide/daily-use" },
-          ],
-        },
-        {
-          text: "控制与扩展",
-          items: [
-            { text: "信任、审批与计划模式", link: "/guide/approvals" },
-            { text: "使用 pi 扩展", link: "/guide/extensions" },
-            { text: "设置与数据", link: "/guide/settings" },
-          ],
-        },
-      ],
-      "/advanced/": [
-        {
-          text: "深入理解",
-          items: [
-            { text: "架构与数据流", link: "/advanced/architecture" },
-            { text: "本地开发", link: "/advanced/development" },
-            { text: "构建、签名与发布", link: "/advanced/release" },
-            { text: "部署文档站", link: "/advanced/docs-deployment" },
-          ],
-        },
-      ],
-      "/reference/": [
-        {
-          text: "参考",
-          items: [
-            { text: "环境变量与目录", link: "/reference/configuration" },
-            { text: "故障排查", link: "/reference/troubleshooting" },
-          ],
-        },
-      ],
-    },
     footer: {
-      message: "PiS · MIT License · 基于 mygo 与 pi",
+      message: "PiS · MIT License",
     },
   },
 });

@@ -1,0 +1,20 @@
+[
+  { "type": "section-header", "label": "开始使用" },
+  { "type": "file", "name": "install", "label": "安装与第一次运行" },
+  { "type": "file", "name": "interface", "label": "窗口与界面" },
+  { "type": "section-header", "label": "使用 PiS" },
+  { "type": "file", "name": "projects", "label": "项目" },
+  { "type": "file", "name": "sessions", "label": "会话" },
+  { "type": "file", "name": "composer", "label": "输入框" },
+  { "type": "file", "name": "changes", "label": "更改与文件" },
+  { "type": "file", "name": "worktrees", "label": "工作树" },
+  { "type": "section-header", "label": "控制与模型" },
+  { "type": "file", "name": "approvals", "label": "信任、审批与计划模式" },
+  { "type": "file", "name": "models", "label": "模型与登录" },
+  { "type": "file", "name": "mcp", "label": "MCP 服务器" },
+  { "type": "file", "name": "extensions", "label": "扩展" },
+  { "type": "section-header", "label": "设置与帮助" },
+  { "type": "file", "name": "settings", "label": "设置" },
+  { "type": "file", "name": "shortcuts", "label": "快捷键" },
+  { "type": "custom-link", "label": "故障排查", "link": "/reference/troubleshooting" }
+]

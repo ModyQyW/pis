@@ -1,5 +1,7 @@
 # Changelog
 
+English | [简体中文](CHANGELOG.zh.md)
+
 ## 0.0.5 (2026-11-24)
 
 - Add a manual `Check for updates…` button to Settings. The Help menu item and

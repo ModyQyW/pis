@@ -1,0 +1,4 @@
+[
+  { "type": "file", "name": "data", "label": "数据、安全与隐私" },
+  { "type": "file", "name": "troubleshooting", "label": "故障排查" }
+]

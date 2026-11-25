@@ -1,0 +1,4 @@
+[
+  { "type": "file", "name": "data", "label": "Data, security, and privacy" },
+  { "type": "file", "name": "troubleshooting", "label": "Troubleshooting" }
+]

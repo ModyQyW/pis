@@ -1,0 +1,20 @@
+[
+  { "type": "section-header", "label": "Get started" },
+  { "type": "file", "name": "install", "label": "Install and first run" },
+  { "type": "file", "name": "interface", "label": "Window and interface" },
+  { "type": "section-header", "label": "Use PiS" },
+  { "type": "file", "name": "projects", "label": "Projects" },
+  { "type": "file", "name": "sessions", "label": "Sessions" },
+  { "type": "file", "name": "composer", "label": "Composer" },
+  { "type": "file", "name": "changes", "label": "Changes and files" },
+  { "type": "file", "name": "worktrees", "label": "Worktrees" },
+  { "type": "section-header", "label": "Control and models" },
+  { "type": "file", "name": "approvals", "label": "Trust, approvals, and plan mode" },
+  { "type": "file", "name": "models", "label": "Models and sign-in" },
+  { "type": "file", "name": "mcp", "label": "MCP servers" },
+  { "type": "file", "name": "extensions", "label": "Extensions" },
+  { "type": "section-header", "label": "Settings and help" },
+  { "type": "file", "name": "settings", "label": "Settings" },
+  { "type": "file", "name": "shortcuts", "label": "Keyboard shortcuts" },
+  { "type": "custom-link", "label": "Troubleshooting", "link": "/reference/troubleshooting" }
+]

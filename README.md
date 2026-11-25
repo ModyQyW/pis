@@ -1,3 +1,5 @@
+English | [简体中文](README.zh.md)
+
 <p align="center"><img src="resources/icon.png" alt="PiS icon" width="120" height="120"></p>
 
 Default mark uses a white background. The black-background variant is
@@ -8,7 +10,7 @@ Default mark uses a white background. The black-background variant is
 A desktop coding agent built on [mygo](https://mygo.run) with
 [pi](https://pi.dev) as the engine. The S stands for strong.
 
-![PiS empty state](docs-dev/images/empty.png)
+![PiS empty state](docs-user/public/images/empty.png)
 
 PiS is a small native shell around a rich web UI. It runs your installed
 pi over RPC, so your existing models, credentials, sessions, skills, prompt
@@ -21,13 +23,13 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.4](https://github.com/ModyQyW/pis/releases/tag/v0.0.4)**
-(27.1 MB app / 6.9 MB DMG). The update feed resolves to `0.0.4`. The `0.0.3`
+Current public release: **[0.0.5](https://github.com/ModyQyW/pis/releases/tag/v0.0.5)**
+(arm64 DMG 7.2 MB). The update feed resolves to `0.0.5`. The `0.0.3`
 GitHub release is a draft. It is not public and does not serve updates. The
 release and update feed are public. macOS is ad-hoc signed, so Gatekeeper
 requires a one-time approval. English is the default. Chinese is available in
-Settings. See [`docs-dev/03-progress.md`](docs-dev/03-progress.md) for evidence
-and [`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
+Settings. See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
+[`docs-dev/history.md`](docs-dev/history.md) for the project history.
 
 ## What works
 
@@ -39,7 +41,8 @@ and [`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
 - **Tool cards** for `bash`, `read`, `edit`, `write`, `grep`, `find`, `ls`,
   `todo`, `ask_user_question`, subagents, and any extension tool (generic card).
 - **Composer**: `@file` search, pi slash commands, image paste/drop, text
-  attachments, per-session drafts, model and thinking pickers.
+  attachments, per-session drafts, model and thinking pickers, and Settings
+  controls for code/interface size and Enter-to-send.
 - **Extensions**: existing pi extensions load unchanged; RPC dialogs appear in
   an inline dock; statuses and widgets are shown quietly; extension errors are
   visible. Shipped bridge adds tree navigation, plan mode, and optional smart
@@ -49,14 +52,16 @@ and [`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
 - **Approvals**: optional Smart / Ask all / Allow all policy, once/session
   grants, no auto-deny. When another guard such as `cc-safety-net` is detected,
   PiS's guard stays off unless enabled in Settings.
-- **Plan mode**: read-only exploration and a plan, mutating tools blocked until
-  you turn it off.
+- **Plan mode**: read-only exploration and a plan; common mutating tools and
+  shell commands are blocked until you turn it off. It is a workflow guardrail,
+  not a sandbox.
 - **Changes and files**: Git branch/status, per-file unified diff, copy patch,
   per-file revert-to-HEAD with confirmation, reveal, file list and read-only
   preview.
 - **MCP and worktrees**: manage user/project MCP entries (add, enable, remove;
   advanced fields stay in `mcp.json`), and list/create/open/remove Git
-  worktrees.
+  worktrees. Removal refuses a worktree with uncommitted files; forcing asks a
+  second time.
 - **Session search and plans**: full-text search across session branches from
   the command palette; Plan and Agents tabs read pi's todo state and subagent
   activity; `ask_user_question` renders as an inline card with the selected
@@ -72,11 +77,17 @@ and [`docs-dev/02-plan.md`](docs-dev/02-plan.md) §8 for the roadmap.
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
   quit guard for running sessions, single small binary.
 
-More screenshots: [chat](docs-dev/images/chat.png),
-[approval](docs-dev/images/approval.png), [plan mode](docs-dev/images/plan.png),
-[trust](docs-dev/images/trust.png), [session tree](docs-dev/images/session-tree.png),
-[diff](docs-dev/images/diff.png), [login](docs-dev/images/login.png),
-[Chinese shell](docs-dev/images/zh-chat.png), [Chinese settings](docs-dev/images/zh-settings.png).
+More screenshots: [chat](docs-user/public/images/chat.png),
+[approval](docs-user/public/images/approval.png),
+[plan mode](docs-user/public/images/plan.png),
+[trust](docs-user/public/images/trust.png),
+[session tree](docs-user/public/images/session-tree.png),
+[diff](docs-user/public/images/diff.png),
+[login](docs-user/public/images/login.png),
+[MCP](docs-user/public/images/mcp.png),
+[worktrees](docs-user/public/images/worktrees.png),
+[Chinese shell](docs-user/public/images/zh-chat.png),
+[Chinese settings](docs-user/public/images/zh-settings.png).
 
 ## Requirements
 
@@ -86,8 +97,7 @@ More screenshots: [chat](docs-dev/images/chat.png),
   `PIS_PI`, `PATH`, common install locations, then your login shell.
   Use `pi auth login` (also available in the app) to connect a provider.
 
-Pi is not bundled. The app is 27.0 MB and the initial DMG is 6.8 MB; pi itself
-is a separate ~103 MB install.
+Pi is not bundled. The arm64 DMG is 7.2 MB; pi itself is a separate install.
 
 ## Run from source
 
@@ -126,7 +136,7 @@ bun run format
 ./scripts/check.sh
 ```
 
-`bun run format` only formats: `go fmt ./...` and Vite+'s `vp fmt`.
+`bun run format` only formats: `go fmt` on module packages and Vite+'s `vp fmt`.
 `./scripts/check.sh` runs Go formatting/build/vet/tests, Vite+ format/lint/
 typecheck, bridge and frontend tests, the frontend build, and the docs-user
 build. `bun run check` is the same gate. `bun install` installs a Vite+
@@ -150,9 +160,10 @@ mygo window (Go, system webview)
      Streamdown code/Mermaid plugins, TanStack Virtual)
 ```
 
-Decisions and tradeoffs are in [`docs-dev/01-decisions.md`](docs-dev/01-decisions.md).
+Decisions and tradeoffs are in [`docs-dev/decisions.md`](docs-dev/decisions.md).
+The current architecture is in [`docs-dev/architecture.md`](docs-dev/architecture.md).
 The research that led there, including competitor strengths and measured
-prototypes, is in [`docs-dev/00-research.md`](docs-dev/00-research.md).
+prototypes, is in [`docs-dev/research.md`](docs-dev/research.md).
 
 ## Known limits
 
@@ -168,17 +179,27 @@ prototypes, is in [`docs-dev/00-research.md`](docs-dev/00-research.md).
   notarized; Gatekeeper requires a one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
-- Smart approvals are heuristics, not a sandbox. Use the OS, a container, or pi's
-  own isolation when you need a real boundary.
+- Markdown images from remote URLs load automatically, so model output or an
+  imported session can cause network requests. Links still open only after a
+  click. See ADR-019 in [`docs-dev/decisions.md`](docs-dev/decisions.md).
+- Smart approvals and plan mode are heuristics, not a sandbox. Use the OS, a
+  container, or pi's own isolation when you need a real boundary.
 
 ## Documentation
 
-- **User guide:** [`docs-user/`](docs-user/), built with
-  [Rspress](https://rspress.rs/). It covers installation, daily use, approvals,
-  extensions, architecture, development, release, configuration, and
-  troubleshooting.
-- **Development record:** [`docs-dev/`](docs-dev/), from research and decisions
-  through plan, progress, pitfalls, QA, UX, and delivery evidence.
+- **User guide:** [`docs-user/en/`](docs-user/en/) and
+  [`docs-user/zh/`](docs-user/zh/), built with
+  [Rspress](https://rspress.rs/) and published at
+  <https://pis.modyqyw.top>. It covers installation, the window, projects,
+  sessions, the composer, changes, approvals, models, MCP, worktrees,
+  extensions, settings, and troubleshooting in English and Chinese.
+- **Developer docs:** [`docs-dev/`](docs-dev/), starting with
+  [`docs-dev/README.md`](docs-dev/README.md). It covers research, architecture,
+  feature implementation, UX, development, testing, release, the docs site,
+  decisions, pitfalls, and the project history. Main guides have English and
+  Chinese versions.
+- **Changelog:** [`CHANGELOG.md`](CHANGELOG.md) and
+  [`CHANGELOG.zh.md`](CHANGELOG.zh.md).
 
 The Rspress source lives in `docs-user/`; the build output is
 `docs-user-build/` and is not committed.
@@ -189,20 +210,9 @@ bun run docs:build
 bun run docs:preview
 ```
 
-Deployment steps for Cloudflare Pages and Netlify are in
-[`docs-user/advanced/docs-deployment.md`](docs-user/advanced/docs-deployment.md).
-
-Development record:
-
-1. [`docs-dev/00-research.md`](docs-dev/00-research.md)
-2. [`docs-dev/01-decisions.md`](docs-dev/01-decisions.md)
-3. [`docs-dev/02-plan.md`](docs-dev/02-plan.md)
-4. [`docs-dev/03-progress.md`](docs-dev/03-progress.md)
-5. [`docs-dev/04-pitfalls.md`](docs-dev/04-pitfalls.md)
-6. [`docs-dev/05-qa.md`](docs-dev/05-qa.md)
-7. [`docs-dev/06-ux.md`](docs-dev/06-ux.md)
-8. [`docs-dev/07-grilling.md`](docs-dev/07-grilling.md)
-9. [`docs-dev/08-delivery.md`](docs-dev/08-delivery.md)
+The user guide is deployed with Cloudflare Pages at
+<https://pis.modyqyw.top>. Deployment steps are in
+[`docs-dev/docs-site.md`](docs-dev/docs-site.md).
 
 ## License
 
