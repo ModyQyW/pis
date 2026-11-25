@@ -4,8 +4,8 @@
 
 ## 当前状态
 
-- 当前 tag 为 `v0.0.5`。
-- `0.0.5` 是公开 Release，也是 latest。
+- 当前 tag 为 `v0.0.6`。
+- `0.0.6` 是公开 Release，也是 latest。
 - `0.0.3` 只有 draft。它不提供更新。
 - macOS 使用 ad-hoc 签名。Windows 安装器未签名。Linux 使用 tar、deb、rpm 和 `install.sh`。
 

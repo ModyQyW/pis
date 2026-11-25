@@ -4,8 +4,8 @@
 
 ## Current state
 
-- The current tag is `v0.0.5`.
-- `0.0.5` is the public release and the latest release.
+- The current tag is `v0.0.6`.
+- `0.0.6` is the public release and the latest release.
 - `0.0.3` is a draft only. It does not serve updates.
 - macOS uses an ad-hoc signature. The Windows installer is unsigned. Linux uses tar, deb, rpm, and `install.sh`.
 
