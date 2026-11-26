@@ -16,7 +16,8 @@
     "generate": "go tool mygo generate",
     "prepare": "vp config --no-agent",
     "test": "vitest run --config frontend/vitest.config.ts",
-    "test:bridge": "bun test internal/bridge/bridge.test.ts"
+    "test:bridge": "bun test internal/bridge/bridge.test.ts",
+    "cn:build": "cn build --css frontend/src/styles.css --out frontend/src/lib/cn-tables.ts --full && vp fmt frontend/src/lib/cn-tables.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
