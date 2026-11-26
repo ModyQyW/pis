@@ -17,7 +17,7 @@ PiS 是围绕 pi 的小型原生外壳，并提供完整的 Web UI。它通过 R
 
 V1 已完成，并针对 macOS arm64 打包验证。Release workflow 为 macOS、Windows 和 Linux 构建 amd64 与 arm64 产物。核心会话、流式 Markdown、扩展、审批、计划模式、更改、MCP 配置、工作树、会话搜索和桌面外壳均可用。
 
-当前公开版本是 **[0.0.6](https://github.com/ModyQyW/pis/releases/tag/v0.0.6)**（arm64 DMG 7.2 MB）。更新 feed 指向 `0.0.6`。`0.0.3` GitHub Release 是 draft，不公开，也不提供更新。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
+当前公开版本是 **[0.0.6](https://github.com/ModyQyW/pis/releases/tag/v0.0.6)**（arm64 DMG 7.2 MB）。更新 feed 指向 `0.0.6`。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
 
 验证证据见 [`docs-dev/testing.zh.md`](docs-dev/testing.zh.md)。项目历史见 [`docs-dev/history.zh.md`](docs-dev/history.zh.md)。
 
@@ -121,7 +121,7 @@ mygo 窗口（Go，系统 WebView）
 - macOS arm64 已验证运行时；Windows/Linux 产物可构建，但运行时 QA 未完成。
 - 应用需要已安装的兼容 pi。没有捆绑版或自动安装器。
 - RPC 支持扩展对话框、状态和 widget，但不支持 `ctx.ui.custom()` TUI 组件或自定义编辑器/主题。部分扩展会降级或提供文本回退；PiS 不伪造。
-- 自动更新使用 GitHub Releases 和 Ed25519 密钥。`0.0.1 → 0.0.2` 签名更新已验证。公开的 `0.0.4` manifest 和 `0.0.2 → 0.0.4` delta 已验证。已安装应用的更新流程未运行。`0.0.3` Release 是 draft。macOS 构建是 ad-hoc 签名，未 notarize；Gatekeeper 需要一次“仍要打开”。
+- 自动更新使用 GitHub Releases 和 Ed25519 密钥。`0.0.1 → 0.0.2` 签名更新已验证。公开的 `0.0.4` manifest 和 `0.0.2 → 0.0.4` delta 已验证。现在不再发布 delta 文件，更新下载完整 archive。已安装应用的更新流程未运行。macOS 构建是 ad-hoc 签名，未 notarize；Gatekeeper 需要一次“仍要打开”。
 - 扩展对话框和通用工具卡片仍是自定义扩展 UI 的回退；中文模式下原生菜单保持英文。
 - Markdown 中的远程图片会自动加载。模型输出或导入的会话可能发起网络请求。链接仍然只有点击后才会打开。见 [`docs-dev/decisions.zh.md`](docs-dev/decisions.zh.md) 的 ADR-019。
 - Smart 审批和计划模式是启发式规则，不是沙箱。需要真实边界时使用 OS、容器或 pi 自己的隔离。

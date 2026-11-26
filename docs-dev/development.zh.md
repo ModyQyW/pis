@@ -72,6 +72,8 @@ bun run check
 
 不得绕过失败的格式、lint、类型或测试检查。
 
+提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)，例如 `feat(frontend): add the palette picker`。
+
 ## 开发环境变量
 
 以下变量用于开发和调试：

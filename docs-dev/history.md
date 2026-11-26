@@ -55,12 +55,12 @@ Every risky path has a test or a manual check: session parsing, streaming, appro
 |---|---|
 | `0.0.1` | First public macOS, Windows, and Linux release |
 | `0.0.2` | User guide, config typecheck, release version prompt |
-| `0.0.3` | Draft only; Vite+ gate, icon, docs split, smart approval fix |
+| `0.0.3` | Never published; Vite+ gate, icon, docs split, smart approval fix |
 | `0.0.4` | Public release of the 0.0.3 source; Netlify config removed |
 | `0.0.5` | Manual update check, authoritative pi path, login-shell PATH, one-shot release script |
 | `0.0.6` | Bilingual guides and UI, session and file hardening, CHANGELOG-driven releases |
 
-The `0.0.3` GitHub release is a draft. `0.0.6` is the current public release and latest.
+The `0.0.3` tag was never published as a GitHub release. `0.0.6` is the current public release and latest.
 
 ## Current state
 

@@ -24,11 +24,10 @@ builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessio
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
 Current public release: **[0.0.6](https://github.com/ModyQyW/pis/releases/tag/v0.0.6)**
-(arm64 DMG 7.2 MB). The update feed resolves to `0.0.6`. The `0.0.3`
-GitHub release is a draft. It is not public and does not serve updates. The
-release and update feed are public. macOS is ad-hoc signed, so Gatekeeper
-requires a one-time approval. English is the default. Chinese is available in
-Settings. See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
+(arm64 DMG 7.2 MB). The update feed resolves to `0.0.6`. The release and
+update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
+one-time approval. English is the default. Chinese is available in Settings.
+See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
 [`docs-dev/history.md`](docs-dev/history.md) for the project history.
 
 ## What works
@@ -174,9 +173,10 @@ prototypes, is in [`docs-dev/research.md`](docs-dev/research.md).
   degrade or offer text fallbacks; PiS does not fake them.
 - Auto-update uses GitHub Releases and an Ed25519 update key. The signed
   0.0.1 → 0.0.2 update was verified. The public `0.0.4` manifest and
-  `0.0.2 → 0.0.4` delta were verified. The installed-app update path was not
-  run. The `0.0.3` release is a draft. macOS builds are ad-hoc signed, not
-  notarized; Gatekeeper requires a one-time Open Anyway approval.
+  `0.0.2 → 0.0.4` delta were verified. Delta files are no longer published;
+  updates download the full archive. The installed-app update path was not
+  run. macOS builds are ad-hoc signed, not notarized; Gatekeeper requires a
+  one-time Open Anyway approval.
 - Extension dialogs and generic tool cards remain the fallback for custom
   extension UIs; native menu labels stay English in Chinese mode.
 - Markdown images from remote URLs load automatically, so model output or an

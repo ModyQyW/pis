@@ -72,6 +72,8 @@ bun run check
 
 Do not bypass a failed format, lint, type, or test check.
 
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/), for example `feat(frontend): add the palette picker`.
+
 ## Development environment variables
 
 These variables are for development and debugging:
