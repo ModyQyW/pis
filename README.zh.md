@@ -13,11 +13,11 @@ PiS 是基于 [mygo](https://mygo.run)、以 [pi](https://pi.dev) 为引擎的�
 
 PiS 是围绕 pi 的小型原生外壳，并提供完整的 Web UI。它通过 RPC 运行你安装的 pi，因此模型、凭据、会话、技能、提示模板、包和扩展都来自你已有的 pi。PiS 不捆绑 pi，不替换 pi 的数据，也不安装第二套 agent runtime。
 
-## 状态（2026-11-25）
+## 状态（2026-11-26）
 
 V1 已完成，并针对 macOS arm64 打包验证。Release workflow 为 macOS、Windows 和 Linux 构建 amd64 与 arm64 产物。核心会话、流式 Markdown、扩展、审批、计划模式、更改、MCP 配置、工作树、会话搜索和桌面外壳均可用。
 
-当前公开版本是 **[0.0.6](https://github.com/ModyQyW/pis/releases/tag/v0.0.6)**（arm64 DMG 7.2 MB）。更新 feed 指向 `0.0.6`。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
+当前公开版本是 **[0.0.7](https://github.com/ModyQyW/pis/releases/tag/v0.0.7)**（arm64 DMG 7.2 MB）。更新 feed 指向 `0.0.7`。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
 
 验证证据见 [`docs-dev/testing.zh.md`](docs-dev/testing.zh.md)。项目历史见 [`docs-dev/history.zh.md`](docs-dev/history.zh.md)。
 

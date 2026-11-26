@@ -4,8 +4,8 @@
 
 ## 当前状态
 
-- 当前 tag 为 `v0.0.6`。
-- `0.0.6` 是公开 Release，也是 latest。
+- 当前 tag 为 `v0.0.7`。
+- `0.0.7` 是公开 Release，也是 latest。
 - macOS 使用 ad-hoc 签名。Windows 安装器未签名。Linux 使用 tar、deb、rpm 和 `install.sh`。
 
 发布前用 `git tag` 和 `gh release list` 确认当前状态。
@@ -65,7 +65,7 @@ git log --oneline -5
 非交互环境：
 
 ```sh
-PIS_VERSION=0.0.6 ./scripts/release.sh
+PIS_VERSION=0.0.7 ./scripts/release.sh
 ```
 
 脚本执行顺序：
@@ -83,7 +83,7 @@ PIS_VERSION=0.0.6 ./scripts/release.sh
 11. 发布 draft，设为 latest。
 12. 校验 `isDraft`、`isLatest` 和 `publishedAt`。
 
-tag 已存在且指向 `HEAD` 时，脚本从等待 workflow 继续。它不会重复提交或打 tag。
+tag 已存在且指向 `HEAD` 时，脚本从等待 workflow 继续。它不会重复提交或打 tag。如果 tag 对应的 Release workflow 一分钟后仍未出现，脚本会失败；用 `gh workflow run release.yml -f version=v<version>` 手动启动。
 
 ## CHANGELOG
 

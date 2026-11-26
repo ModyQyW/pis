@@ -4,8 +4,8 @@
 
 ## Current state
 
-- The current tag is `v0.0.6`.
-- `0.0.6` is the public release and the latest release.
+- The current tag is `v0.0.7`.
+- `0.0.7` is the public release and the latest release.
 - macOS uses an ad-hoc signature. The Windows installer is unsigned. Linux uses tar, deb, rpm, and `install.sh`.
 
 Before a release, confirm the state with `git tag` and `gh release list`.
@@ -65,7 +65,7 @@ The script asks for a version. Press Enter to accept the suggested patch version
 Non-interactive:
 
 ```sh
-PIS_VERSION=0.0.6 ./scripts/release.sh
+PIS_VERSION=0.0.7 ./scripts/release.sh
 ```
 
 The script:
@@ -83,7 +83,7 @@ The script:
 11. Publishes the draft and sets it as latest.
 12. Checks `isDraft`, `isLatest`, and `publishedAt`.
 
-If the tag exists and points to `HEAD`, the script continues from the workflow wait. It does not commit or tag again.
+If the tag exists and points to `HEAD`, the script continues from the workflow wait. It does not commit or tag again. If no Release workflow run appears for the tag, the script fails after a minute; start it manually with `gh workflow run release.yml -f version=v<version>`.
 
 ## CHANGELOG
 

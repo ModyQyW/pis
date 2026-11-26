@@ -17,14 +17,14 @@ pi over RPC, so your existing models, credentials, sessions, skills, prompt
 templates, packages, and extensions are the ones it uses. It does not bundle
 pi, replace pi's data, or install a second agent runtime.
 
-## Status (2026-11-25)
+## Status (2026-11-26)
 
 V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.6](https://github.com/ModyQyW/pis/releases/tag/v0.0.6)**
-(arm64 DMG 7.2 MB). The update feed resolves to `0.0.6`. The release and
+Current public release: **[0.0.7](https://github.com/ModyQyW/pis/releases/tag/v0.0.7)**
+(arm64 DMG 7.2 MB). The update feed resolves to `0.0.7`. The release and
 update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
 one-time approval. English is the default. Chinese is available in Settings.
 See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
