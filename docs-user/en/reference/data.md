@@ -18,7 +18,7 @@ Contents:
 
 | Item | Content |
 |---|---|
-| `settings.json` | Theme, language, font size, notifications, approvals, trust, recent projects. See the table below |
+| `settings.json` | Theme, palette, language, font size, notifications, approvals, trust, recent projects. See the table below |
 | `window-state.json` | Window position and size |
 | `extensions/` | Built-in bridge extension |
 
@@ -56,7 +56,8 @@ Main fields in `settings.json`:
 
 | Field | Purpose |
 |---|---|
-| `theme` | `system`, `light`, or `dark` |
+| `theme` | Mode: `system`, `light`, or `dark` |
+| `palette` | Color palette: `amber`, `graphite`, `teal`, or `ink` |
 | `language` | `en` or `zh` |
 | `codeFontSize` | Code font size |
 | `uiFontSize` | Interface scale |
@@ -69,7 +70,7 @@ Main fields in `settings.json`:
 | `lastWorkspace` | Last project |
 | `piPath` | Manual pi path |
 
-PiS uses a schema version. It migrates old settings at load time. If an old file has no `sendOnEnter`, PiS keeps Enter as the send key.
+PiS uses a schema version. It migrates old settings at load time. If an old file has no `sendOnEnter`, PiS keeps Enter as the send key. If it has no `palette`, PiS uses `amber`.
 
 If settings are damaged, follow the reset steps in [Settings](/guide/settings).
 

@@ -121,7 +121,7 @@ Trust only a project you have checked. Extensions can run code with the same sys
 
 Open Settings, then find pi executable.
 
-![pi path in Settings](/images/settings.png)
+![pi path in Settings](/images/settings-path.png)
 
 PiS finds pi automatically. The search order is:
 

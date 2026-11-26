@@ -2,6 +2,14 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.7 (2026-11-26)
+
+- Add four color palettes (Amber, Graphite, Teal, and Ink) with separate light and dark tuning and a palette picker in Settings.
+- Rebuild the visual system on one token layer: type scale, control boundaries, scrim, focus ring, dialog surfaces, and shared button, field, pill, and key primitives.
+- Raise secondary text, muted labels, and success states to the 4.5:1 contrast floor; controls keep a 3:1 boundary.
+- Persist the palette in settings (schema v3). Existing users keep Amber.
+- Refresh the user and developer docs for palettes, tokens, and the settings fields.
+
 ## 0.0.6 (2026-11-25)
 
 - Add English and Chinese UI strings across the shell, dialogs, composer, and settings.

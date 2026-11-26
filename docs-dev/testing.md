@@ -130,7 +130,7 @@ Use real pi and a real project. Check:
 - MCP: add, enable, remove, reload session.
 - Worktrees: create, open, remove, dirty worktree second confirmation.
 - Extension dialogs, statuses, and widgets.
-- Settings: theme, language, font size, send key, notifications.
+- Settings: theme mode, all four palettes, language, font size, send key, notifications.
 - Quit guard: running session warning.
 - Update check and Gatekeeper flow.
 
@@ -153,8 +153,10 @@ Check:
 2. Code font size affects Markdown code blocks, diff, tool output, and previews.
 3. Dialogs stay inside the window after interface scaling.
 4. With Send on Enter off, Enter adds a line and `⌘Enter` sends.
-5. Dark and light themes.
-6. Chinese interface has no obvious English leftovers.
+5. Dark and light modes for each palette.
+6. Focus rings are visible and body text and labels keep the 4.5:1 contrast floor.
+7. At 900 px and below, the sidebar overlays with a scrim and closes after a selection; at 1100 px and below, the right panel becomes a sheet.
+8. Chinese interface has no obvious English leftovers.
 
 Browser mode uses mock data. It does not replace a real pi test.
 

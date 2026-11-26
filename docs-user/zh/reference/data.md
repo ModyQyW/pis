@@ -18,7 +18,7 @@ Windows 和 Linux 的路径不同。打开「设置 > 诊断」，查看实际�
 
 | 项目 | 内容 |
 |---|---|
-| `settings.json` | 主题、语言、字号、通知、审批、信任、最近项目。完整字段见下方表格 |
+| `settings.json` | 主题、色板、语言、字号、通知、审批、信任、最近项目。完整字段见下方表格 |
 | `window-state.json` | 窗口位置和大小 |
 | `extensions/` | 内置 bridge 扩展 |
 
@@ -56,7 +56,8 @@ PiS 不修改 pi 的会话内容、凭据、模型或扩展配置。删除会话
 
 | 字段 | 作用 |
 |---|---|
-| `theme` | `system`、`light` 或 `dark` |
+| `theme` | 模式：`system`、`light` 或 `dark` |
+| `palette` | 色板：`amber`、`graphite`、`teal` 或 `ink` |
 | `language` | `en` 或 `zh` |
 | `codeFontSize` | 代码字号 |
 | `uiFontSize` | 界面缩放 |

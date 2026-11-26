@@ -39,20 +39,32 @@ PiS is a calm, fast, native-feeling coding agent. It is not an IDE and not a cha
 
 ## Visual system
 
+Themes:
+
+- Appearance has two independent choices: mode (System, Light, Dark) and palette.
+- Four palettes ship: Amber (default), Graphite, Teal, and Ink.
+- Amber keeps warm neutral surfaces with an amber brand accent. Graphite uses cool neutrals with a steel blue accent. Teal uses cool neutrals with a deep teal accent. Ink is neutral gray with a near-black accent.
+- Each palette is tuned for light and dark separately. Palettes never invert, and switching one does not change layout.
+- Primary actions use the near-black primary surface, not the brand color. The brand color marks identity, active state, and focus.
+- Status colors (success, warning, danger) are independent of the palette.
+- The palette is stored with the other settings. Existing users keep Amber after an upgrade.
+
 Type:
 
 - System UI font on macOS; monospace for code.
-- Body 13.5–14 px; Markdown 13.5 px with 1.72 line height; code 12–14 px; labels 9–11.5 px.
-- Compact, but every label remains readable at 100% scale.
+- One scale: micro 11, label 12, body 13.5, body-large 14, title 16, heading 20, display 30.
+- Body line height is 1.7 and Markdown uses 1.72. Code size follows the code font size setting.
+- Labels never drop below 11 px, and components do not use arbitrary font sizes.
 - Settings can change code font size and interface scale.
 
 Color:
 
-- Warm neutral surfaces. One amber/orange accent. Semantic green, red, and yellow.
+- Palettes set raw values; components read only semantic names (canvas, surface, foreground, subtle, faint, control, brand).
+- Contrast floors: body text 4.5:1, large text and icons 3:1. Control boundaries use the `control` token at 3:1.
 - Light and dark are tuned separately, not inverted.
 - No purple gradients and no glass everywhere.
-- Layered neutrals with 1 px borders. Shadows only on floating layers.
-- Tool cards use a quieter surface than messages. Secondary text is subtle; tertiary text is faint.
+- Layered neutrals with 1 px borders. Floating layers use one of three shadows: popover, dialog, or float.
+- One scrim token backs every overlay. Tool cards use a quieter surface than messages. Secondary text is subtle; tertiary text is faint.
 
 Density:
 
@@ -61,7 +73,7 @@ Density:
 
 Motion:
 
-- 120–180 ms ease-out for panels and popovers.
+- Fast 120 ms, base 160 ms, slow 200 ms, ease-out for panels and popovers.
 - A blinking cursor while text streams. No bouncing.
 - Respect `prefers-reduced-motion`.
 
@@ -72,6 +84,10 @@ Icons:
 ## Components
 
 - Base UI primitives with the shadcn-style component surface.
+- Buttons come in primary, secondary, outline, ghost, brand, destructive, and quiet variants at xs to large sizes, plus icon sizes.
+- Dialogs share one surface and header. Widths are 440, 600, 720, and 900 px; the body scrolls and the footer stays put.
+- Fields share one control style with linked labels and a 3:1 boundary. Status pills, section labels, and keyboard keys are shared primitives, so state reads the same everywhere.
+- Single-choice controls expose `aria-pressed`; inputs keep labels and placeholders distinct.
 - Product surfaces stay bespoke: tool cards, diff view, approval dock, extension status rail, changes panel.
 - Markdown uses Streamdown with code, math, CJK, and Mermaid plugins. The plugins own loading and errors; app CSS only aligns container tokens.
 - Prompt, approval, and settings dialogs share one visual language.
@@ -137,6 +153,7 @@ The full list is in the [user guide](https://pis.modyqyw.top/guide/shortcuts).
 
 ## Related
 
+- [Design system](design-system.md)
 - [Feature implementation](features.md)
 - [Research](research.md)
 - [Testing](testing.md)

@@ -127,7 +127,7 @@ To add a user setting:
 
 Define the default when the field is missing. When a boolean cannot tell "unset" from `false`, use a schema version migration.
 
-The current version is `settings.Version`. Version 1 files have no `sendOnEnter`; PiS keeps it `true` when they load.
+The current version is `settings.Version`. Version 1 files have no `sendOnEnter`; PiS keeps it `true`. Version 2 files have no `palette`; PiS keeps the Amber default.
 
 ## Change the bridge
 

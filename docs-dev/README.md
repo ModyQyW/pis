@@ -15,9 +15,10 @@ First time on the project:
 3. [Feature implementation](features.md): where each feature lives and how it works.
 4. [Research](research.md): measured facts, competitors, and the reasoning behind the architecture.
 5. [UX and visual direction](ux.md): layout, visual rules, components, and interaction.
-6. [Testing](testing.md): test layers, the full gate, real pi tests, and manual checks.
-7. [Decisions](decisions.md): accepted tradeoffs. Read it before a design change.
-8. [Pitfalls](pitfalls.md): problems that already happened and the rules that prevent them.
+6. [Design system](design-system.md): tokens, palettes, type scale, components, and extension steps.
+7. [Testing](testing.md): test layers, the full gate, real pi tests, and manual checks.
+8. [Decisions](decisions.md): accepted tradeoffs. Read it before a design change.
+9. [Pitfalls](pitfalls.md): problems that already happened and the rules that prevent them.
 
 Release work:
 

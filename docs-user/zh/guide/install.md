@@ -121,7 +121,7 @@ PiS 打开后，先显示空状态页面。
 
 打开设置，找到「pi 可执行文件」。
 
-![设置中的 pi 路径](/images/zh-settings.png)
+![设置中的 pi 路径](/images/zh-settings-path.png)
 
 PiS 会自动查找 pi。查找顺序是：
 

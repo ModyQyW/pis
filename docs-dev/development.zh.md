@@ -126,7 +126,7 @@ Go 服务的导出方法会被绑定到页面。
 
 字段缺失时的默认值要明确。布尔字段无法区分「未设置」和 `false` 时，使用 schema 版本迁移。
 
-当前版本在 `settings.Version`。版本 1 的文件没有 `sendOnEnter`，加载时保持 `true`。
+当前版本在 `settings.Version`。版本 1 的文件没有 `sendOnEnter`，加载时保持 `true`；版本 2 的文件没有 `palette`，加载时保持默认的暖砂。
 
 ## 修改 bridge
 

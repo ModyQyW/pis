@@ -11,11 +11,26 @@ Open Settings:
 
 ## Appearance
 
-There are three themes:
+The theme mode has three choices:
 
 - System: follow the operating system.
 - Light.
 - Dark.
+
+### Palette
+
+Four palettes are available:
+
+- Amber (default): warm neutral surfaces with an amber accent.
+- Graphite: cool neutral surfaces with a steel blue accent.
+- Teal: cool neutral surfaces with a deep teal accent.
+- Ink: neutral gray surfaces with a near-black accent.
+
+A palette applies to both light and dark mode. It changes surfaces, the brand accent, and focus rings; layout and text sizes stay the same. Primary actions stay near-black in every palette.
+
+![Palette picker](/images/palettes.png)
+
+Existing settings keep Amber after an upgrade. If an older settings file has no palette, PiS also uses Amber. The palette is saved in `settings.json` as `palette` with the values `amber`, `graphite`, `teal`, or `ink`.
 
 The interface supports English and Chinese. After a language change, the interface text updates. Native menus stay in English.
 
