@@ -120,8 +120,14 @@ need() {
   command -v "$1" >/dev/null 2>&1 || fail "$1 is required"
 }
 
+release_notes_header() {
+  sed -e "s/__VERSION__/$PIS_VERSION/g" -e "s|__REPO__|$repo|g" scripts/release-notes-header.md
+}
+
 changelog_section() {
   notes=$1
+  release_notes_header >"$notes"
+  printf '\n' >>"$notes"
   awk -v v="$PIS_VERSION" '
     $0 ~ "^## " v "([ (]|$)" { inside = 1; next }
     inside && /^## / { exit }
@@ -129,7 +135,7 @@ changelog_section() {
   ' CHANGELOG.md | awk '
     NF { started = 1; while (blanks > 0) { print ""; blanks-- } print; next }
     started { blanks++ }
-  ' >"$notes"
+  ' >>"$notes"
   [ -s "$notes" ] || fail "CHANGELOG.md has no $PIS_VERSION section"
   previous=$(git tag --list 'v*' --sort=-v:refname | grep -vx "v$PIS_VERSION" | sed -n '1p')
   if [ -n "$previous" ]; then
@@ -158,6 +164,7 @@ generate_changelog() {
   fi
   entries=$(git log --no-merges --reverse --pretty=format:'- %s' "$range" |
     grep -Ev '^- (Prepare|Record) [0-9]+\.[0-9]+\.[0-9]+ (release|publication)$' |
+    grep -Ev '^- chore\(release\): prepare [0-9]+\.[0-9]+\.[0-9]+$' |
     awk '!seen[$0]++' || true)
   [ -n "$entries" ] || fail "no commits to describe since ${previous:-the first commit}"
 
@@ -210,6 +217,9 @@ verify_assets() {
   tag=$1
   v=$2
   assets=$(gh release view "$tag" --json assets --jq '.assets[].name') || fail "release $tag not found"
+  if printf '%s\n' "$assets" | grep -q '\.delta$'; then
+    fail "draft $tag has delta assets; keep updates.deltas at 0"
+  fi
   for asset in \
     SHA256SUMS \
     "pis-$v-arm64.dmg" \
@@ -288,7 +298,7 @@ publish_release() {
 
     git add CHANGELOG.md CHANGELOG.zh.md mygo.config.ts
     if ! git diff --cached --quiet; then
-      git commit -m "Prepare $PIS_VERSION release" >/dev/null
+      git commit -m "chore(release): prepare $PIS_VERSION" >/dev/null
     fi
     [ "$(git status --porcelain)" = "" ] || fail "release preparation left uncommitted changes"
 

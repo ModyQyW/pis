@@ -6,7 +6,6 @@
 
 - The current tag is `v0.0.6`.
 - `0.0.6` is the public release and the latest release.
-- `0.0.3` is a draft only. It does not serve updates.
 - macOS uses an ad-hoc signature. The Windows installer is unsigned. Linux uses tar, deb, rpm, and `install.sh`.
 
 Before a release, confirm the state with `git tag` and `gh release list`.
@@ -19,8 +18,9 @@ The release flow generates update files:
 
 - An update archive for each platform.
 - A manifest for each platform.
-- Optional deltas.
 - `SHA256SUMS`.
+
+Deltas are off (`updates.deltas: 0`): updates download the full archive, and the release asset list stays short.
 
 The update public key must be set at build time. An installed old version uses the key to verify a new version.
 
@@ -75,11 +75,11 @@ The script:
 3. Installs dependencies and runs `bun run check`.
 4. Generates the CHANGELOG section.
 5. Changes the default version in `mygo.config.ts`.
-6. Commits `Prepare <version> release`.
+6. Commits `chore(release): prepare <version>`.
 7. Pushes `main`, creates the `v<version>` tag, and pushes it.
 8. Waits for the Release workflow.
 9. Checks the draft assets and `SHA256SUMS`.
-10. Extracts the CHANGELOG section for the release notes.
+10. Prepends the download header and extracts the CHANGELOG section for the release notes.
 11. Publishes the draft and sets it as latest.
 12. Checks `isDraft`, `isLatest`, and `publishedAt`.
 
@@ -91,13 +91,13 @@ The CHANGELOG is the only release record. The script writes the target version s
 
 Filter rules:
 
-- Remove `Prepare <version> release`.
-- Remove `Record <version> publication`.
+- Remove `chore(release): prepare <version>`.
+- Remove the legacy `Prepare <version> release` and `Record <version> publication` lines.
 - Remove duplicate lines.
 
 If the target version section already exists, the script keeps the manual text.
 
-At publish time, the script extracts the matching CHANGELOG section to a temporary file. It passes that file to `gh release edit --notes-file`. No release-notes file enters Git.
+At publish time, the script prepends the download header in `scripts/release-notes-header.md`, then extracts the matching CHANGELOG section to a temporary file. It passes that file to `gh release edit --notes-file`. The assembled notes file does not enter Git; the header template does.
 
 The Chinese CHANGELOG is `CHANGELOG.zh.md`. Add the same version section before you run the script. Keep that edit uncommitted; the script commits it with the English section. It stops if the Chinese section is missing.
 
@@ -200,8 +200,8 @@ Checklist:
 - Six architecture artifacts exist.
 - `SHA256SUMS` exists.
 - Six `update-*.json` manifests exist.
-- The required deltas exist.
-- The release notes contain no keys, internal paths, or unfinished claims.
+- No delta files are attached (`updates.deltas` is 0).
+- The release notes start with the download table and contain no keys, internal paths, or unfinished claims.
 
 Asset names:
 

@@ -6,7 +6,6 @@
 
 - 当前 tag 为 `v0.0.6`。
 - `0.0.6` 是公开 Release，也是 latest。
-- `0.0.3` 只有 draft。它不提供更新。
 - macOS 使用 ad-hoc 签名。Windows 安装器未签名。Linux 使用 tar、deb、rpm 和 `install.sh`。
 
 发布前用 `git tag` 和 `gh release list` 确认当前状态。
@@ -19,8 +18,9 @@ Releases 中的更新文件由发布流程生成：
 
 - 每个平台的 update archive。
 - 每个平台的 manifest。
-- 可选的 delta。
 - `SHA256SUMS`。
+
+delta 已关闭（`updates.deltas: 0`）：更新下载完整 archive，Release 资产列表更短。
 
 更新公钥必须在构建时设置。用户安装的旧版本用公钥验证新版本。
 
@@ -74,9 +74,9 @@ PIS_VERSION=0.0.6 ./scripts/release.sh
 2. 快进到 `origin/main`。
 3. 安装依赖，运行 `bun run check`。
 4. 生成 CHANGELOG 小节。
-5. 从 CHANGELOG 提取版本小节，供发布使用。
+5. 拼接下载指引和 CHANGELOG 版本小节，供发布使用。
 6. 修改 `mygo.config.ts` 的默认版本。
-7. 提交 `Prepare <version> release`。
+7. 提交 `chore(release): prepare <version>`。
 8. 推送 `main`，创建并推送 `v<version>` tag。
 9. 等待 Release workflow。
 10. 校验 draft 资产和 `SHA256SUMS`。
@@ -91,13 +91,13 @@ CHANGELOG 是唯一的发布记录。脚本把上一个 `v*` tag 到 `HEAD` 的�
 
 过滤规则：
 
-- 去掉 `Prepare <version> release`。
-- 去掉 `Record <version> publication`。
+- 去掉 `chore(release): prepare <version>`。
+- 去掉历史格式 `Prepare <version> release` 和 `Record <version> publication`。
 - 去掉重复行。
 
 目标版本的 CHANGELOG 小节已存在时，脚本保留手写内容。
 
-发布时，脚本把对应小节提取到临时文件，再用 `gh release edit --notes-file` 写入 Release。仓库中不保存 release notes 文件。
+发布时，脚本先把 `scripts/release-notes-header.md` 中的下载指引放在最前，再把对应 CHANGELOG 小节提取到临时文件，并用 `gh release edit --notes-file` 写入 Release。组装后的 notes 文件不进入仓库，header 模板会提交。
 
 中文 CHANGELOG 是 `CHANGELOG.zh.md`。运行脚本前，先在中文文件加入同一个版本小节。这一处改动可以保持未提交；脚本会和英文小节一起提交。中文小节缺失时，脚本停止。
 
@@ -200,7 +200,8 @@ gh run watch <run-id> --exit-status
 - 六个架构产物存在。
 - `SHA256SUMS` 存在。
 - 六个 `update-*.json` manifest 存在。
-- 需要的 delta 存在。
+- 不附带 delta 文件（`updates.deltas` 为 0）。
+- Release notes 以下载表格开头。
 - CHANGELOG 版本小节没有密钥、内部路径或未完成声明。
 
 资产名称：

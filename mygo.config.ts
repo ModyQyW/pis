@@ -16,6 +16,7 @@ export default defineConfig({
         updates: {
           publicKey: updatePublicKey,
           ...(updateURL ? { url: updateURL } : { github: updateGithub }),
+          deltas: 0,
         },
       }
     : {}),

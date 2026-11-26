@@ -9,6 +9,7 @@ English | [简体中文](CHANGELOG.zh.md)
 - Raise secondary text, muted labels, and success states to the 4.5:1 contrast floor; controls keep a 3:1 boundary.
 - Persist the palette in settings (schema v3). Existing users keep Amber.
 - Refresh the user and developer docs for palettes, tokens, and the settings fields.
+- Stop generating delta update files and open each release note with a download table for the right installer.
 
 ## 0.0.6 (2026-11-25)
 
