@@ -1,4 +1,6 @@
 import * as Dialog from "@/components/ui/dialog-compat";
+import { Button } from "@/components/ui/button";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 
 import { t } from "../lib/i18n";
 
@@ -22,34 +24,29 @@ export function ConfirmDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/25 backdrop-blur-[1px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[min(440px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border-strong bg-surface p-4 shadow-2xl outline-none">
-          <Dialog.Title className="text-[13.5px] font-semibold">{title}</Dialog.Title>
-          <Dialog.Description className="mt-1.5 whitespace-pre-wrap text-[11.5px] leading-5 text-subtle">
-            {message}
-          </Dialog.Description>
-          <div className="mt-4 flex justify-end gap-2">
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
+        <DialogOverlay />
+        <DialogSurface width="sm">
+          <DialogHeader title={title} closeLabel={t("Close")} />
+          <div className="px-5 py-4">
+            <Dialog.Description className="whitespace-pre-wrap text-label leading-5 text-subtle">
+              {message}
+            </Dialog.Description>
+            <div className="mt-4 flex justify-end gap-2">
+              <Dialog.Close asChild>
+                <Button variant="outline" size="md">
+                  {t("Cancel")}
+                </Button>
+              </Dialog.Close>
+              <Button
+                variant={danger ? "destructive" : "primary"}
+                size="md"
+                onClick={() => void onConfirm()}
               >
-                {t("Cancel")}
-              </button>
-            </Dialog.Close>
-            <button
-              type="button"
-              onClick={() => void onConfirm()}
-              className={
-                danger
-                  ? "h-8 rounded-md bg-danger px-3 text-[11.5px] font-medium text-white hover:opacity-90"
-                  : "h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90"
-              }
-            >
-              {confirmLabel ?? t("Confirm")}
-            </button>
+                {confirmLabel ?? t("Confirm")}
+              </Button>
+            </div>
           </div>
-        </Dialog.Content>
+        </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
   );

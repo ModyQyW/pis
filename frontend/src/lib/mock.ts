@@ -11,8 +11,9 @@ const pi: PiStatus = {
 };
 
 let settings: Settings = {
-  version: 2,
+  version: 3,
   theme: "system",
+  palette: "amber",
   lastWorkspace: "/Users/you/Projects/atlas",
   recents: [],
   trust: {},
@@ -30,6 +31,7 @@ export function setMockPreferences(p: Preferences): void {
   if (p.language) settings.language = p.language === "zh" ? "zh" : "en";
   if (typeof p.showWidgets === "boolean") settings.showWidgets = p.showWidgets;
   if (typeof p.notifications === "boolean") settings.notifications = p.notifications;
+  if (p.palette) settings.palette = p.palette;
   if (typeof p.codeFontSize === "number") settings.codeFontSize = p.codeFontSize;
   if (typeof p.uiFontSize === "number") settings.uiFontSize = p.uiFontSize;
   if (typeof p.sendOnEnter === "boolean") settings.sendOnEnter = p.sendOnEnter;

@@ -1,7 +1,9 @@
 import * as Dialog from "@/components/ui/dialog-compat";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
+import { TextInput } from "@/components/ui/field";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
-import { KeyRound, Loader2, LogIn, X } from "lucide-react";
+import { KeyRound, Loader2, LogIn } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
@@ -72,16 +74,23 @@ export function LoginDialog({
   useEffect(() => {
     if (!open || !authId || !host.current) return;
     const styles = getComputedStyle(document.documentElement);
+    const token = (name: string, fallback: string) =>
+      styles.getPropertyValue(name).trim() || fallback;
+    const probe = document.createElement("span");
+    probe.style.cssText = "position:fixed;display:none;color:var(--brand)";
+    document.body.appendChild(probe);
+    const cursor = getComputedStyle(probe).color || "#e88a4b";
+    probe.remove();
     const t = new Terminal({
       fontFamily: styles.getPropertyValue("--font-mono").trim() || "monospace",
       fontSize: codeFontSize,
       lineHeight: 1.35,
       cursorBlink: true,
       theme: {
-        background: "#141413",
-        foreground: "#edeae3",
-        cursor: "#e88a4b",
-        selectionBackground: "#3a2a1d",
+        background: token("--term-bg", "#141413"),
+        foreground: token("--term-fg", "#edeae3"),
+        cursor,
+        selectionBackground: token("--term-selection", "#3a2a1d"),
       },
     });
     const f = new FitAddon();
@@ -142,39 +151,27 @@ export function LoginDialog({
   return (
     <Dialog.Root open={open} onOpenChange={(o) => (o ? onOpenChange(o) : void cancel())}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(760px,calc(100vh-64px))] w-[min(680px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <div>
-              <Dialog.Title className="text-[13.5px] font-semibold">
-                {t("Connect a provider")}
-              </Dialog.Title>
-              <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                {t("Runs pi's own login. PiS does not store or log credentials.")}
-              </Dialog.Description>
-            </div>
-            <button
-              type="button"
-              onClick={() => void cancel()}
-              className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-              aria-label={t("Close login")}
-            >
-              <X size={15} />
-            </button>
-          </div>
+        <DialogOverlay />
+        <DialogSurface width="lg">
+          <DialogHeader
+            title={t("Connect a provider")}
+            description={t("Runs pi's own login. PiS does not store or log credentials.")}
+            closeLabel={t("Close login")}
+          />
 
           {!authId ? (
             <div className="px-5 py-5">
-              <label className="text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
+              <label htmlFor="login-provider" className="text-label font-medium text-subtle">
                 {t("Provider")}
               </label>
-              <input
+              <TextInput
+                id="login-provider"
                 value={provider}
                 onChange={(e) => setProvider(e.target.value)}
                 placeholder={t("anthropic, openai, google, openrouter…")}
                 spellCheck={false}
                 autoFocus
-                className="mt-1.5 h-8 w-full rounded-md border border-border bg-canvas px-2.5 text-[12px] outline-none placeholder:text-faint focus:border-border-strong"
+                className="mt-1.5"
               />
               <div className="mt-3 flex gap-1.5">
                 <Method active={!apiKey} onClick={() => setApiKey(false)}>
@@ -186,7 +183,7 @@ export function LoginDialog({
                   {t("API key")}
                 </Method>
               </div>
-              <p className="mt-3 text-[10.5px] leading-4 text-faint">
+              <p className="mt-3 text-micro leading-4 text-faint">
                 {t(
                   "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.",
                 )}
@@ -200,7 +197,7 @@ export function LoginDialog({
                     e.preventDefault();
                     void api.openExternal("https://pi.dev/docs/latest/providers");
                   }}
-                  className="mr-auto self-center text-[10.5px] text-subtle underline underline-offset-2 hover:text-fg"
+                  className="mr-auto self-center text-micro text-subtle underline underline-offset-2 hover:text-fg"
                 >
                   {t("Provider docs")}
                 </a>
@@ -208,7 +205,7 @@ export function LoginDialog({
                   type="button"
                   disabled={starting || !provider.trim()}
                   onClick={() => void start()}
-                  className="flex h-8 items-center gap-1.5 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
+                  className="flex h-8 items-center gap-1.5 rounded-md bg-primary px-3 text-label font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
                 >
                   {starting ? <Loader2 size={12} className="animate-spin" /> : <LogIn size={12} />}
                   {t("Start sign-in")}
@@ -219,10 +216,10 @@ export function LoginDialog({
             <div className="flex min-h-0 flex-1 flex-col">
               <div
                 ref={host}
-                className="h-[380px] min-h-[240px] overflow-hidden bg-[#141413] p-2"
+                className="h-[380px] min-h-[240px] overflow-hidden bg-[var(--term-bg)] p-2"
               />
               <div className="flex items-center gap-2 border-t border-border px-4 py-2">
-                <span className="text-[10px] text-faint">
+                <span className="text-micro text-faint">
                   {exited
                     ? exited.code === 0
                       ? t("Finished. You can close this window.")
@@ -232,14 +229,14 @@ export function LoginDialog({
                 <button
                   type="button"
                   onClick={() => void cancel()}
-                  className="ml-auto h-7 rounded-md border border-border px-2.5 text-[11px] text-subtle hover:bg-surface-2 hover:text-fg"
+                  className="ml-auto h-7 rounded-md border border-control px-2.5 text-label text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   {exited ? t("Close") : t("Cancel")}
                 </button>
               </div>
             </div>
           )}
-        </Dialog.Content>
+        </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
   );
@@ -258,10 +255,11 @@ function Method({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={cn(
-        "flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-[11px] transition-colors",
+        "flex h-8 items-center gap-1.5 rounded-md border px-2.5 text-label transition-colors",
         active
-          ? "border-brand/40 bg-brand-soft text-brand"
+          ? "border-brand/40 bg-brand-soft text-brand-ink"
           : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
       )}
     >

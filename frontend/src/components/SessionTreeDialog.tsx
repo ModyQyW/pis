@@ -1,5 +1,6 @@
 import * as Dialog from "@/components/ui/dialog-compat";
-import { GitBranch, Loader2, X } from "lucide-react";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
+import { GitBranch, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { api } from "../lib/api";
@@ -66,42 +67,28 @@ export function SessionTreeDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(680px,calc(100vh-80px))] w-[min(640px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <div>
-              <Dialog.Title className="text-[13.5px] font-semibold">
-                {t("Session tree")}
-              </Dialog.Title>
-              <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                {t("Pick a point to continue from. The abandoned branch is kept.")}
-              </Dialog.Description>
-            </div>
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label={t("Close session tree")}
-              >
-                <X size={15} />
-              </button>
-            </Dialog.Close>
-          </div>
+        <DialogOverlay />
+        <DialogSurface width="md">
+          <DialogHeader
+            title={t("Session tree")}
+            description={t("Pick a point to continue from. The abandoned branch is kept.")}
+            closeLabel={t("Close session tree")}
+          />
 
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-3 py-2">
             {!sessionId ? (
-              <div className="px-2 py-10 text-center text-[11.5px] text-faint">
+              <div className="px-2 py-10 text-center text-label text-faint">
                 {t("Open a session first.")}
               </div>
             ) : !data && !error ? (
-              <div className="flex items-center justify-center gap-2 py-16 text-[11.5px] text-faint">
+              <div className="flex items-center justify-center gap-2 py-16 text-label text-faint">
                 <Loader2 size={14} className="animate-spin" />
                 {t("Reading the tree…")}
               </div>
             ) : error ? (
-              <div className="px-2 py-10 text-center text-[11.5px] text-danger">{error}</div>
+              <div className="px-2 py-10 text-center text-label text-danger">{error}</div>
             ) : data && data.tree.length === 0 ? (
-              <div className="px-2 py-10 text-center text-[11.5px] text-faint">
+              <div className="px-2 py-10 text-center text-label text-faint">
                 {t("This session has no entries yet.")}
               </div>
             ) : (
@@ -119,7 +106,7 @@ export function SessionTreeDialog({
           </div>
 
           <div className="flex items-center gap-3 border-t border-border px-4 py-2.5">
-            <label className="flex items-center gap-2 text-[11px] text-subtle">
+            <label className="flex items-center gap-2 text-label text-subtle">
               <input
                 type="checkbox"
                 checked={summarize}
@@ -142,13 +129,13 @@ export function SessionTreeDialog({
                 }
               }}
               disabled={busy !== null}
-              className="ml-auto flex h-7 items-center gap-1.5 rounded-md border border-border px-2.5 text-[11px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+              className="ml-auto flex h-7 items-center gap-1.5 rounded-md border border-control px-2.5 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
             >
               <GitBranch size={12} />
               {t("Clone branch")}
             </button>
           </div>
-        </Dialog.Content>
+        </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
   );
@@ -190,13 +177,17 @@ function TreeNode({
         />
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
-            <span className="text-[9.5px] font-medium uppercase tracking-[0.06em] text-faint">
-              {entry.type === "message" ? (entry.role ?? "message") : entry.type.replace("_", " ")}
+            <span className="text-micro font-medium uppercase tracking-label text-faint">
+              {t(
+                entry.type === "message"
+                  ? (entry.role ?? "message")
+                  : entry.type.replaceAll("_", " "),
+              )}
             </span>
-            {active ? <span className="text-[9px] text-brand">{t("current")}</span> : null}
+            {active ? <span className="text-micro text-brand-ink">{t("current")}</span> : null}
             {busy === entry.id ? <Loader2 size={10} className="animate-spin" /> : null}
           </span>
-          <span className="mt-0.5 line-clamp-2 block text-[11px] leading-4">{title}</span>
+          <span className="mt-0.5 line-clamp-2 block text-label leading-4">{title}</span>
         </span>
       </button>
       {node.children.map((child) => (

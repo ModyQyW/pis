@@ -1,5 +1,6 @@
 import * as Dialog from "@/components/ui/dialog-compat";
-import { Check, RefreshCw, Search, X } from "lucide-react";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
+import { Check, RefreshCw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { cn } from "../lib/cn";
@@ -57,27 +58,13 @@ export function ModelPickerDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(700px,calc(100vh-64px))] w-[min(620px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-          <div className="flex items-center justify-between border-b border-border px-4 py-3">
-            <div>
-              <Dialog.Title className="text-[13.5px] font-semibold">
-                {t("Model & thinking")}
-              </Dialog.Title>
-              <Dialog.Description className="mt-0.5 text-[10.5px] text-faint">
-                {t("Models come from your pi credentials and configuration.")}
-              </Dialog.Description>
-            </div>
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label={t("Close model picker")}
-              >
-                <X size={15} />
-              </button>
-            </Dialog.Close>
-          </div>
+        <DialogOverlay />
+        <DialogSurface width="md">
+          <DialogHeader
+            title={t("Model & thinking")}
+            description={t("Models come from your pi credentials and configuration.")}
+            closeLabel={t("Close model picker")}
+          />
 
           <div className="flex items-center gap-2 border-b border-border px-3">
             <Search size={13} className="text-faint" />
@@ -86,7 +73,7 @@ export function ModelPickerDialog({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("Search models…")}
-              className="h-9 min-w-0 flex-1 bg-transparent text-[12px] outline-none placeholder:text-faint"
+              className="h-9 min-w-0 flex-1 bg-transparent text-label outline-none placeholder:text-faint"
             />
             <button
               type="button"
@@ -101,13 +88,13 @@ export function ModelPickerDialog({
 
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-2 py-1.5">
             {grouped.length === 0 ? (
-              <div className="px-4 py-12 text-center text-[11.5px] leading-5 text-faint">
+              <div className="px-4 py-12 text-center text-label leading-5 text-faint">
                 {t("No models available. Sign in with pi or configure a provider, then refresh.")}
               </div>
             ) : (
               grouped.map(([provider, models]) => (
                 <div key={provider} className="mb-1">
-                  <div className="px-2 pb-1 pt-2 text-[9.5px] font-medium uppercase tracking-[0.08em] text-faint">
+                  <div className="px-2 pb-1 pt-2 text-micro font-medium uppercase tracking-label text-faint">
                     {provider}
                   </div>
                   {models.map((model) => {
@@ -127,10 +114,10 @@ export function ModelPickerDialog({
                         )}
                       >
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-[12px] font-medium">
+                          <span className="block truncate text-label font-medium">
                             {model.name}
                           </span>
-                          <span className="mt-0.5 block truncate text-[10px] text-faint">
+                          <span className="mt-0.5 block truncate text-micro text-faint">
                             {model.id}
                             {model.contextWindow
                               ? ` · ${Math.round(model.contextWindow / 1000)}k context`
@@ -140,7 +127,7 @@ export function ModelPickerDialog({
                         {busy === model.id ? (
                           <RefreshCw size={12} className="animate-spin text-subtle" />
                         ) : active ? (
-                          <Check size={13} className="text-brand" />
+                          <Check size={13} className="text-brand-ink" />
                         ) : null}
                       </button>
                     );
@@ -152,7 +139,7 @@ export function ModelPickerDialog({
 
           <div className="border-t border-border px-4 py-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
+              <span className="text-micro font-medium uppercase tracking-label text-faint">
                 {t("Thinking")}
               </span>
               <div className="flex gap-1">
@@ -166,17 +153,17 @@ export function ModelPickerDialog({
                     disabled={!session?.model?.reasoning}
                     onClick={() => void onChooseThinking(level)}
                     className={cn(
-                      "h-6 rounded-md border px-2 text-[10px] capitalize transition-colors disabled:opacity-40",
+                      "h-6 rounded-md border px-2 text-micro capitalize transition-colors disabled:opacity-40",
                       session?.thinking === level
-                        ? "border-brand/35 bg-brand-soft text-brand"
+                        ? "border-brand/35 bg-brand-soft text-brand-ink"
                         : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    {level}
+                    {t(level)}
                   </button>
                 ))}
               </div>
-              <label className="ml-auto flex items-center gap-1.5 text-[10.5px] text-subtle">
+              <label className="ml-auto flex items-center gap-1.5 text-micro text-subtle">
                 <input
                   type="checkbox"
                   checked={session?.autoCompaction ?? true}
@@ -187,7 +174,7 @@ export function ModelPickerDialog({
               </label>
             </div>
           </div>
-        </Dialog.Content>
+        </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
   );

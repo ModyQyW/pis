@@ -167,6 +167,8 @@ export interface Output {
   data: string;
 }
 
+export type Palette = string;
+
 export type PermissionPolicy = string;
 
 export interface Permissions {
@@ -198,6 +200,7 @@ export interface PiStatusChanged {
 export interface Preferences {
   showWidgets?: boolean;
   notifications?: boolean;
+  palette?: string;
   codeFontSize?: number;
   uiFontSize?: number;
   sendOnEnter?: boolean;
@@ -271,6 +274,7 @@ export interface SessionInfo {
 export interface Settings {
   version: number;
   theme: Theme;
+  palette: Palette;
   lastWorkspace?: string;
   recents: Recent[];
   trust: Record<string, TrustDecision>;

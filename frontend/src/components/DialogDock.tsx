@@ -38,15 +38,15 @@ export function DialogDock({
   };
 
   return (
-    <div className="mx-auto w-full max-w-[860px] px-5 pb-2">
-      <div className="overflow-hidden rounded-xl border border-brand/30 bg-surface shadow-[0_8px_30px_rgba(30,25,15,0.06)]">
+    <div className="mx-auto w-full max-w-chat px-5 pb-2">
+      <div className="overflow-hidden rounded-xl border border-brand/30 bg-surface shadow-float">
         <div className="flex items-start gap-2.5 border-b border-border/70 bg-brand-soft/40 px-3.5 py-2.5">
-          <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border border-brand/30 bg-surface text-brand">
+          <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border border-brand/30 bg-surface text-brand-ink">
             {dialog.method === "confirm" ? <CircleAlert size={11} /> : <HelpCircle size={11} />}
           </span>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-medium text-brand">
+              <span className="text-label font-medium text-brand-ink">
                 {dialog.method === "confirm"
                   ? t("Approval needed")
                   : dialog.method === "select"
@@ -56,18 +56,18 @@ export function DialogDock({
                       : t("Input needed")}
               </span>
               {pending > 1 ? (
-                <span className="rounded-full border border-brand/25 px-1.5 py-0.5 text-[9px] text-brand/80">
+                <span className="rounded-full border border-brand/25 px-1.5 py-0.5 text-micro text-brand-ink">
                   {t("1 of {count}", { count: pending })}
                 </span>
               ) : null}
             </div>
             {dialog.title ? (
-              <div className="mt-1 whitespace-pre-wrap text-[12.5px] font-medium leading-5">
+              <div className="mt-1 whitespace-pre-wrap text-label font-medium leading-5">
                 {dialog.title}
               </div>
             ) : null}
             {dialog.message ? (
-              <div className="mt-1 whitespace-pre-wrap text-[11.5px] leading-5 text-subtle">
+              <div className="mt-1 whitespace-pre-wrap text-label leading-5 text-subtle">
                 {dialog.message}
               </div>
             ) : null}
@@ -89,14 +89,14 @@ export function DialogDock({
               <button
                 type="button"
                 onClick={() => onRespond({ confirmed: false })}
-                className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
+                className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg"
               >
                 {t("Deny")}
               </button>
               <button
                 type="button"
                 onClick={() => onRespond({ confirmed: true })}
-                className="h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90"
+                className="h-8 rounded-md bg-primary px-3 text-label font-medium text-primary-foreground hover:opacity-90"
               >
                 {t("Allow")}
               </button>
@@ -109,9 +109,9 @@ export function DialogDock({
                     key={option}
                     type="button"
                     onClick={() => onRespond({ value: option })}
-                    className="flex w-full items-start gap-2 rounded-md border border-border/70 bg-canvas px-2.5 py-2 text-left text-[11.5px] leading-5 transition-colors hover:border-border-strong hover:bg-surface-2"
+                    className="flex w-full items-start gap-2 rounded-md border border-border/70 bg-canvas px-2.5 py-2 text-left text-label leading-5 transition-colors hover:border-border-strong hover:bg-surface-2"
                   >
-                    <span className="mt-0.5 w-4 shrink-0 text-right text-[10px] tabular-nums text-faint">
+                    <span className="mt-0.5 w-4 shrink-0 text-right text-micro tabular-nums text-faint">
                       {i + 1}
                     </span>
                     <span className="min-w-0 flex-1 whitespace-pre-wrap">{option}</span>
@@ -128,13 +128,13 @@ export function DialogDock({
                       if (e.key === "Enter" && !e.nativeEvent.isComposing) submitText();
                     }}
                     placeholder={t("Or type your own answer…")}
-                    className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
+                    className="h-8 min-w-0 flex-1 rounded-md border border-control bg-canvas px-2.5 text-label outline-none placeholder:text-faint focus:border-brand"
                   />
                   <button
                     type="button"
                     disabled={!text.trim()}
                     onClick={submitText}
-                    className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                    className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
                   >
                     {t("Send")}
                   </button>
@@ -155,15 +155,15 @@ export function DialogDock({
                 placeholder={dialog.placeholder ?? ""}
                 rows={dialog.method === "editor" ? 6 : 3}
                 autoFocus
-                className="w-full resize-y rounded-md border border-border bg-canvas px-2.5 py-2 text-[11.5px] leading-5 outline-none placeholder:text-faint focus:border-border-strong"
+                className="w-full resize-y rounded-md border border-control bg-canvas px-2.5 py-2 text-label leading-5 outline-none placeholder:text-faint focus:border-brand"
               />
               <div className="mt-2 flex items-center justify-end gap-2">
-                <span className="mr-auto text-[9.5px] text-faint">{t("⌘Enter to send")}</span>
+                <span className="mr-auto text-micro text-faint">{t("⌘Enter to send")}</span>
                 <button
                   type="button"
                   disabled={!text.trim()}
                   onClick={submitText}
-                  className="h-8 rounded-md bg-brand px-3 text-[11.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
+                  className="h-8 rounded-md bg-primary px-3 text-label font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
                 >
                   {t("Send")}
                 </button>
@@ -171,7 +171,7 @@ export function DialogDock({
             </div>
           )}
           {dialog.timeout ? (
-            <p className="mt-2 text-[9.5px] text-faint">
+            <p className="mt-2 text-micro text-faint">
               {t("This request may resolve automatically after {seconds}s.", {
                 seconds: Math.round(dialog.timeout / 1000),
               })}

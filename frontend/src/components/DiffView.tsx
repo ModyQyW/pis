@@ -30,7 +30,7 @@ export function DiffView({ diff, className }: { diff: string; className?: string
               "flex min-h-[17px] whitespace-pre px-2",
               line.kind === "add" && "bg-success/10 text-success",
               line.kind === "del" && "bg-danger/10 text-danger",
-              line.kind === "hunk" && "mt-1 text-brand/80",
+              line.kind === "hunk" && "mt-1 text-brand-ink",
               line.kind === "meta" && "text-faint",
             )}
           >

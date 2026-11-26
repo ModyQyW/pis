@@ -8,6 +8,7 @@ import {
   LogIn,
   Minimize2,
   PanelLeft,
+  Palette as PaletteIcon,
   PanelRight,
   Pencil,
   Plus,
@@ -53,7 +54,14 @@ import { setLocale, t } from "../lib/i18n";
 import { buildTranscript } from "../lib/transcript";
 import type { Info as TrustInfo, Summary } from "../mygo";
 import { useChat } from "../store/chat";
-import type { Bootstrap, MenuCommand, Theme, Workspace } from "../lib/types";
+import {
+  paletteOf,
+  type Bootstrap,
+  type MenuCommand,
+  type Palette,
+  type Theme,
+  type Workspace,
+} from "../lib/types";
 
 const LoginDialog = lazy(() =>
   import("../components/LoginDialog").then((m) => ({ default: m.LoginDialog })),
@@ -66,7 +74,10 @@ export function App() {
   const [recentSessions, setRecentSessions] = useState<Summary[]>([]);
   const [draft, setDraft] = useState("");
   const [theme, setTheme] = useState<Theme>("system");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [colorPalette, setColorPalette] = useState<Palette>("amber");
+  const [sidebarOpen, setSidebarOpen] = useState(
+    () => typeof window === "undefined" || !window.matchMedia("(max-width: 900px)").matches,
+  );
   const [rightOpen, setRightOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -82,6 +93,14 @@ export function App() {
   const trustResolver = useRef<((choice: { decided: boolean; trusted: boolean }) => void) | null>(
     null,
   );
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen((open) => !open);
+    if (window.matchMedia("(max-width: 900px)").matches) setRightOpen(false);
+  }, []);
+  const toggleRight = useCallback(() => {
+    setRightOpen((open) => !open);
+    if (window.matchMedia("(max-width: 900px)").matches) setSidebarOpen(false);
+  }, []);
 
   const sessions = useChat((s) => s.sessions);
   const activeKey = useChat((s) => s.activeKey);
@@ -110,6 +129,7 @@ export function App() {
       const next = await api.bootstrap();
       setBoot(next);
       setTheme(next.settings.theme);
+      setColorPalette(paletteOf(next.settings.palette));
       setSelected((current) => {
         if (current) {
           return next.recents.find((r) => r.path === current.path) ?? current;
@@ -232,6 +252,11 @@ export function App() {
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
   }, [theme, boot]);
+
+  useEffect(() => {
+    if (!boot) return;
+    document.documentElement.dataset.palette = colorPalette;
+  }, [colorPalette, boot]);
 
   const refreshSessions = useCallback(async () => {
     if (!selected) {
@@ -535,10 +560,10 @@ export function App() {
           setPaletteOpen(true);
           break;
         case "toggleSidebar":
-          setSidebarOpen((v) => !v);
+          toggleSidebar();
           break;
         case "toggleChanges":
-          setRightOpen((v) => !v);
+          toggleRight();
           break;
         case "stop":
           stop();
@@ -605,10 +630,10 @@ export function App() {
         setPaletteOpen(true);
       } else if (key === "b") {
         e.preventDefault();
-        setSidebarOpen((v) => !v);
+        toggleSidebar();
       } else if (key === "g" && e.shiftKey) {
         e.preventDefault();
-        setRightOpen((v) => !v);
+        toggleRight();
       } else if (key === "t" && e.shiftKey) {
         e.preventDefault();
         setTreeOpen(true);
@@ -637,6 +662,15 @@ export function App() {
     setTheme(next);
     try {
       await api.setTheme(next);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err));
+    }
+  }, []);
+
+  const choosePalette = useCallback(async (next: Palette) => {
+    setColorPalette(next);
+    try {
+      await api.setPreferences({ palette: next });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
@@ -721,6 +755,34 @@ export function App() {
         run: () => setModelPickerOpen(true),
       },
       {
+        id: "palette-amber",
+        label: "Palette: Amber",
+        group: "Preferences",
+        icon: PaletteIcon,
+        run: () => void choosePalette("amber"),
+      },
+      {
+        id: "palette-graphite",
+        label: "Palette: Graphite",
+        group: "Preferences",
+        icon: PaletteIcon,
+        run: () => void choosePalette("graphite"),
+      },
+      {
+        id: "palette-teal",
+        label: "Palette: Teal",
+        group: "Preferences",
+        icon: PaletteIcon,
+        run: () => void choosePalette("teal"),
+      },
+      {
+        id: "palette-ink",
+        label: "Palette: Ink",
+        group: "Preferences",
+        icon: PaletteIcon,
+        run: () => void choosePalette("ink"),
+      },
+      {
         id: "settings",
         label: "Open settings",
         group: "Preferences",
@@ -734,7 +796,7 @@ export function App() {
         group: "View",
         icon: PanelLeft,
         shortcut: "⌘B",
-        run: () => setSidebarOpen((v) => !v),
+        run: toggleSidebar,
       },
       {
         id: "changes",
@@ -742,7 +804,7 @@ export function App() {
         group: "View",
         icon: PanelRight,
         shortcut: "⌘⇧G",
-        run: () => setRightOpen((v) => !v),
+        run: toggleRight,
       },
       {
         id: "pi",
@@ -810,12 +872,12 @@ export function App() {
       <div className="flex h-full items-center justify-center bg-canvas p-8">
         <div className="w-full max-w-[440px] rounded-xl border border-border bg-surface p-6">
           <BrandMark size={34} />
-          <h1 className="mt-4 text-[16px] font-semibold">{t("PiS could not start")}</h1>
-          <p className="mt-2 text-[12px] leading-5 text-subtle">{fatal}</p>
+          <h1 className="mt-4 text-title font-semibold">{t("PiS could not start")}</h1>
+          <p className="mt-2 text-label leading-5 text-subtle">{fatal}</p>
           <button
             type="button"
             onClick={() => void load()}
-            className="mt-5 h-8 rounded-md border border-border px-3 text-[12px] hover:bg-surface-2"
+            className="mt-5 h-8 rounded-md border border-border px-3 text-label hover:bg-surface-2"
           >
             {t("Try again")}
           </button>
@@ -827,7 +889,7 @@ export function App() {
   if (!boot) {
     return (
       <div className="flex h-full items-center justify-center bg-canvas">
-        <div className="flex items-center gap-3 text-[12px] text-subtle">
+        <div className="flex items-center gap-3 text-label text-subtle">
           <BrandMark size={30} />
           <span className="pulse-soft">{t("Starting PiS…")}</span>
         </div>
@@ -847,6 +909,9 @@ export function App() {
             ? "error"
             : "idle";
   const running = Boolean(active?.streaming);
+  const closeNarrowSidebar = () => {
+    if (window.matchMedia("(max-width: 900px)").matches) setSidebarOpen(false);
+  };
   const composerDraft = active ? active.draft : draft;
   const setComposerDraft = (text: string) => {
     if (activeKey) useChat.getState().setDraft(activeKey, text);
@@ -854,37 +919,63 @@ export function App() {
   };
 
   return (
-    <div className="flex h-full bg-canvas text-fg">
+    <div className="relative flex h-full bg-canvas text-fg">
       {sidebarOpen ? (
-        <Sidebar
-          boot={boot}
-          selected={displayWorkspace}
-          onSelect={(ws) => {
-            setSelected(ws);
-            const open = Object.values(useChat.getState().sessions).find((s) => s.cwd === ws.path);
-            useChat.getState().setActive(open?.key ?? null);
-          }}
-          onNewChat={() => void handleNewChat()}
-          onOpenProject={() => void handleOpenProject()}
-          onSettings={() => setSettingsOpen(true)}
-          recentSessions={recentSessions}
-          openSessions={openSessions}
-          activeKey={activeKey}
-          onOpenSummary={(summary) => void handleOpenSummary(summary)}
-          onSelectOpen={(key) => {
-            const s = useChat.getState().sessions[key];
-            if (s) {
-              setSelected(
-                boot.recents.find((r) => r.path === s.cwd) ?? {
-                  path: s.cwd,
-                  name: s.cwd.split("/").pop() ?? s.cwd,
-                  lastOpened: new Date().toISOString(),
-                },
-              );
-            }
-            useChat.getState().setActive(key);
-          }}
-        />
+        <>
+          <button
+            type="button"
+            className="sidebar-scrim"
+            aria-label={t("Hide sidebar")}
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="sidebar-shell">
+            <Sidebar
+              boot={boot}
+              selected={displayWorkspace}
+              onSelect={(ws) => {
+                closeNarrowSidebar();
+                setSelected(ws);
+                const open = Object.values(useChat.getState().sessions).find(
+                  (s) => s.cwd === ws.path,
+                );
+                useChat.getState().setActive(open?.key ?? null);
+              }}
+              onNewChat={() => {
+                closeNarrowSidebar();
+                void handleNewChat();
+              }}
+              onOpenProject={() => {
+                closeNarrowSidebar();
+                void handleOpenProject();
+              }}
+              onSettings={() => {
+                closeNarrowSidebar();
+                setSettingsOpen(true);
+              }}
+              recentSessions={recentSessions}
+              openSessions={openSessions}
+              activeKey={activeKey}
+              onOpenSummary={(summary) => {
+                closeNarrowSidebar();
+                void handleOpenSummary(summary);
+              }}
+              onSelectOpen={(key) => {
+                closeNarrowSidebar();
+                const s = useChat.getState().sessions[key];
+                if (s) {
+                  setSelected(
+                    boot.recents.find((r) => r.path === s.cwd) ?? {
+                      path: s.cwd,
+                      name: s.cwd.split("/").pop() ?? s.cwd,
+                      lastOpened: new Date().toISOString(),
+                    },
+                  );
+                }
+                useChat.getState().setActive(key);
+              }}
+            />
+          </div>
+        </>
       ) : null}
 
       <main className="flex min-w-0 flex-1 flex-col">
@@ -910,12 +1001,13 @@ export function App() {
             ) : undefined
           }
           onPalette={() => setPaletteOpen(true)}
-          onToggleRight={() => setRightOpen((v) => !v)}
+          onToggleRight={toggleRight}
+          onToggleSidebar={toggleSidebar}
         />
         <div className="flex min-h-0 flex-1">
           <section className="flex min-w-0 flex-1 flex-col">
             {!boot.pi.checking && !boot.pi.compatible ? (
-              <div className="flex items-start gap-2 border-b border-warning/25 bg-warning/5 px-4 py-2.5 text-[11px] leading-5 text-warning">
+              <div className="flex items-start gap-2 border-b border-warning/25 bg-warning/5 px-4 py-2.5 text-label leading-5 text-warning">
                 <AlertCircle size={13} className="mt-0.5 shrink-0" />
                 <span className="min-w-0 flex-1">
                   {boot.pi.found
@@ -925,27 +1017,27 @@ export function App() {
                 <button
                   type="button"
                   onClick={() => setSettingsOpen(true)}
-                  className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-[10px] hover:bg-warning/10"
+                  className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-micro hover:bg-warning/10"
                 >
                   {t("Locate pi")}
                 </button>
                 <button
                   type="button"
                   onClick={() => void api.openExternal("https://pi.dev/docs/latest/quickstart")}
-                  className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-[10px] hover:bg-warning/10"
+                  className="shrink-0 rounded border border-warning/30 px-2 py-0.5 text-micro hover:bg-warning/10"
                 >
                   {t("Install guide")}
                 </button>
               </div>
             ) : null}
             {active?.error ? (
-              <div className="flex items-start gap-2 border-b border-danger/20 bg-danger/5 px-4 py-2 text-[11px] leading-4 text-danger">
+              <div className="flex items-start gap-2 border-b border-danger/20 bg-danger/5 px-4 py-2 text-label leading-4 text-danger">
                 <AlertCircle size={13} className="mt-0.5 shrink-0" />
                 <span className="min-w-0 flex-1 whitespace-pre-wrap">{active.error}</span>
                 <button
                   type="button"
                   onClick={() => useChat.getState().close(active.key)}
-                  className="shrink-0 rounded border border-danger/30 px-1.5 py-0.5 text-[10px] hover:bg-danger/10"
+                  className="shrink-0 rounded border border-danger/30 px-1.5 py-0.5 text-micro hover:bg-danger/10"
                 >
                   {t("Close")}
                 </button>
@@ -953,14 +1045,14 @@ export function App() {
             ) : null}
             <div className="min-h-0 flex-1 overflow-hidden">
               {active && active.status === "ready" && active.models.length === 0 ? (
-                <div className="flex items-center gap-2 border-b border-brand/20 bg-brand-soft/40 px-4 py-2 text-[11px] text-subtle">
+                <div className="flex items-center gap-2 border-b border-brand/20 bg-brand-soft/40 px-4 py-2 text-label text-subtle">
                   <span className="min-w-0 flex-1">
                     {t("No models are available. Connect a provider in pi to start.")}
                   </span>
                   <button
                     type="button"
                     onClick={() => setLoginOpen(true)}
-                    className="shrink-0 rounded-md border border-brand/30 bg-surface px-2 py-1 text-[10.5px] text-brand hover:bg-surface-2"
+                    className="shrink-0 rounded-md border border-brand/30 bg-surface px-2 py-1 text-micro text-brand-ink hover:bg-surface-2"
                   >
                     {t("Connect")}
                   </button>
@@ -1043,11 +1135,21 @@ export function App() {
             />
           </section>
           {rightOpen ? (
-            <RightPanel
-              workspace={displayWorkspace}
-              session={active}
-              onClose={() => setRightOpen(false)}
-            />
+            <>
+              <button
+                type="button"
+                className="right-scrim"
+                aria-label={t("Close panel")}
+                onClick={() => setRightOpen(false)}
+              />
+              <div className="right-shell">
+                <RightPanel
+                  workspace={displayWorkspace}
+                  session={active}
+                  onClose={() => setRightOpen(false)}
+                />
+              </div>
+            </>
           ) : null}
         </div>
       </main>
@@ -1065,6 +1167,8 @@ export function App() {
         boot={boot}
         theme={theme}
         onTheme={(t) => void chooseTheme(t)}
+        palette={colorPalette}
+        onPalette={(p) => void choosePalette(p)}
         onReload={() => void load()}
         onMCP={() => {
           setSettingsOpen(false);

@@ -2,7 +2,7 @@ import * as React from "react";
 import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
-import { cn } from "cn";
+import { cn } from "../../lib/cn";
 
 import { Button } from "@/components/ui/button";
 
@@ -12,9 +12,9 @@ const attachmentVariants = cva(
     variants: {
       size: {
         default:
-          "gap-2 text-sm has-data-[slot=attachment-content]:px-2.5 has-data-[slot=attachment-content]:py-2 has-data-[slot=attachment-media]:p-2",
-        sm: "gap-2.5 text-xs has-data-[slot=attachment-content]:px-2 has-data-[slot=attachment-content]:py-1.5 has-data-[slot=attachment-media]:p-1.5",
-        xs: "gap-1.5 rounded-lg text-xs has-data-[slot=attachment-content]:px-1.5 has-data-[slot=attachment-content]:py-1 has-data-[slot=attachment-media]:p-1",
+          "gap-2 text-body-lg has-data-[slot=attachment-content]:px-2.5 has-data-[slot=attachment-content]:py-2 has-data-[slot=attachment-media]:p-2",
+        sm: "gap-2.5 text-label has-data-[slot=attachment-content]:px-2 has-data-[slot=attachment-content]:py-1.5 has-data-[slot=attachment-media]:p-1.5",
+        xs: "gap-1.5 rounded-lg text-label has-data-[slot=attachment-content]:px-1.5 has-data-[slot=attachment-content]:py-1 has-data-[slot=attachment-media]:p-1",
       },
       orientation: {
         horizontal: "min-w-40 items-center",
@@ -108,7 +108,7 @@ function AttachmentDescription({ className, ...props }: React.ComponentProps<"sp
     <span
       data-slot="attachment-description"
       className={cn(
-        "mt-0.5 block min-w-0 truncate text-xs text-subtle group-data-[state=error]/attachment:text-destructive/80",
+        "mt-0.5 block min-w-0 truncate text-label text-subtle group-data-[state=error]/attachment:text-destructive/80",
         "max-w-full",
         className,
       )}

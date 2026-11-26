@@ -1,7 +1,8 @@
-import { FolderGit2, GitBranch, Loader2, X } from "lucide-react";
+import { FolderGit2, GitBranch, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import * as Dialog from "@/components/ui/dialog-compat";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { api } from "../lib/api";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
@@ -64,36 +65,22 @@ export function WorktreeDialog({
     <>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(680px,calc(100vh-64px))] w-[min(620px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-            <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-              <div>
-                <Dialog.Title className="flex items-center gap-2 text-[14px] font-semibold">
-                  <FolderGit2 size={15} className="text-brand" />
-                  {t("Worktrees")}
-                </Dialog.Title>
-                <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                  {t("Parallel checkouts for the same repository. Open one as a project.")}
-                </Dialog.Description>
-              </div>
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                  aria-label={t("Close worktrees")}
-                >
-                  <X size={15} />
-                </button>
-              </Dialog.Close>
-            </div>
+          <DialogOverlay />
+          <DialogSurface width="md">
+            <DialogHeader
+              icon={<FolderGit2 size={15} />}
+              title={t("Worktrees")}
+              description={t("Parallel checkouts for the same repository. Open one as a project.")}
+              closeLabel={t("Close worktrees")}
+            />
 
             <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
               {!workspace ? (
-                <p className="py-6 text-center text-[11.5px] text-faint">
+                <p className="py-6 text-center text-label text-faint">
                   {t("Open a project first.")}
                 </p>
               ) : loading && list.length === 0 ? (
-                <div className="flex items-center gap-2 py-8 text-[11px] text-faint">
+                <div className="flex items-center gap-2 py-8 text-label text-faint">
                   <Loader2 size={13} className="animate-spin" />
                   {t("Reading worktrees…")}
                 </div>
@@ -107,21 +94,19 @@ export function WorktreeDialog({
                       <GitBranch size={12} className="mt-0.5 shrink-0 text-faint" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="truncate text-[11.5px] font-medium">
+                          <span className="truncate text-label font-medium">
                             {wt.branch || t(wt.detached ? "detached" : "worktree")}
                           </span>
                           {wt.locked ? (
-                            <span className="text-[9px] text-warning">{t("locked")}</span>
+                            <span className="text-micro text-warning">{t("locked")}</span>
                           ) : null}
                         </div>
-                        <p className="mt-0.5 truncate font-mono text-[10px] text-faint">
-                          {wt.path}
-                        </p>
+                        <p className="mt-0.5 truncate font-mono text-micro text-faint">{wt.path}</p>
                       </div>
                       <button
                         type="button"
                         onClick={() => onOpen(wt.path)}
-                        className="h-7 rounded-md border border-border px-2 text-[10px] text-subtle hover:bg-surface-2 hover:text-fg"
+                        className="h-7 rounded-md border border-control px-2 text-micro text-subtle hover:bg-surface-2 hover:text-fg"
                       >
                         {t("Open")}
                       </button>
@@ -129,7 +114,7 @@ export function WorktreeDialog({
                         <button
                           type="button"
                           onClick={() => setRemove(wt)}
-                          className="h-7 rounded-md px-1.5 text-[10px] text-faint hover:bg-danger/10 hover:text-danger"
+                          className="h-7 rounded-md px-1.5 text-micro text-faint hover:bg-danger/10 hover:text-danger"
                           title={t("Remove worktree")}
                         >
                           {t("Remove")}
@@ -142,7 +127,7 @@ export function WorktreeDialog({
 
               {workspace ? (
                 <>
-                  <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
+                  <h3 className="mt-5 text-label font-semibold uppercase tracking-label text-faint">
                     {t("New worktree")}
                   </h3>
                   <div className="mt-2 flex gap-2">
@@ -150,17 +135,17 @@ export function WorktreeDialog({
                       value={path}
                       onChange={(e) => setPath(e.target.value)}
                       placeholder={t("Absolute path")}
-                      className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 min-w-0 flex-1 rounded-md border border-control bg-canvas px-2.5 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                     <input
                       value={branch}
                       onChange={(e) => setBranch(e.target.value)}
                       placeholder={createBranch ? t("new branch") : t("branch (optional)")}
-                      className="h-8 w-[180px] rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 w-[180px] rounded-md border border-control bg-canvas px-2.5 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                   </div>
                   <div className="mt-2 flex items-center gap-3">
-                    <label className="flex items-center gap-1.5 text-[10.5px] text-subtle">
+                    <label className="flex items-center gap-1.5 text-micro text-subtle">
                       <input
                         type="checkbox"
                         checked={createBranch}
@@ -173,7 +158,7 @@ export function WorktreeDialog({
                       type="button"
                       disabled={!path.trim() || (createBranch && !branch.trim())}
                       onClick={() => void add()}
-                      className="ml-auto h-7 rounded-md bg-brand px-2.5 text-[10.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
+                      className="ml-auto h-7 rounded-md bg-primary px-2.5 text-micro font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
                     >
                       {t("Create worktree")}
                     </button>
@@ -181,7 +166,7 @@ export function WorktreeDialog({
                 </>
               ) : null}
             </div>
-          </Dialog.Content>
+          </DialogSurface>
         </Dialog.Portal>
       </Dialog.Root>
       <ConfirmDialog

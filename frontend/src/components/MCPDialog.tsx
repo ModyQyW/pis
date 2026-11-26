@@ -1,7 +1,8 @@
-import { Loader2, Plus, Server, Trash2, X } from "lucide-react";
+import { Loader2, Plus, Server, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import * as Dialog from "@/components/ui/dialog-compat";
+import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { t } from "../lib/i18n";
@@ -75,57 +76,43 @@ export function MCPDialog({
     <>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(720px,calc(100vh-64px))] w-[min(720px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-            <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-              <div>
-                <Dialog.Title className="flex items-center gap-2 text-[14px] font-semibold">
-                  <Server size={15} className="text-brand" />
-                  {t("MCP servers")}
-                </Dialog.Title>
-                <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                  {t("Edit pi's mcp.json. pi connects enabled servers at session start.")}
-                </Dialog.Description>
-              </div>
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                  aria-label={t("Close MCP servers")}
-                >
-                  <X size={15} />
-                </button>
-              </Dialog.Close>
-            </div>
+          <DialogOverlay />
+          <DialogSurface width="lg">
+            <DialogHeader
+              icon={<Server size={15} />}
+              title={t("MCP servers")}
+              description={t("Edit pi's mcp.json. pi connects enabled servers at session start.")}
+              closeLabel={t("Close MCP servers")}
+            />
 
             <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
               {!workspace ? (
-                <p className="py-6 text-center text-[11.5px] text-faint">
+                <p className="py-6 text-center text-label text-faint">
                   {t("Open a project first.")}
                 </p>
               ) : (
                 <>
                   <div className="flex items-center justify-between">
-                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
+                    <h3 className="text-label font-semibold uppercase tracking-label text-faint">
                       {t("Configured")}
                     </h3>
                     <button
                       type="button"
                       onClick={() => void load()}
-                      className="text-[10.5px] text-subtle hover:text-fg"
+                      className="text-micro text-subtle hover:text-fg"
                     >
                       {t("Refresh")}
                     </button>
                   </div>
                   {loading && servers.length === 0 ? (
-                    <div className="flex items-center gap-2 py-8 text-[11px] text-faint">
+                    <div className="flex items-center gap-2 py-8 text-label text-faint">
                       <Loader2 size={13} className="animate-spin" />
                       {t("Reading mcp.json…")}
                     </div>
                   ) : error ? (
-                    <p className="py-4 text-[11px] leading-5 text-danger">{error}</p>
+                    <p className="py-4 text-label leading-5 text-danger">{error}</p>
                   ) : servers.length === 0 ? (
-                    <p className="py-4 text-[11px] text-faint">{t("No MCP servers configured.")}</p>
+                    <p className="py-4 text-label text-faint">{t("No MCP servers configured.")}</p>
                   ) : (
                     <ul className="mt-2 space-y-1">
                       {servers.map((server) => (
@@ -154,21 +141,19 @@ export function MCPDialog({
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-[11.5px] font-medium">{server.name}</span>
-                              <span className="rounded bg-surface-3 px-1 py-0.5 text-[9px] text-faint">
+                              <span className="text-label font-medium">{server.name}</span>
+                              <span className="rounded bg-surface-3 px-1 py-0.5 text-micro text-subtle">
                                 {server.source}
                               </span>
-                              <span className="text-[9px] uppercase tracking-wide text-faint">
+                              <span className="text-micro uppercase tracking-label text-faint">
                                 {server.kind}
                               </span>
                             </div>
-                            <p className="mt-0.5 truncate font-mono text-[10px] text-faint">
+                            <p className="mt-0.5 truncate font-mono text-micro text-faint">
                               {server.url || [server.command, ...(server.args ?? [])].join(" ")}
                             </p>
                             {server.description ? (
-                              <p className="mt-0.5 text-[10.5px] text-subtle">
-                                {server.description}
-                              </p>
+                              <p className="mt-0.5 text-micro text-subtle">{server.description}</p>
                             ) : null}
                           </div>
                           <button
@@ -185,7 +170,7 @@ export function MCPDialog({
                     </ul>
                   )}
 
-                  <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">
+                  <h3 className="mt-5 text-label font-semibold uppercase tracking-label text-faint">
                     {t("Add a server")}
                   </h3>
                   <div className="mt-2 grid grid-cols-2 gap-2">
@@ -193,35 +178,35 @@ export function MCPDialog({
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder={t("server name")}
-                      className="h-8 rounded-md border border-border bg-canvas px-2.5 text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 rounded-md border border-control bg-canvas px-2.5 text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                     <input
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder={t("description (optional)")}
-                      className="h-8 rounded-md border border-border bg-canvas px-2.5 text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 rounded-md border border-control bg-canvas px-2.5 text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                     <input
                       value={command}
                       onChange={(e) => setCommand(e.target.value)}
                       placeholder={t("command (stdio)")}
-                      className="h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 rounded-md border border-control bg-canvas px-2.5 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                     <input
                       value={args}
                       onChange={(e) => setArgs(e.target.value)}
                       placeholder={t("arguments")}
-                      className="h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="h-8 rounded-md border border-control bg-canvas px-2.5 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                     <input
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       placeholder={t("or URL (http)")}
-                      className="col-span-2 h-8 rounded-md border border-border bg-canvas px-2.5 font-mono text-[11px] outline-none placeholder:text-faint focus:border-border-strong"
+                      className="col-span-2 h-8 rounded-md border border-control bg-canvas px-2.5 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
                     />
                   </div>
                   <div className="mt-2 flex items-center gap-3">
-                    <label className="flex items-center gap-1.5 text-[10.5px] text-subtle">
+                    <label className="flex items-center gap-1.5 text-micro text-subtle">
                       <input
                         type="checkbox"
                         checked={local}
@@ -234,13 +219,13 @@ export function MCPDialog({
                       type="button"
                       disabled={!name.trim() || (!command.trim() && !url.trim())}
                       onClick={() => void add()}
-                      className="ml-auto flex h-7 items-center gap-1.5 rounded-md bg-brand px-2.5 text-[10.5px] font-medium text-brand-fg hover:opacity-90 disabled:opacity-40"
+                      className="ml-auto flex h-7 items-center gap-1.5 rounded-md bg-primary px-2.5 text-micro font-medium text-primary-foreground hover:opacity-90 disabled:opacity-40"
                     >
                       <Plus size={11} />
                       {t("Add server")}
                     </button>
                   </div>
-                  <p className={cn("mt-2 text-[10px] leading-4 text-faint")}>
+                  <p className={cn("mt-2 text-micro leading-4 text-faint")}>
                     {t(
                       "Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.",
                     )}
@@ -248,7 +233,7 @@ export function MCPDialog({
                 </>
               )}
             </div>
-          </Dialog.Content>
+          </DialogSurface>
         </Dialog.Portal>
       </Dialog.Root>
       <ConfirmDialog

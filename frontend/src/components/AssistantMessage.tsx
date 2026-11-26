@@ -30,7 +30,7 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
               <Suspense
                 key={i}
                 fallback={
-                  <div className="whitespace-pre-wrap text-[13.5px] leading-7 text-fg">
+                  <div className="whitespace-pre-wrap text-body leading-7 text-fg">
                     {block.text}
                   </div>
                 }
@@ -60,7 +60,7 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
           </Bubble>
         ) : null}
         {item.usage ? (
-          <MessageFooter className="mt-1 gap-2 text-[9.5px] tabular-nums text-faint opacity-0 transition-opacity group-hover/message:opacity-100">
+          <MessageFooter className="mt-1 gap-2 text-micro tabular-nums text-faint opacity-0 transition-opacity group-hover/message:opacity-100">
             {item.model ? <span>{item.model}</span> : null}
             <span>{Math.round((item.usage.totalTokens ?? 0) / 1000)}k tokens</span>
             <span>${(item.usage.cost?.total ?? 0).toFixed(3)}</span>
@@ -86,7 +86,7 @@ function ThinkingBlock({ text, redacted }: { text: string; redacted?: boolean })
             <TraceTitle>{redacted ? t("Redacted thinking") : t("Thinking")}</TraceTitle>
           </TraceLine>
         </TraceCollapsibleTrigger>
-        <TraceCollapsibleContent className="whitespace-pre-wrap pt-1 text-[11.5px] leading-5">
+        <TraceCollapsibleContent className="whitespace-pre-wrap pt-1 text-label leading-5">
           {text}
         </TraceCollapsibleContent>
       </TraceCollapsible>

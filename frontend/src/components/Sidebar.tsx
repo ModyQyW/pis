@@ -7,6 +7,7 @@ import type { Summary } from "../mygo";
 import type { ChatSession } from "../store/chat";
 import type { Bootstrap, Workspace } from "../lib/types";
 import { BrandMark } from "./BrandMark";
+import { SectionLabel } from "./ui/section-label";
 
 export function Sidebar({
   boot,
@@ -44,8 +45,8 @@ export function Sidebar({
         <div className="flex items-center gap-2.5 px-1">
           <BrandMark size={26} />
           <div className="min-w-0">
-            <div className="truncate text-[13px] font-semibold tracking-[-0.01em]">PiS</div>
-            <div className="truncate text-[10.5px] text-faint">{t("desktop coding agent")}</div>
+            <div className="truncate text-body font-semibold tracking-[-0.01em]">PiS</div>
+            <div className="truncate text-micro text-faint">{t("desktop coding agent")}</div>
           </div>
         </div>
       </div>
@@ -54,7 +55,7 @@ export function Sidebar({
         <button
           type="button"
           onClick={onNewChat}
-          className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-border-strong/70 bg-surface text-[12.5px] font-medium shadow-[0_1px_0_rgba(0,0,0,0.03)] transition-colors hover:bg-surface-2"
+          className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-border-strong/70 bg-surface text-label font-medium transition-colors hover:bg-surface-2"
         >
           <Plus size={15} strokeWidth={2.2} />
           {t("New chat")}
@@ -63,9 +64,7 @@ export function Sidebar({
 
       <div className="no-drag mt-5 min-h-0 flex-1 overflow-y-auto scroll-thin px-2 pb-3">
         <div className="flex items-center justify-between px-2 pb-1.5">
-          <span className="text-[10.5px] font-medium uppercase tracking-[0.08em] text-faint">
-            {t("Projects")}
-          </span>
+          <SectionLabel>{t("Projects")}</SectionLabel>
           <button
             type="button"
             onClick={onOpenProject}
@@ -80,7 +79,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={onOpenProject}
-            className="mx-1 mt-1 flex w-[calc(100%-8px)] items-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-left text-[12px] text-subtle transition-colors hover:border-border-strong hover:text-fg"
+            className="mx-1 mt-1 flex w-[calc(100%-8px)] items-center gap-2 rounded-lg border border-dashed border-border px-3 py-2.5 text-left text-label text-subtle transition-colors hover:border-border-strong hover:text-fg"
           >
             <Folder size={14} />
             {t("Open a project folder")}
@@ -103,11 +102,11 @@ export function Sidebar({
                   >
                     <Folder
                       size={14}
-                      className={cn("mt-0.5 shrink-0", active ? "text-brand" : "text-faint")}
+                      className={cn("mt-0.5 shrink-0", active ? "text-brand-ink" : "text-faint")}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12.5px] font-medium">{ws.name}</span>
-                      <span className="mt-0.5 block truncate text-[10.5px] text-faint">
+                      <span className="block truncate text-label font-medium">{ws.name}</span>
+                      <span className="mt-0.5 block truncate text-micro text-faint">
                         {relativeTime(ws.lastOpened)}
                       </span>
                     </span>
@@ -120,12 +119,10 @@ export function Sidebar({
 
         <div className="mt-5 px-2">
           <div className="flex items-center justify-between pb-1.5">
-            <span className="text-[10.5px] font-medium uppercase tracking-[0.08em] text-faint">
-              {t("Chats")}
-            </span>
+            <SectionLabel>{t("Chats")}</SectionLabel>
           </div>
           {openSessions.length === 0 && recentSessions.length === 0 ? (
-            <div className="rounded-lg px-2 py-2 text-[11px] leading-4 text-faint">
+            <div className="rounded-lg px-2 py-2 text-label leading-4 text-faint">
               {selected
                 ? t("No chats yet. Start one above.")
                 : t("Open a project to see its chats.")}
@@ -159,10 +156,15 @@ export function Sidebar({
                       )}
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[12px] font-medium">
+                      <span className="block truncate text-label font-medium">
                         {s.name || t("New chat")}
                       </span>
-                      <span className="mt-0.5 block truncate text-[10px] text-faint">
+                      <span
+                        className={cn(
+                          "mt-0.5 block truncate text-micro",
+                          activeKey === s.key ? "text-subtle" : "text-faint",
+                        )}
+                      >
                         {s.dialogs.length > 0
                           ? t("Needs input")
                           : s.streaming
@@ -188,8 +190,8 @@ export function Sidebar({
                     >
                       <MessageSquare size={12} className="mt-0.5 shrink-0 text-faint" />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[11.5px]">{r.title}</span>
-                        <span className="mt-0.5 block truncate text-[10px] text-faint">
+                        <span className="block truncate text-label">{r.title}</span>
+                        <span className="mt-0.5 block truncate text-micro text-faint">
                           {relativeTime(r.updatedAt)}
                         </span>
                       </span>
@@ -205,12 +207,12 @@ export function Sidebar({
         <button
           type="button"
           onClick={onSettings}
-          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-[11.5px] text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-label text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
         >
           <Settings2 size={14} />
           {t("Settings")}
         </button>
-        <div className="mt-1 flex items-center gap-2 px-2 py-1.5 text-[10.5px] text-faint">
+        <div className="mt-1 flex items-center gap-2 px-2 py-1.5 text-micro text-faint">
           <span
             className={cn(
               "size-1.5 rounded-full",

@@ -50,20 +50,20 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2">
-            <span className="text-[11.5px] font-medium">{t(labelFor(tool.name))}</span>
+            <span className="text-label font-medium">{t(labelFor(tool.name))}</span>
             {target ? (
-              <span className="truncate font-mono text-[10.5px] text-subtle">{target}</span>
+              <span className="truncate font-mono text-micro text-subtle">{target}</span>
             ) : null}
           </span>
           {!open && output && !diff ? (
-            <span className="mt-0.5 line-clamp-1 block font-mono text-[10.5px] text-faint">
+            <span className="mt-0.5 line-clamp-1 block font-mono text-micro text-faint">
               {output.split("\n")[0]}
             </span>
           ) : null}
         </span>
-        <span className="mt-0.5 flex shrink-0 items-center gap-1.5 text-[10px] text-faint">
+        <span className="mt-0.5 flex shrink-0 items-center gap-1.5 text-micro text-faint">
           {running ? (
-            <span className="size-2.5 animate-spin rounded-full border border-border-strong border-t-accent" />
+            <span className="size-2.5 animate-spin rounded-full border border-border-strong border-t-brand" />
           ) : failed ? (
             <CircleAlert size={12} className="text-danger" />
           ) : (
@@ -114,11 +114,11 @@ function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Questio
   return (
     <div className="my-1.5 overflow-hidden rounded-lg border border-brand/25 bg-surface/70">
       <div className="flex items-center gap-2 border-b border-border/70 bg-brand-soft/30 px-2.5 py-2">
-        <span className="flex size-5 items-center justify-center rounded-md border border-brand/25 bg-surface text-brand">
+        <span className="flex size-5 items-center justify-center rounded-md border border-brand/25 bg-surface text-brand-ink">
           <HelpCircle size={11} />
         </span>
-        <span className="text-[11.5px] font-medium">{t("Question")}</span>
-        <span className="ml-auto text-[9.5px] text-faint">
+        <span className="text-label font-medium">{t("Question")}</span>
+        <span className="ml-auto text-micro text-faint">
           {tool.result ? t("Answered") : t("Waiting for answer")}
         </span>
       </div>
@@ -128,11 +128,11 @@ function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Questio
           return (
             <div key={`${question.question}-${index}`}>
               {question.header ? (
-                <div className="text-[9px] font-medium uppercase tracking-[0.08em] text-faint">
+                <div className="text-micro font-medium uppercase tracking-label text-faint">
                   {question.header}
                 </div>
               ) : null}
-              <div className="mt-0.5 text-[11.5px] leading-5 text-subtle">{question.question}</div>
+              <div className="mt-0.5 text-label leading-5 text-subtle">{question.question}</div>
               {question.options.length ? (
                 <ul className="mt-1.5 space-y-1">
                   {question.options.map((option) => {
@@ -141,7 +141,7 @@ function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Questio
                       <li
                         key={option.label}
                         className={cn(
-                          "flex items-start gap-2 rounded-md border px-2 py-1.5 text-[10.5px] leading-4",
+                          "flex items-start gap-2 rounded-md border px-2 py-1.5 text-micro leading-4",
                           selected
                             ? "border-brand/40 bg-brand-soft/50 text-fg"
                             : "border-border/70 text-subtle",
@@ -160,7 +160,7 @@ function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Questio
                         <span className="min-w-0 flex-1">
                           <span className="block">{option.label}</span>
                           {option.description ? (
-                            <span className="mt-0.5 block text-[9.5px] text-faint">
+                            <span className="mt-0.5 block text-micro text-faint">
                               {option.description}
                             </span>
                           ) : null}

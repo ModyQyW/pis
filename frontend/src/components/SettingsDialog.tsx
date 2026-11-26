@@ -1,5 +1,5 @@
 import * as Dialog from "@/components/ui/dialog-compat";
-import { Check, Clipboard, FolderOpen, RefreshCw, X } from "lucide-react";
+import { Check, Clipboard, FolderOpen, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { toast } from "../lib/toast";
 
@@ -7,10 +7,19 @@ import { api } from "../lib/api";
 import { cn } from "../lib/cn";
 import { platformName } from "../lib/format";
 import { t as tr } from "../lib/i18n";
-import type { Bootstrap, Diagnostics, Theme } from "../lib/types";
+import type { Bootstrap, Diagnostics, Palette, Theme } from "../lib/types";
+import { DialogHeader, DialogOverlay, DialogSurface } from "./ui/dialog-shell";
+import { SectionLabel } from "./ui/section-label";
 
 const CODE_FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 const UI_SIZES = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+
+const PALETTES: { id: Palette; name: string; note: string }[] = [
+  { id: "amber", name: "Amber", note: "Warm neutrals with an amber accent." },
+  { id: "graphite", name: "Graphite", note: "Cool neutrals with a steel blue accent." },
+  { id: "teal", name: "Teal", note: "Cool neutrals with a deep teal accent." },
+  { id: "ink", name: "Ink", note: "Neutral grays with a quiet ink accent." },
+];
 
 export function SettingsDialog({
   open,
@@ -18,6 +27,8 @@ export function SettingsDialog({
   boot,
   theme,
   onTheme,
+  palette,
+  onPalette,
   onReload,
   onLogin,
   onMCP,
@@ -27,6 +38,8 @@ export function SettingsDialog({
   boot: Bootstrap;
   theme: Theme;
   onTheme: (theme: Theme) => void;
+  palette: Palette;
+  onPalette: (palette: Palette) => void;
   onReload: () => void;
   onLogin?: () => void;
   onMCP?: () => void;
@@ -126,25 +139,13 @@ export function SettingsDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[1px]" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex max-h-[min(720px,calc(100vh-64px))] w-[min(720px,calc(100vw-48px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border-strong bg-surface shadow-2xl outline-none">
-          <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-            <div>
-              <Dialog.Title className="text-[14px] font-semibold">{tr("Settings")}</Dialog.Title>
-              <Dialog.Description className="mt-0.5 text-[11px] text-faint">
-                PiS {boot.appVersion} · {platformName(boot.platform)}
-              </Dialog.Description>
-            </div>
-            <Dialog.Close asChild>
-              <button
-                type="button"
-                className="flex size-7 items-center justify-center rounded-md text-subtle hover:bg-surface-2 hover:text-fg"
-                aria-label={tr("Close settings")}
-              >
-                <X size={15} />
-              </button>
-            </Dialog.Close>
-          </div>
+        <DialogOverlay />
+        <DialogSurface width="lg">
+          <DialogHeader
+            title={tr("Settings")}
+            description={`PiS ${boot.appVersion} · ${platformName(boot.platform)}`}
+            closeLabel={tr("Close settings")}
+          />
 
           <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
             <Section title={tr("Appearance")}>
@@ -154,10 +155,11 @@ export function SettingsDialog({
                     key={option}
                     type="button"
                     onClick={() => onTheme(option)}
+                    aria-pressed={theme === option}
                     className={cn(
-                      "flex h-8 items-center gap-1.5 rounded-md border px-3 text-[11.5px] capitalize transition-colors",
+                      "flex h-8 items-center gap-1.5 rounded-md border px-3 text-label capitalize transition-colors",
                       theme === option
-                        ? "border-brand/40 bg-brand-soft text-brand"
+                        ? "border-brand bg-brand-soft text-brand-ink"
                         : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
                     )}
                   >
@@ -166,7 +168,50 @@ export function SettingsDialog({
                   </button>
                 ))}
               </div>
-              <label className="mt-2.5 flex items-center gap-2 text-[11px] text-subtle">
+              <div className="mt-3 border-t border-border pt-3">
+                <SectionLabel>{tr("Palette")}</SectionLabel>
+                <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                  {PALETTES.map((entry) => (
+                    <button
+                      key={entry.id}
+                      type="button"
+                      data-palette={entry.id}
+                      onClick={() => onPalette(entry.id)}
+                      aria-pressed={palette === entry.id}
+                      title={tr(entry.note)}
+                      className={cn(
+                        "overflow-hidden rounded-lg border text-left transition-colors",
+                        palette === entry.id
+                          ? "border-brand ring-1 ring-brand/30"
+                          : "border-border hover:border-border-strong",
+                      )}
+                    >
+                      <span className="flex h-8 items-stretch" aria-hidden="true">
+                        <span className="flex-1 bg-canvas" />
+                        <span className="flex-1 bg-surface-2" />
+                        <span className="w-5 bg-brand" />
+                      </span>
+                      <span className="flex items-center justify-between gap-2 bg-surface px-2 py-1.5">
+                        <span className="min-w-0">
+                          <span className="block truncate text-micro font-medium text-fg">
+                            {tr(entry.name)}
+                          </span>
+                          <span className="block truncate text-micro text-faint">
+                            {tr(entry.note)}
+                          </span>
+                        </span>
+                        {palette === entry.id ? (
+                          <Check size={11} className="shrink-0 text-brand-ink" />
+                        ) : null}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-micro leading-4 text-faint">
+                  {tr("The palette applies in both light and dark mode.")}
+                </p>
+              </div>
+              <label className="mt-2.5 flex items-center gap-2 text-label text-subtle">
                 <span>{tr("Language")}</span>
                 <select
                   value={boot.settings.language === "zh" ? "zh" : "en"}
@@ -179,13 +224,13 @@ export function SettingsDialog({
                       setBusy(false);
                     }
                   }}
-                  className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                  className="h-7 rounded-md border border-control bg-canvas px-2 text-label outline-none focus:border-brand"
                 >
                   <option value="en">English</option>
                   <option value="zh">中文</option>
                 </select>
               </label>
-              <label className="mt-2.5 flex items-start gap-2 text-[11px] leading-4 text-subtle">
+              <label className="mt-2.5 flex items-start gap-2 text-label leading-4 text-subtle">
                 <input
                   type="checkbox"
                   checked={boot.settings.showWidgets}
@@ -202,14 +247,14 @@ export function SettingsDialog({
                 />
                 <span>
                   {tr("Show raw extension widgets")}
-                  <span className="block text-[10px] text-faint">
+                  <span className="block text-micro text-faint">
                     {tr(
                       "TUI widgets are off by default because they are designed for a terminal, not this layout.",
                     )}
                   </span>
                 </span>
               </label>
-              <label className="mt-2.5 flex items-start gap-2 text-[11px] leading-4 text-subtle">
+              <label className="mt-2.5 flex items-start gap-2 text-label leading-4 text-subtle">
                 <input
                   type="checkbox"
                   checked={boot.settings.notifications}
@@ -226,7 +271,7 @@ export function SettingsDialog({
                 />
                 <span>
                   {tr("Desktop notifications")}
-                  <span className="block text-[10px] text-faint">
+                  <span className="block text-micro text-faint">
                     {tr(
                       "Notify when a background run finishes. The setting is off if the system does not allow notifications.",
                     )}
@@ -243,7 +288,7 @@ export function SettingsDialog({
                     toast.error(err instanceof Error ? err.message : String(err));
                   }
                 }}
-                className="mt-2 h-7 rounded-md border border-border px-2.5 text-[10.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                className="mt-2 h-7 rounded-md border border-control px-2.5 text-micro text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
               >
                 {tr("Test notification")}
               </button>
@@ -255,14 +300,14 @@ export function SettingsDialog({
                 "Code size covers Markdown code blocks, diffs, tool output, and previews. Interface size scales the whole window.",
               )}
             >
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-subtle">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-label text-subtle">
                 <label className="flex items-center gap-2">
                   <span>{tr("Code font size")}</span>
                   <select
                     value={boot.settings.codeFontSize}
                     disabled={busy}
                     onChange={(e) => void savePref({ codeFontSize: Number(e.target.value) })}
-                    className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                    className="h-7 rounded-md border border-control bg-canvas px-2 text-label outline-none focus:border-brand"
                   >
                     {CODE_FONT_SIZES.map((size) => (
                       <option key={size} value={size}>
@@ -277,7 +322,7 @@ export function SettingsDialog({
                     value={boot.settings.uiFontSize}
                     disabled={busy}
                     onChange={(e) => void savePref({ uiFontSize: Number(e.target.value) })}
-                    className="h-7 rounded-md border border-border bg-canvas px-2 text-[11px] outline-none focus:border-border-strong"
+                    className="h-7 rounded-md border border-control bg-canvas px-2 text-label outline-none focus:border-brand"
                   >
                     {UI_SIZES.map((size) => (
                       <option key={size} value={size}>
@@ -296,7 +341,7 @@ export function SettingsDialog({
                   />
                   <span>
                     {tr("Send on Enter")}
-                    <span className="block text-[10px] text-faint">
+                    <span className="block text-micro text-faint">
                       {tr("Off: ⌘Enter sends and Enter adds a line.")}
                     </span>
                   </span>
@@ -314,7 +359,7 @@ export function SettingsDialog({
                 <button
                   type="button"
                   onClick={onLogin}
-                  className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
+                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   {tr("Sign in to a provider…")}
                 </button>
@@ -322,11 +367,11 @@ export function SettingsDialog({
                   type="button"
                   onClick={onMCP}
                   disabled={!onMCP}
-                  className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
                 >
                   {tr("MCP servers…")}
                 </button>
-                <span className="text-[10.5px] text-faint">
+                <span className="text-micro text-faint">
                   {boot.pi.compatible
                     ? tr("Credentials live in pi's auth store")
                     : tr("Locate pi first")}
@@ -343,14 +388,14 @@ export function SettingsDialog({
                   value={path}
                   onChange={(e) => setPath(e.target.value)}
                   placeholder={tr("Auto-detect pi")}
-                  className="h-8 min-w-0 flex-1 rounded-md border border-border bg-canvas px-2.5 text-[11.5px] outline-none placeholder:text-faint focus:border-border-strong"
+                  className="h-8 min-w-0 flex-1 rounded-md border border-control bg-canvas px-2.5 text-label outline-none placeholder:text-faint focus:border-brand"
                   spellCheck={false}
                 />
                 <button
                   type="button"
                   disabled={busy}
                   onClick={savePath}
-                  className="h-8 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
+                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
                   {tr("Use path")}
                 </button>
@@ -358,13 +403,13 @@ export function SettingsDialog({
                   type="button"
                   disabled={busy}
                   onClick={check}
-                  className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
+                  className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
                   <RefreshCw size={12} />
                   {tr("Check")}
                 </button>
               </div>
-              <div className="mt-2 flex items-center gap-2 text-[11px] text-faint">
+              <div className="mt-2 flex items-center gap-2 text-label text-faint">
                 <span
                   className={cn(
                     "size-1.5 rounded-full",
@@ -378,7 +423,7 @@ export function SettingsDialog({
                     : tr("pi was not found")}
               </div>
               {boot.pi.error ? (
-                <p className="mt-1.5 text-[11px] leading-4 text-danger">{boot.pi.error}</p>
+                <p className="mt-1.5 text-label leading-4 text-danger">{boot.pi.error}</p>
               ) : null}
             </Section>
 
@@ -413,9 +458,9 @@ export function SettingsDialog({
                       }
                     }}
                     className={cn(
-                      "h-8 rounded-md border px-3 text-[11.5px] transition-colors",
+                      "h-8 rounded-md border px-3 text-label transition-colors",
                       boot.settings.permissions.policy === value
-                        ? "border-brand/40 bg-brand-soft text-brand"
+                        ? "border-brand/40 bg-brand-soft text-brand-ink"
                         : "border-border text-subtle hover:bg-surface-2 hover:text-fg",
                     )}
                   >
@@ -423,7 +468,7 @@ export function SettingsDialog({
                   </button>
                 ))}
               </div>
-              <label className="mt-2.5 flex items-start gap-2 text-[11px] leading-4 text-subtle">
+              <label className="mt-2.5 flex items-start gap-2 text-label leading-4 text-subtle">
                 <input
                   type="checkbox"
                   checked={boot.guard.active}
@@ -447,7 +492,7 @@ export function SettingsDialog({
                 />
                 <span>
                   {tr("Use PiS approvals")}
-                  <span className="block text-[10px] text-faint">
+                  <span className="block text-micro text-faint">
                     {boot.guard.detected.length
                       ? tr(
                           "Another guard is present ({names}); built-in approvals stay off unless enabled.",
@@ -460,7 +505,7 @@ export function SettingsDialog({
                 </span>
               </label>
               {boot.guard.detected.length > 0 ? (
-                <p className="mt-1.5 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-[10px] leading-4 text-warning">
+                <p className="mt-1.5 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-micro leading-4 text-warning">
                   {tr("Detected: {names}. Both guards are never enabled by default.", {
                     names: boot.guard.detected.join(", "),
                   })}
@@ -488,12 +533,12 @@ export function SettingsDialog({
                       setBusy(false);
                     }
                   }}
-                  className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
+                  className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
                   <RefreshCw size={12} />
                   {tr("Check for updates…")}
                 </button>
-                <span className="text-[10.5px] text-faint">PiS {boot.appVersion}</span>
+                <span className="text-micro text-faint">PiS {boot.appVersion}</span>
               </div>
             </Section>
 
@@ -503,7 +548,7 @@ export function SettingsDialog({
                 "Paths and versions only. Prompts and credentials are never included.",
               )}
             >
-              <div className="rounded-lg border border-border bg-canvas p-3 font-mono text-[10.5px] leading-5 text-subtle">
+              <div className="rounded-lg border border-border bg-canvas p-3 font-mono text-micro leading-5 text-subtle">
                 <div className="truncate">data {diag?.dataDir ?? boot.dataDir}</div>
                 <div className="truncate">settings {diag?.settings ?? "settings.json"}</div>
                 {diag?.settingsError ? (
@@ -519,7 +564,7 @@ export function SettingsDialog({
                 <button
                   type="button"
                   onClick={copyReport}
-                  className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
+                  className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   <Clipboard size={12} />
                   {tr("Copy report")}
@@ -527,7 +572,7 @@ export function SettingsDialog({
                 <button
                   type="button"
                   onClick={() => api.reveal(boot.dataDir)}
-                  className="flex h-8 items-center gap-1.5 rounded-md border border-border px-3 text-[11.5px] text-subtle hover:bg-surface-2 hover:text-fg"
+                  className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg"
                 >
                   <FolderOpen size={12} />
                   {tr("Reveal data folder")}
@@ -535,7 +580,7 @@ export function SettingsDialog({
               </div>
             </Section>
           </div>
-        </Dialog.Content>
+        </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
   );
@@ -552,9 +597,9 @@ function Section({
 }) {
   return (
     <section className="mb-6 last:mb-1">
-      <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-faint">{title}</h3>
+      <SectionLabel>{title}</SectionLabel>
       {description ? (
-        <p className="mt-1 max-w-[560px] text-[11px] leading-4 text-faint">{description}</p>
+        <p className="mt-1 max-w-[560px] text-label leading-4 text-faint">{description}</p>
       ) : null}
       <div className="mt-2.5">{children}</div>
     </section>

@@ -91,7 +91,7 @@ export function SessionTranscript({
   if (items.length === 0) {
     return (
       <div className="flex min-h-full items-center justify-center px-8">
-        <div className="flex flex-col items-center gap-2 text-[12px] text-faint">
+        <div className="flex flex-col items-center gap-2 text-label text-faint">
           {session.status === "loading" ? (
             <>
               <Loader2 size={16} className="animate-spin text-subtle" />
@@ -101,7 +101,7 @@ export function SessionTranscript({
             <span className="max-w-[420px] text-center text-danger">{session.error}</span>
           ) : (
             <>
-              <span className="text-[13px] text-subtle">{t("New chat")}</span>
+              <span className="text-body text-subtle">{t("New chat")}</span>
               <span>{t("Ask pi to inspect, change, or explain this project.")}</span>
             </>
           )}
@@ -129,7 +129,7 @@ export function SessionTranscript({
                 className="absolute left-0 top-0 w-full"
                 style={{ transform: `translateY(${virtualRow.start}px)` }}
               >
-                <div className="mx-auto w-full max-w-[860px] px-7">
+                <div className="mx-auto w-full max-w-chat px-7">
                   <TranscriptRow item={item} onFork={onFork} />
                 </div>
               </div>
@@ -174,11 +174,11 @@ function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: st
       return (
         <Marker variant="separator" className="my-5">
           <MarkerContent className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] font-medium uppercase tracking-[0.08em]">
+            <span className="text-micro font-medium uppercase tracking-label">
               {t("Context compacted")}
             </span>
             {item.tokensBefore ? (
-              <span className="text-[10px]">
+              <span className="text-micro">
                 {t("{count}k tokens summarized", {
                   count: Math.round(item.tokensBefore / 1000),
                 })}
@@ -191,17 +191,17 @@ function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: st
       return (
         <Marker variant="border" className="my-4">
           <MarkerContent>
-            <span className="mr-2 text-[10px] font-medium uppercase tracking-[0.08em] text-faint">
+            <span className="mr-2 text-micro font-medium uppercase tracking-label text-faint">
               {t("Branch summary")}
             </span>
-            <span className="text-[11.5px] leading-5">{item.summary || t("Earlier branch")}</span>
+            <span className="text-label leading-5">{item.summary || t("Earlier branch")}</span>
           </MarkerContent>
         </Marker>
       );
     case "note":
       return (
         <Marker className="my-3">
-          <MarkerContent className="text-[11.5px] leading-5">{item.text}</MarkerContent>
+          <MarkerContent className="text-label leading-5">{item.text}</MarkerContent>
         </Marker>
       );
   }
@@ -218,7 +218,7 @@ function UserMessage({
     <Message align="end" className="pb-2 pt-5">
       <MessageContent className="items-end gap-1">
         <Bubble variant="muted" align="end" className="max-w-[88%]">
-          <BubbleContent className="whitespace-pre-wrap text-[13px] leading-6">
+          <BubbleContent className="whitespace-pre-wrap text-body leading-6">
             {item.text}
             {item.images.length ? (
               <span className="mt-2 grid grid-cols-2 gap-2">

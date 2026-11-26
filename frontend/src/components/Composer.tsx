@@ -205,10 +205,10 @@ export function Composer({
 
   return (
     <div className="shrink-0 px-5 pb-5 pt-2">
-      <div className="mx-auto w-full max-w-[860px]">
+      <div className="@container mx-auto w-full max-w-chat">
         <div
           className={cn(
-            "rounded-2xl border bg-surface shadow-[0_8px_30px_rgba(30,25,15,0.05)] transition-colors",
+            "rounded-2xl border bg-surface shadow-float transition-colors",
             focused ? "border-border-strong" : "border-border",
           )}
         >
@@ -310,12 +310,12 @@ export function Composer({
             rows={1}
             placeholder={t("Ask pi to inspect, change, or explain…")}
             disabled={disabled}
-            className="max-h-[260px] min-h-[64px] w-full resize-none bg-transparent px-4 pb-1 pt-3.5 text-[13.5px] leading-6 outline-none placeholder:text-faint disabled:opacity-60"
+            className="max-h-[260px] min-h-[64px] w-full resize-none bg-transparent px-4 pb-1 pt-3.5 text-body leading-6 outline-none placeholder:text-faint disabled:opacity-60"
           />
 
           {suggestions.length > 0 && !disabled ? (
-            <div className="mx-2 mb-1 max-h-[240px] overflow-y-auto scroll-thin rounded-lg border border-border bg-surface p-1 shadow-lg">
-              <div className="flex items-center justify-between px-1.5 pb-1 pt-0.5 text-[9px] uppercase tracking-[0.08em] text-faint">
+            <div className="mx-2 mb-1 max-h-[240px] overflow-y-auto scroll-thin rounded-lg border border-border bg-surface p-1 shadow-popover">
+              <div className="flex items-center justify-between px-1.5 pb-1 pt-0.5 text-micro uppercase tracking-label text-faint">
                 <span>{token?.kind === "command" ? t("Pi commands") : t("Files")}</span>
                 {fileLoading ? <span>{t("searching…")}</span> : null}
               </div>
@@ -334,20 +334,20 @@ export function Composer({
                 >
                   <FileText size={11} className="mt-1 shrink-0 text-faint" />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-mono text-[11px]">{s.label}</span>
+                    <span className="block truncate font-mono text-label">{s.label}</span>
                     {s.description ? (
-                      <span className="mt-0.5 line-clamp-1 block text-[10px] text-faint">
+                      <span className="mt-0.5 line-clamp-1 block text-micro text-faint">
                         {s.description}
                       </span>
                     ) : null}
                   </span>
-                  <span className="mt-0.5 shrink-0 text-[9px] text-faint">{s.badge}</span>
+                  <span className="mt-0.5 shrink-0 text-micro text-faint">{s.badge}</span>
                 </button>
               ))}
             </div>
           ) : null}
 
-          <div className="flex items-center gap-1 px-2.5 pb-2.5">
+          <div className="flex flex-wrap items-center gap-1 gap-y-1.5 px-2.5 pb-2.5">
             <button
               type="button"
               onClick={() => {
@@ -361,7 +361,7 @@ export function Composer({
                   setCursor(at + 1);
                 });
               }}
-              className="flex size-7 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
               title={t("Mention a project file")}
               aria-label={t("Mention a project file")}
             >
@@ -370,7 +370,7 @@ export function Composer({
             <button
               type="button"
               onClick={() => fileInput.current?.click()}
-              className="flex size-7 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
               title={t("Attach a file")}
               aria-label={t("Attach a file")}
             >
@@ -381,7 +381,7 @@ export function Composer({
               <button
                 type="button"
                 onClick={onOpenModelPicker}
-                className="flex h-7 max-w-[240px] items-center gap-1.5 rounded-lg px-2 text-[11px] text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+                className="flex h-7 max-w-[240px] items-center gap-1.5 rounded-lg px-2 text-label text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
                 title={t("Model and thinking")}
               >
                 <span className="size-1.5 rounded-full bg-brand/70" />
@@ -391,7 +391,7 @@ export function Composer({
                 <button
                   type="button"
                   onClick={onOpenModelPicker}
-                  className="hidden h-7 items-center gap-1 rounded-lg px-2 text-[10px] capitalize text-faint transition-colors hover:bg-surface-2 hover:text-fg sm:flex"
+                  className="hidden h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-micro capitalize text-faint transition-colors hover:bg-surface-2 hover:text-fg sm:flex"
                   title={t("Thinking level")}
                 >
                   {thinking}
@@ -418,8 +418,8 @@ export function Composer({
                   }
                 }}
                 className={cn(
-                  "hidden h-7 items-center gap-1.5 rounded-lg px-2 text-[11px] transition-colors hover:bg-surface-2 sm:flex",
-                  planMode ? "bg-brand-soft text-brand" : "text-subtle hover:text-fg",
+                  "hidden h-7 shrink-0 items-center gap-1.5 rounded-lg px-2 text-label transition-colors hover:bg-surface-2 sm:flex",
+                  planMode ? "bg-brand-soft text-brand-ink" : "text-subtle hover:text-fg",
                 )}
                 title={
                   externalPlanCommand
@@ -432,8 +432,8 @@ export function Composer({
               </button>
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
-              <span className="hidden text-[10px] text-faint sm:inline">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <span className="hidden text-micro text-faint @[26rem]:inline">
                 {running
                   ? t("Enter queues · Esc stops")
                   : sendOnEnter
@@ -441,7 +441,7 @@ export function Composer({
                     : t("⌘Enter sends · Enter newline")}
               </span>
               <div
-                className="flex size-7 items-center justify-center rounded-full border border-border text-[9px] font-medium tabular-nums text-faint"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-micro font-medium tabular-nums text-faint"
                 title={t("Context used")}
               >
                 {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
@@ -450,7 +450,7 @@ export function Composer({
                 <button
                   type="button"
                   onClick={onStop}
-                  className="flex size-8 items-center justify-center rounded-full bg-fg text-canvas transition-transform hover:scale-[1.03]"
+                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-[1.03]"
                   aria-label={t("Stop run")}
                   title={t("Stop")}
                 >
@@ -462,7 +462,7 @@ export function Composer({
                   onClick={onSubmit}
                   disabled={!canSend}
                   className={cn(
-                    "flex size-8 items-center justify-center rounded-full transition-all",
+                    "flex size-8 shrink-0 items-center justify-center rounded-full transition-all",
                     canSend ? "bg-fg text-canvas hover:scale-[1.03]" : "bg-surface-3 text-faint",
                   )}
                   aria-label={t("Send")}
@@ -474,7 +474,7 @@ export function Composer({
             </div>
           </div>
         </div>
-        <div className="mt-2 flex items-center justify-center gap-1.5 text-[10px] text-faint">
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-micro text-faint">
           <CornerDownLeft size={10} />
           <span>
             {disabled

@@ -47,7 +47,7 @@ export function SessionActions({
         <DropdownMenu.Content
           align="end"
           sideOffset={6}
-          className="z-50 min-w-[190px] rounded-lg border border-border-strong bg-surface p-1 shadow-xl"
+          className="z-50 min-w-[190px] rounded-lg border border-border-strong bg-surface p-1 shadow-popover"
         >
           <Item icon={Pencil} onSelect={onRename}>
             {t("Rename session…")}
@@ -95,7 +95,7 @@ function Item({
   return (
     <DropdownMenu.Item
       onSelect={onSelect}
-      className={`flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-[11.5px] outline-none data-[highlighted]:bg-surface-2 ${
+      className={`flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-label outline-none data-[highlighted]:bg-surface-2 ${
         danger
           ? "text-danger data-[highlighted]:text-danger"
           : "text-subtle data-[highlighted]:text-fg"

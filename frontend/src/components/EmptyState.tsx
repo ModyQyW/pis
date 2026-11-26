@@ -31,17 +31,17 @@ export function EmptyState({
   onStarter: (prompt: string) => void;
 }) {
   return (
-    <div className="mx-auto flex min-h-full w-full max-w-[820px] flex-col justify-center px-8 pb-10 pt-16">
+    <div className="mx-auto flex min-h-full w-full max-w-empty flex-col justify-center px-8 pb-10 pt-16">
       <div className="mb-5 flex items-center gap-3">
         <BrandMark size={38} />
-        <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-faint">
+        <div className="text-label font-medium uppercase tracking-label text-faint">
           {workspace ? workspace.name : "PiS"}
         </div>
       </div>
-      <h1 className="max-w-[560px] text-balance text-[30px] font-semibold leading-[1.15] tracking-[-0.025em]">
+      <h1 className="max-w-[560px] text-balance text-display font-semibold tracking-tight">
         {t("What are we building?")}
       </h1>
-      <p className="mt-3 max-w-[520px] text-[13.5px] leading-6 text-subtle">
+      <p className="mt-3 max-w-[520px] text-body leading-6 text-subtle">
         {t(
           "Pi works in your project folder with your models, skills, and extensions. Describe the outcome; it will inspect, edit, and run commands.",
         )}
@@ -55,11 +55,11 @@ export function EmptyState({
             onClick={() => onStarter(t(prompt))}
             className="group flex flex-col items-start gap-3 rounded-xl border border-border/80 bg-surface/70 p-3.5 text-left transition-colors hover:border-border-strong hover:bg-surface"
           >
-            <span className="flex size-7 items-center justify-center rounded-lg bg-surface-2 text-subtle transition-colors group-hover:text-brand">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-surface-2 text-subtle transition-colors group-hover:text-brand-ink">
               <Icon size={14} />
             </span>
             <span className="flex w-full items-start justify-between gap-2">
-              <span className="text-[12px] font-medium leading-4">{t(label)}</span>
+              <span className="text-label font-medium leading-4">{t(label)}</span>
               <ArrowUpRight size={12} className="mt-0.5 shrink-0 text-faint" />
             </span>
           </button>
