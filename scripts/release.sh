@@ -188,22 +188,24 @@ generate_changelog() {
   rm -f "$section"
 }
 
+tag_run_id() {
+  gh run list --workflow release.yml --limit 30 \
+    --json databaseId,headBranch --jq "[.[] | select(.headBranch == \"$1\")][0].databaseId // empty"
+}
+
 wait_for_run() {
   tag=$1
-  run_id=$(gh run list --workflow release.yml --limit 30 \
-    --json databaseId,headBranch --jq "[.[] | select(.headBranch == \"$tag\")][0].databaseId // empty")
+  run_id=$(tag_run_id "$tag")
+  # The tag push starts the workflow; wait for it instead of starting a second run.
   if [ -z "$run_id" ]; then
-    echo "release: starting the Release workflow for $tag"
-    gh workflow run release.yml -f version="$tag" >/dev/null
     i=0
-    while [ -z "$run_id" ] && [ "$i" -lt 36 ]; do
+    while [ -z "$run_id" ] && [ "$i" -lt 12 ]; do
       sleep 5
-      run_id=$(gh run list --workflow release.yml --limit 30 \
-        --json databaseId,headBranch --jq "[.[] | select(.headBranch == \"$tag\")][0].databaseId // empty")
+      run_id=$(tag_run_id "$tag")
       i=$((i + 1))
     done
   fi
-  [ -n "$run_id" ] || fail "no Release workflow run for $tag"
+  [ -n "$run_id" ] || fail "no Release workflow run for $tag; start release.yml manually"
   conclusion=$(gh run view "$run_id" --json conclusion --jq '.conclusion // ""')
   if [ "$conclusion" = "failure" ] || [ "$conclusion" = "cancelled" ] || [ "$conclusion" = "timed_out" ]; then
     echo "release: retrying failed workflow run $run_id"
