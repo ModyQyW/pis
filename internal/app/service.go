@@ -282,6 +282,7 @@ func ApplyTheme(t settings.Theme) {
 type Preferences struct {
 	ShowWidgets   *bool   `json:"showWidgets,omitempty"`
 	Notifications *bool   `json:"notifications,omitempty"`
+	Palette       *string `json:"palette,omitempty"`
 	CodeFontSize  *int    `json:"codeFontSize,omitempty"`
 	UIFontSize    *int    `json:"uiFontSize,omitempty"`
 	SendOnEnter   *bool   `json:"sendOnEnter,omitempty"`
@@ -299,6 +300,13 @@ func (s *Service) SetPreferences(p Preferences) error {
 		}
 		if p.Notifications != nil {
 			c.Notifications = *p.Notifications
+		}
+		if p.Palette != nil {
+			pal := settings.Palette(*p.Palette)
+			if !pal.Valid() {
+				return fmt.Errorf("unknown palette %q", *p.Palette)
+			}
+			c.Palette = pal
 		}
 		if p.CodeFontSize != nil && *p.CodeFontSize >= 10 && *p.CodeFontSize <= 22 {
 			c.CodeFontSize = *p.CodeFontSize

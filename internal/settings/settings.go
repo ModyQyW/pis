@@ -13,7 +13,7 @@ import (
 )
 
 // Version is the current settings schema version.
-const Version = 2
+const Version = 3
 
 // Theme is the application appearance.
 type Theme string
@@ -23,6 +23,25 @@ const (
 	ThemeLight  Theme = "light"
 	ThemeDark   Theme = "dark"
 )
+
+// Palette is the built-in color palette id.
+type Palette string
+
+const (
+	PaletteAmber    Palette = "amber"
+	PaletteGraphite Palette = "graphite"
+	PaletteTeal     Palette = "teal"
+	PaletteInk      Palette = "ink"
+)
+
+// Valid reports whether p is a known built-in palette.
+func (p Palette) Valid() bool {
+	switch p {
+	case PaletteAmber, PaletteGraphite, PaletteTeal, PaletteInk:
+		return true
+	}
+	return false
+}
 
 // PermissionPolicy selects how the bridge extension treats tool calls.
 type PermissionPolicy string
@@ -56,6 +75,7 @@ const (
 type Settings struct {
 	Version       int                      `json:"version"`
 	Theme         Theme                    `json:"theme"`
+	Palette       Palette                  `json:"palette"`
 	LastWorkspace string                   `json:"lastWorkspace,omitempty"`
 	Recents       []Recent                 `json:"recents"`
 	Trust         map[string]TrustDecision `json:"trust"`
@@ -83,6 +103,7 @@ func Defaults() Settings {
 	return Settings{
 		Version:       Version,
 		Theme:         ThemeSystem,
+		Palette:       PaletteAmber,
 		Recents:       []Recent{},
 		Trust:         map[string]TrustDecision{},
 		Permissions:   Permissions{Policy: PolicySmart},
@@ -133,10 +154,17 @@ func merge(def, cfg Settings) Settings {
 		if cfg.Version < 2 {
 			cfg.SendOnEnter = def.SendOnEnter
 		}
+		// palettes arrived in version 3; older files keep the amber default.
+		if cfg.Version < 3 {
+			cfg.Palette = def.Palette
+		}
 		cfg.Version = Version
 	}
 	if cfg.Theme != ThemeLight && cfg.Theme != ThemeDark {
 		cfg.Theme = def.Theme
+	}
+	if !cfg.Palette.Valid() {
+		cfg.Palette = def.Palette
 	}
 	if cfg.Permissions.Policy != PolicyAsk && cfg.Permissions.Policy != PolicyAllow {
 		cfg.Permissions.Policy = def.Permissions.Policy

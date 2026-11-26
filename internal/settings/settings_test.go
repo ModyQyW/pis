@@ -118,3 +118,44 @@ func TestSnapshotCopiesMapsAndSlices(t *testing.T) {
 		t.Fatal("Snapshot leaked mutable state")
 	}
 }
+
+func TestPaletteDefaultsMigratesAndValidates(t *testing.T) {
+	dir := t.TempDir()
+	if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte(`{"version":2,"theme":"dark"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	store, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cfg := store.Snapshot()
+	if cfg.Palette != PaletteAmber {
+		t.Fatalf("palette = %q, want amber", cfg.Palette)
+	}
+	if cfg.Version != Version {
+		t.Fatalf("version = %d, want %d", cfg.Version, Version)
+	}
+	if err := store.Update(func(c *Settings) error {
+		c.Palette = PaletteTeal
+		return nil
+	}); err != nil {
+		t.Fatal(err)
+	}
+	again, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := again.Snapshot().Palette; got != PaletteTeal {
+		t.Fatalf("palette = %q, want teal", got)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "settings.json"), []byte(`{"version":3,"palette":"neon"}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	invalid, err := Open(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := invalid.Snapshot().Palette; got != PaletteAmber {
+		t.Fatalf("invalid palette = %q, want amber", got)
+	}
+}
