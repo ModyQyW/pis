@@ -6,7 +6,19 @@ import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dial
 import { FormSection } from "@/components/ui/form-section";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Select } from "@/components/ui/select";
-import { Boxes, Check, FolderOpen, Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Boxes,
+  Check,
+  ExternalLink,
+  FolderOpen,
+  Loader2,
+  LogIn,
+  Plus,
+  RefreshCw,
+  Search,
+  Trash2,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { api } from "../lib/api";
@@ -72,6 +84,7 @@ export function PiConfigPanel({
   confirmedHash,
   onConfirmed,
   onOpenMCP,
+  onLogin,
   embedded = false,
   onClose,
   section,
@@ -80,6 +93,7 @@ export function PiConfigPanel({
   confirmedHash: string;
   onConfirmed: (hash: string) => void;
   onOpenMCP?: () => void;
+  onLogin?: () => void;
   embedded?: boolean;
   onClose?: () => void;
   section?: PiConfigSection;
@@ -106,6 +120,7 @@ export function PiConfigPanel({
     label: string;
   } | null>(null);
   const [skillPath, setSkillPath] = useState("");
+  const [skillQuery, setSkillQuery] = useState("");
   const [extensionPath, setExtensionPath] = useState("");
   const [packageSource, setPackageSource] = useState("");
 
@@ -324,6 +339,14 @@ export function PiConfigPanel({
       (model ? { value: model, label: model } : null),
     [modelOptions, model],
   );
+  const visibleSkills = useMemo(() => {
+    const items = snapshot?.skills ?? [];
+    const term = skillQuery.trim().toLowerCase();
+    if (!term) return items;
+    return items.filter((item) =>
+      `${item.name} ${item.path} ${item.description ?? ""}`.toLowerCase().includes(term),
+    );
+  }, [snapshot?.skills, skillQuery]);
   const show = (id: PiConfigSection) => !section || section === id;
 
   return (
@@ -389,10 +412,7 @@ export function PiConfigPanel({
               <>
                 <div className="mb-5 rounded-lg border border-border bg-canvas px-3 py-2">
                   <div className="flex items-center gap-2">
-                    <span
-                      className="min-w-0 flex-1 truncate font-mono text-micro text-subtle"
-                      title={snapshot.agentDir}
-                    >
+                    <span className="min-w-0 flex-1 break-all font-mono text-micro text-subtle">
                       {snapshot.agentDir}
                     </span>
                     <button
@@ -404,7 +424,6 @@ export function PiConfigPanel({
                       }}
                       disabled={loading || modelsLoading}
                       aria-label={t("Refresh pi configuration")}
-                      title={t("Refresh pi configuration")}
                       className="flex shrink-0 items-center gap-1 text-micro text-subtle hover:text-fg disabled:opacity-40"
                     >
                       <RefreshCw
@@ -413,15 +432,16 @@ export function PiConfigPanel({
                       />
                       {t("Refresh")}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => void api.reveal(snapshot.agentDir).catch(() => {})}
-                      aria-label={t("Reveal pi config folder")}
-                      title={t("Reveal pi config folder")}
-                      className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
-                    >
-                      <FolderOpen size={11} />
-                    </button>
+                    <Tooltip>
+                      <TooltipTrigger
+                        onClick={() => void api.reveal(snapshot.agentDir).catch(() => {})}
+                        aria-label={t("Reveal pi config folder")}
+                        className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
+                      >
+                        <FolderOpen size={11} />
+                      </TooltipTrigger>
+                      <TooltipContent>{t("Reveal pi config folder")}</TooltipContent>
+                    </Tooltip>
                   </div>
                   <p className="mt-1 text-micro leading-4 text-faint">
                     {t("PiS writes these files directly and does not copy them.")}
@@ -604,18 +624,26 @@ export function PiConfigPanel({
                   "Providers configured in models.json. Built-in providers use pi sign-in.",
                 )}
                 actions={
-                  <Button
-                    size="xs"
-                    variant="outline"
-                    onClick={() => {
-                      setEditing(emptyProvider());
-                      setEditingMeta({ baseUrl: "", keySet: false });
-                      setNewProvider(true);
-                    }}
-                  >
-                    <Plus size={11} />
-                    {t("Add provider")}
-                  </Button>
+                  <div className="flex gap-1.5">
+                    {onLogin && !editing ? (
+                      <Button size="xs" variant="outline" disabled={busy} onClick={onLogin}>
+                        <LogIn size={11} />
+                        {t("Sign in")}
+                      </Button>
+                    ) : null}
+                    <Button
+                      size="xs"
+                      variant="outline"
+                      onClick={() => {
+                        setEditing(emptyProvider());
+                        setEditingMeta({ baseUrl: "", keySet: false });
+                        setNewProvider(true);
+                      }}
+                    >
+                      <Plus size={11} />
+                      {t("Add provider")}
+                    </Button>
+                  </div>
                 }
               >
                 {editing ? (
@@ -678,15 +706,16 @@ export function PiConfigPanel({
                           >
                             {t("Edit")}
                           </Button>
-                          <button
-                            type="button"
-                            onClick={() => setRemovingProvider(p.id)}
-                            className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                            aria-label={t("Remove {name}", { name: p.id })}
-                            title={t("Remove provider")}
-                          >
-                            <Trash2 size={11} />
-                          </button>
+                          <Tooltip>
+                            <TooltipTrigger
+                              onClick={() => setRemovingProvider(p.id)}
+                              className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
+                              aria-label={t("Remove {name}", { name: p.id })}
+                            >
+                              <Trash2 size={11} />
+                            </TooltipTrigger>
+                            <TooltipContent>{t("Remove provider")}</TooltipContent>
+                          </Tooltip>
                         </div>
                       </li>
                     ))}
@@ -703,12 +732,34 @@ export function PiConfigPanel({
                   "Skills pi discovers in its folders and the paths configured in settings.json.",
                 )}
               >
-                <ResourceList
-                  items={snapshot.skills}
-                  busy={busy}
-                  onRemove={(path) => void removePath("skills", path)}
-                  empty={t("No skills found.")}
-                />
+                <div className="flex items-center gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <Search
+                      size={12}
+                      className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-faint"
+                    />
+                    <input
+                      value={skillQuery}
+                      onChange={(event) => setSkillQuery(event.target.value)}
+                      placeholder={t("Search skills…")}
+                      aria-label={t("Search skills…")}
+                      className="h-8 w-full rounded-md border border-control bg-canvas pl-7 pr-2 text-label outline-none placeholder:text-faint focus:border-brand"
+                    />
+                  </div>
+                  <a
+                    href="https://www.skills.sh/"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void api.openExternal("https://www.skills.sh/");
+                    }}
+                    className="flex h-8 shrink-0 items-center gap-1 rounded-md border border-control px-2.5 text-label text-subtle hover:bg-surface-2 hover:text-fg"
+                  >
+                    <ExternalLink size={11} />
+                    skills.sh
+                  </a>
+                </div>
                 <PathForm
                   value={skillPath}
                   onChange={setSkillPath}
@@ -717,6 +768,14 @@ export function PiConfigPanel({
                   busy={busy}
                   onAdd={() => void addPath("skills", skillPath)}
                 />
+                <div className="mt-2">
+                  <ResourceList
+                    items={visibleSkills}
+                    busy={busy}
+                    onRemove={(path, label) => setRemovingPath({ kind: "skills", path, label })}
+                    empty={skillQuery.trim() ? t("No skills match.") : t("No skills found.")}
+                  />
+                </div>
               </FormSection>
             ) : null}
 
@@ -728,12 +787,6 @@ export function PiConfigPanel({
                   "Extension files and folders. Packages are installed by pi at session start.",
                 )}
               >
-                <ResourceList
-                  items={snapshot.extensions}
-                  busy={busy}
-                  onRemove={(path) => void removePath("extensions", path)}
-                  empty={t("No extensions found.")}
-                />
                 <PathForm
                   value={extensionPath}
                   onChange={setExtensionPath}
@@ -742,37 +795,16 @@ export function PiConfigPanel({
                   busy={busy}
                   onAdd={() => void addPath("extensions", extensionPath)}
                 />
-                <div className="mt-3 border-t border-border pt-2.5">
+                <div className="mt-2">
+                  <ResourceList
+                    items={snapshot.extensions}
+                    busy={busy}
+                    onRemove={(path, label) => setRemovingPath({ kind: "extensions", path, label })}
+                    empty={t("No extensions found.")}
+                  />
+                </div>
+                <div className="mt-4 border-t border-border pt-3">
                   <SectionLabel>{t("Pi packages")}</SectionLabel>
-                  {snapshot.packages.length ? (
-                    <ul className="mt-1.5 space-y-1">
-                      {snapshot.packages.map((pkg) => (
-                        <li
-                          key={`${pkg.project}:${pkg.source}`}
-                          className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
-                        >
-                          <span className="min-w-0 flex-1 truncate font-mono text-micro text-subtle">
-                            {pkg.source}
-                          </span>
-                          <SourceBadge source={pkg.project ? "project" : "user"} />
-                          {!pkg.active ? <InactiveBadge /> : null}
-                          {!pkg.project ? (
-                            <button
-                              type="button"
-                              onClick={() => setRemovingPackage(pkg.source)}
-                              className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                              aria-label={t("Remove {name}", { name: pkg.source })}
-                              title={t("Remove package")}
-                            >
-                              <Trash2 size={11} />
-                            </button>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="mt-1.5 text-label text-faint">{t("No packages configured.")}</p>
-                  )}
                   <PathForm
                     value={packageSource}
                     onChange={setPackageSource}
@@ -784,6 +816,36 @@ export function PiConfigPanel({
                   <p className="mt-1.5 text-micro leading-4 text-faint">
                     {t("Examples: npm:pi-web-access, git:github.com/user/repo, or a local path.")}
                   </p>
+                  {snapshot.packages.length ? (
+                    <ul className="mt-2 space-y-1">
+                      {snapshot.packages.map((pkg) => (
+                        <li
+                          key={`${pkg.project}:${pkg.source}`}
+                          className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
+                        >
+                          <span className="min-w-0 flex-1 truncate font-mono text-micro text-subtle">
+                            {pkg.source}
+                          </span>
+                          <SourceBadge source={pkg.project ? "project" : "user"} />
+                          {!pkg.active ? <InactiveBadge /> : null}
+                          {!pkg.project ? (
+                            <Tooltip>
+                              <TooltipTrigger
+                                onClick={() => setRemovingPackage(pkg.source)}
+                                className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
+                                aria-label={t("Remove {name}", { name: pkg.source })}
+                              >
+                                <Trash2 size={11} />
+                              </TooltipTrigger>
+                              <TooltipContent>{t("Remove package")}</TooltipContent>
+                            </Tooltip>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-2 text-label text-faint">{t("No packages configured.")}</p>
+                  )}
                 </div>
               </FormSection>
             ) : null}
@@ -803,6 +865,21 @@ export function PiConfigPanel({
                   ) : null
                 }
               >
+                <p className="mb-2 text-micro leading-4 text-faint">
+                  {t("Servers use pi's mcp.json format.")}{" "}
+                  <a
+                    href="https://pi.dev/docs/latest/mcp"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void api.openExternal("https://pi.dev/docs/latest/mcp");
+                    }}
+                    className="text-subtle underline underline-offset-2 hover:text-fg"
+                  >
+                    {t("MCP documentation")}
+                  </a>
+                </p>
                 {snapshot.mcp.length ? (
                   <ul className="space-y-1">
                     {snapshot.mcp.map((server) => (
@@ -886,6 +963,7 @@ export function PiConfigDialog({
   confirmedHash,
   onConfirmed,
   onOpenMCP,
+  onLogin,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -893,6 +971,7 @@ export function PiConfigDialog({
   confirmedHash: string;
   onConfirmed: (hash: string) => void;
   onOpenMCP?: () => void;
+  onLogin?: () => void;
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -912,6 +991,7 @@ export function PiConfigDialog({
             confirmedHash={confirmedHash}
             onConfirmed={onConfirmed}
             onOpenMCP={onOpenMCP}
+            onLogin={onLogin}
             onClose={() => onOpenChange(false)}
           />
         </DialogSurface>
@@ -1054,15 +1134,16 @@ function ProviderForm({
                   placeholder={t("Model name")}
                   className="h-7 min-w-0 flex-1 rounded-md border border-control bg-canvas px-2 text-micro outline-none placeholder:text-faint focus:border-brand"
                 />
-                <button
-                  type="button"
-                  onClick={() => patch({ models: input.models.filter((_, i) => i !== index) })}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                  aria-label={t("Remove model")}
-                  title={t("Remove model")}
-                >
-                  <Trash2 size={11} />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={() => patch({ models: input.models.filter((_, i) => i !== index) })}
+                    className="flex size-7 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
+                    aria-label={t("Remove model")}
+                  >
+                    <Trash2 size={11} />
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Remove model")}</TooltipContent>
+                </Tooltip>
               </div>
               <div className="flex flex-wrap items-center gap-2 text-micro text-subtle">
                 <label className="flex items-center gap-1">
@@ -1166,20 +1247,19 @@ function ResourceList({
                 {item.description}
               </p>
             ) : null}
-            <p className="mt-0.5 truncate font-mono text-micro text-faint" title={item.path}>
-              {item.path}
-            </p>
+            <p className="mt-0.5 break-all font-mono text-micro text-faint">{item.path}</p>
           </div>
           <div className="flex shrink-0 gap-0.5">
-            <button
-              type="button"
-              onClick={() => void api.reveal(item.path).catch(() => {})}
-              className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
-              aria-label={t("Reveal {path}", { path: item.path })}
-              title={t("Reveal")}
-            >
-              <FolderOpen size={11} />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => void api.reveal(item.path).catch(() => {})}
+                className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
+                aria-label={t("Reveal {path}", { path: item.path })}
+              >
+                <FolderOpen size={11} />
+              </TooltipTrigger>
+              <TooltipContent>{t("Reveal")}</TooltipContent>
+            </Tooltip>
             {item.source === "configured" && !item.project ? (
               <button
                 type="button"
@@ -1187,7 +1267,6 @@ function ResourceList({
                 onClick={() => onRemove(item.ref ?? item.path, item.ref ?? item.path)}
                 className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger disabled:opacity-40"
                 aria-label={t("Remove path")}
-                title={t("Remove path")}
               >
                 <Trash2 size={11} />
               </button>
@@ -1209,12 +1288,14 @@ function SourceBadge({ source }: { source: string }) {
 
 function InactiveBadge() {
   return (
-    <span
-      className="rounded bg-warning/10 px-1 py-0.5 text-micro text-warning"
-      title={t("This resource does not load. Check its path, or trust the project.")}
-    >
-      {t("not loaded")}
-    </span>
+    <Tooltip>
+      <TooltipTrigger className="rounded bg-warning/10 px-1 py-0.5 text-micro text-warning">
+        {t("not loaded")}
+      </TooltipTrigger>
+      <TooltipContent>
+        {t("This resource does not load. Check its path, or trust the project.")}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

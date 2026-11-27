@@ -32,7 +32,12 @@ export function MCPDialog({
   const [remove, setRemove] = useState<MCPServer | null>(null);
 
   const load = async () => {
-    if (!workspace) return;
+    if (!workspace) {
+      setServers([]);
+      return;
+    }
+    setServers([]);
+    setRemove(null);
     setLoading(true);
     setError(null);
     try {
@@ -229,6 +234,18 @@ export function MCPDialog({
                       "Environment variables, headers, OAuth, and tool exposure can be edited in mcp.json. Reload the session or run /mcp in pi after changes.",
                     )}
                   </p>
+                  <a
+                    href="https://pi.dev/docs/latest/mcp"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      void api.openExternal("https://pi.dev/docs/latest/mcp");
+                    }}
+                    className="mt-1 inline-block text-micro text-subtle underline underline-offset-2 hover:text-fg"
+                  >
+                    {t("MCP documentation")}
+                  </a>
                 </>
               )}
             </div>

@@ -4,10 +4,12 @@ const zh: Record<string, string> = {
   "desktop coding agent": "桌面编程助手",
   "New chat": "新对话",
   Projects: "项目",
-  Chats: "对话",
+  "Search projects and chats…": "搜索项目和对话…",
+  "No projects or chats match.": "没有匹配的项目或对话。",
+  "Expand project": "展开项目",
+  "Collapse project": "收起项目",
   "Open a project folder": "打开项目文件夹",
   "No chats yet. Start one above.": "还没有对话。先新建一个。",
-  "Open a project to see its chats.": "打开项目以查看对话。",
   "Needs input": "需要输入",
   Working: "运行中",
   "Starting pi…": "正在启动 pi…",
@@ -96,6 +98,9 @@ const zh: Record<string, string> = {
   "This restores the file from HEAD and discards both staged and unstaged changes. This cannot be undone by PiS.":
     "这会从 HEAD 恢复文件，并丢弃已暂存和未暂存的更改。PiS 无法撤销。",
   "Desktop notifications": "桌面通知",
+  Notifications: "通知",
+  "Notifications appear when background work finishes. PiS never sends prompts or credentials.":
+    "后台工作结束时显示通知。PiS 不会发送提示词或凭据。",
   "Notify when a background run finishes. The setting is off if the system does not allow notifications.":
     "后台运行结束时通知。系统不允许通知时此设置不会生效。",
   "Test notification": "测试通知",
@@ -104,11 +109,12 @@ const zh: Record<string, string> = {
   "TUI widgets are off by default because they are designed for a terminal, not this layout.":
     "TUI 组件默认关闭，因为它们是为终端设计的，不适合此布局。",
   Providers: "提供商",
-  "PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.":
-    "PiS 使用 pi 自己的凭据。登录运行 pi 的终端登录流程，应用本身不保存任何凭据。",
-  "Sign in to a provider…": "登录提供商…",
   "MCP servers…": "MCP 服务器…",
-  "Credentials live in pi's auth store": "凭据保存在 pi 的授权存储中",
+  "Choose a provider": "选择提供商",
+  "Loading providers…": "正在加载提供商…",
+  "No providers found.": "未找到提供商。",
+  "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. The provider list comes from pi.":
+    "账户登录会打开提供商的浏览器流程。API 密钥模式会在终端中询问密钥。提供商列表来自 pi。",
   "pi executable": "pi 可执行文件",
   "PiS uses the pi you already have. It never installs or updates it.":
     "PiS 使用你已有的 pi，不会安装或更新它。",
@@ -452,6 +458,11 @@ const zh: Record<string, string> = {
   "Providers configured in models.json. Built-in providers use pi sign-in.":
     "在 models.json 中配置的提供商。内置提供商使用 pi 登录。",
   "Add provider": "添加提供商",
+  "Sign in": "登录",
+  "Search skills…": "搜索技能…",
+  "No skills match.": "没有匹配的技能。",
+  "MCP documentation": "MCP 文档",
+  "Servers use pi's mcp.json format.": "服务器使用 pi 的 mcp.json 格式。",
   "No custom providers configured.": "尚未配置自定义提供商。",
   "API key is stored": "已保存 API 密钥",
   "Environment key": "环境变量密钥",

@@ -1,10 +1,10 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
-import { TextInput } from "@/components/ui/field";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import { KeyRound, Loader2, LogIn } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 
@@ -25,6 +25,8 @@ export function LoginDialog({
   codeFontSize: number;
 }) {
   const [provider, setProvider] = useState("anthropic");
+  const [providerOptions, setProviderOptions] = useState<ComboboxOption[]>([]);
+  const [loadingProviders, setLoadingProviders] = useState(false);
   const [apiKey, setApiKey] = useState(false);
   const [authId, setAuthId] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
@@ -46,6 +48,31 @@ export function LoginDialog({
       term.current?.dispose();
       term.current = null;
     }
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    setLoadingProviders(true);
+    void Promise.allSettled([api.piConfigModels(), api.piConfigInspect("")])
+      .then(([models, snapshot]) => {
+        if (!alive) return;
+        const ids = new Set<string>();
+        if (models.status === "fulfilled") {
+          for (const model of models.value) ids.add(model.provider);
+        }
+        if (snapshot.status === "fulfilled") {
+          for (const item of snapshot.value.providers) ids.add(item.id);
+        }
+        const options = [...ids].sort().map((id) => ({ value: id, label: id }));
+        setProviderOptions(options);
+      })
+      .finally(() => {
+        if (alive) setLoadingProviders(false);
+      });
+    return () => {
+      alive = false;
+    };
   }, [open]);
 
   useEffect(() => {
@@ -126,6 +153,13 @@ export function LoginDialog({
     };
   }, [open, authId, codeFontSize]);
 
+  const selectedProvider = useMemo(
+    () =>
+      providerOptions.find((option) => option.value === provider) ??
+      (provider ? { value: provider, label: provider } : null),
+    [providerOptions, provider],
+  );
+
   const start = async () => {
     if (!provider.trim()) return;
     setStarting(true);
@@ -161,18 +195,19 @@ export function LoginDialog({
 
           {!authId ? (
             <div className="px-5 py-5">
-              <label htmlFor="login-provider" className="text-label font-medium text-subtle">
-                {t("Provider")}
-              </label>
-              <TextInput
-                id="login-provider"
-                value={provider}
-                onChange={(e) => setProvider(e.target.value)}
-                placeholder={t("anthropic, openai, google, openrouter…")}
-                spellCheck={false}
-                autoFocus
+              <label className="text-label font-medium text-subtle">{t("Provider")}</label>
+              <Combobox
+                value={selectedProvider}
+                options={providerOptions}
+                onValueChange={(option) => setProvider(option.value)}
+                ariaLabel={t("Provider")}
+                placeholder={loadingProviders ? t("Loading providers…") : t("Choose a provider")}
+                emptyLabel={t("No providers found.")}
                 className="mt-1.5"
               />
+              {loadingProviders ? (
+                <p className="mt-1 text-micro text-faint">{t("Loading providers…")}</p>
+              ) : null}
               <div className="mt-3 flex gap-1.5">
                 <Method active={!apiKey} onClick={() => setApiKey(false)}>
                   <LogIn size={12} />
@@ -185,7 +220,7 @@ export function LoginDialog({
               </div>
               <p className="mt-3 text-micro leading-4 text-faint">
                 {t(
-                  "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. Use pi's provider docs if you are unsure of the provider id.",
+                  "Account sign-in opens the provider's browser flow. API key mode asks for the key in the terminal. The provider list comes from pi.",
                 )}
               </p>
               <div className="mt-4 flex justify-end gap-2">

@@ -41,22 +41,20 @@ const SECTIONS: SettingsSection[] = [
       "Teal",
       "Ink",
       "Language",
-      "Desktop notifications",
       "Show raw extension widgets",
-      "Test notification",
     ],
+  },
+  {
+    id: "notifications",
+    group: "general",
+    label: "Notifications",
+    keywords: ["Desktop notifications", "Test notification", "background run"],
   },
   {
     id: "text",
     group: "general",
     label: "Text and input",
     keywords: ["Code font size", "Interface size", "Send on Enter"],
-  },
-  {
-    id: "providers",
-    group: "general",
-    label: "Providers",
-    keywords: ["Sign in to a provider…", "credentials"],
   },
   {
     id: "executable",
@@ -92,7 +90,15 @@ const SECTIONS: SettingsSection[] = [
     id: "models",
     group: "pi",
     label: "Models and providers",
-    keywords: ["API key", "Base URL", "Add provider", "models.json"],
+    keywords: [
+      "API key",
+      "Base URL",
+      "Add provider",
+      "Sign in",
+      "login",
+      "credentials",
+      "models.json",
+    ],
   },
   {
     id: "skills",
@@ -310,7 +316,6 @@ export function SettingsDialog({
                       type="button"
                       onClick={() => setQuery("")}
                       aria-label={tr("Clear search")}
-                      title={tr("Clear search")}
                       className="absolute right-1.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-sm text-faint hover:bg-surface-2 hover:text-fg"
                     >
                       <X size={11} />
@@ -395,7 +400,6 @@ export function SettingsDialog({
                               data-palette={entry.id}
                               onClick={() => onPalette(entry.id)}
                               aria-pressed={palette === entry.id}
-                              title={tr(entry.note)}
                               className={cn(
                                 "overflow-hidden rounded-lg border text-left transition-colors",
                                 palette === entry.id
@@ -473,6 +477,16 @@ export function SettingsDialog({
                           </span>
                         </span>
                       </CheckboxField>
+                    </FormSection>
+                  ) : null}
+
+                  {section === "notifications" ? (
+                    <FormSection
+                      title={tr("Notifications")}
+                      description={tr(
+                        "Notifications appear when background work finishes. PiS never sends prompts or credentials.",
+                      )}
+                    >
                       <CheckboxField
                         checked={boot.settings.notifications}
                         onCheckedChange={async (checked) => {
@@ -484,7 +498,7 @@ export function SettingsDialog({
                             setBusy(false);
                           }
                         }}
-                        className="mt-2.5 flex items-start gap-2 text-label leading-4 text-subtle"
+                        className="flex items-start gap-2 text-label leading-4 text-subtle"
                         checkboxClassName="mt-0.5"
                         ariaLabel={tr("Desktop notifications")}
                       >
@@ -567,30 +581,6 @@ export function SettingsDialog({
                             </span>
                           </span>
                         </CheckboxField>
-                      </div>
-                    </FormSection>
-                  ) : null}
-
-                  {section === "providers" ? (
-                    <FormSection
-                      title={tr("Providers")}
-                      description={tr(
-                        "PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.",
-                      )}
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={onLogin}
-                          className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg"
-                        >
-                          {tr("Sign in to a provider…")}
-                        </button>
-                        <span className="text-micro text-faint">
-                          {boot.pi.compatible
-                            ? tr("Credentials live in pi's auth store")
-                            : tr("Locate pi first")}
-                        </span>
                       </div>
                     </FormSection>
                   ) : null}
@@ -814,8 +804,8 @@ export function SettingsDialog({
                 </>
               )}
 
-              {filtered.length > 0 && piMounted ? (
-                <div className={active.group === "pi" ? "" : "hidden"}>
+              {piMounted ? (
+                <div className={active.group === "pi" && filtered.length > 0 ? "" : "hidden"}>
                   <p className="mb-3 text-label leading-4 text-faint">
                     {tr(
                       "These controls read and write pi's own settings. The file paths are shown below.",
@@ -826,6 +816,7 @@ export function SettingsDialog({
                     confirmedHash={confirmedHash}
                     onConfirmed={onConfirmed}
                     onOpenMCP={onMCP}
+                    onLogin={onLogin}
                     embedded
                     section={active.group === "pi" ? (active.id as PiConfigSection) : "defaults"}
                   />

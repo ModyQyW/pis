@@ -495,7 +495,7 @@ export function Composer({
               <Popover onOpenChange={(open) => open && onContextOpen?.()}>
                 <PopoverTrigger
                   aria-label={totalLabel}
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-micro font-medium tabular-nums text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-nano font-medium tabular-nums text-faint transition-colors hover:border-border-strong hover:bg-surface-2 hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
                 >
                   {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
                 </PopoverTrigger>

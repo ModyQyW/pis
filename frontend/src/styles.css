@@ -190,6 +190,8 @@
 }
 
 @theme {
+  --text-nano: 10px;
+  --text-nano--line-height: 1.4;
   --text-micro: 11px;
   --text-micro--line-height: 1.45;
   --text-label: 12px;
