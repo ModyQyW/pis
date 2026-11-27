@@ -222,6 +222,14 @@ The budget is not an automated test. When you measure, record:
 - Command.
 - Result.
 
+## 0.0.11 checks
+
+- `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest 27, frontend and docs builds).
+- Real desktop app: launched from source; a loaded session showed the context percentage and the transcript changes. The context panel and compact action were checked in the browser preview.
+- Release workflow `45981606508` passed. Draft `v0.0.11` had 23 assets: the six architecture artifacts, `SHA256SUMS`, six update manifests, install scripts, and macOS/Windows archives. No delta files.
+- Release `v0.0.11` is published as latest. `publishedAt` is 2026-11-27T10:34:29Z.
+- Update from 0.0.10 and Windows/Linux runtime installs: skipped. No installed previous version or test machines in this environment.
+
 ## 0.0.10 checks
 
 - `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest, frontend and docs builds).

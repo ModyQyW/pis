@@ -222,6 +222,14 @@ bun run dev:web
 - 测量命令。
 - 结果。
 
+## 0.0.11 检查
+
+- `bun run check`：通过（Go 格式、构建、vet、测试、前端检查、bridge 测试、Vitest 27、前端和文档构建）。
+- 真实桌面应用：从源码启动；已加载会话显示上下文百分比和会话区改动。上下文面板与压缩操作在浏览器预览中检查。
+- Release workflow `45981606508` 通过。`v0.0.11` 草稿有 23 个资产：六个架构产物、`SHA256SUMS`、六个更新 manifest、安装脚本和 macOS/Windows archive。没有 delta 文件。
+- Release `v0.0.11` 已发布为 latest。`publishedAt` 为 2026-11-27T10:34:29Z。
+- 从 0.0.10 更新及 Windows/Linux 运行时安装：跳过。此环境没有安装旧版本或测试机。
+
 ## 0.0.10 检查
 
 - `bun run check`：通过（Go 格式、构建、vet、测试、前端检查、bridge 测试、Vitest、前端和文档构建）。
