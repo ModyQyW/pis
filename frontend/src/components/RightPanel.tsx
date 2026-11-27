@@ -128,10 +128,11 @@ export function RightPanel({
         </TabButton>
         <button
           type="button"
+          disabled={loading}
           onClick={() => setRefresh((v) => v + 1)}
-          className="ml-auto flex size-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+          className="ml-auto flex size-7 items-center justify-center rounded-md text-subtle transition-colors hover:bg-surface-2 hover:text-fg disabled:opacity-50"
           aria-label={t("Refresh panel")}
-          title={t("Refresh")}
+          title={t("Refresh panel")}
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
         </button>

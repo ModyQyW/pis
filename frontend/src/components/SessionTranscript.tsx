@@ -146,6 +146,7 @@ export function SessionTranscript({
           }}
           className="absolute bottom-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-surface text-subtle shadow-sm hover:text-fg"
           aria-label={t("Scroll to latest")}
+          title={t("Scroll to latest")}
         >
           <ArrowDown size={13} />
         </button>

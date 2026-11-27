@@ -1,7 +1,9 @@
-import { Folder, MessageSquare, Plus, Settings2 } from "lucide-react";
+import { Folder, ListChecks, MessageSquare, Plus, Settings2, Trash2, X } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { relativeTime } from "../lib/format";
+import { pruneSelection } from "../lib/session-selection";
 import { t } from "../lib/i18n";
 import type { Summary } from "../mygo";
 import type { ChatSession } from "../store/chat";
@@ -21,6 +23,8 @@ export function Sidebar({
   activeKey,
   onOpenSummary,
   onSelectOpen,
+  onDeleteSession,
+  onDeleteSessions,
 }: {
   boot: Bootstrap;
   selected: Workspace | null;
@@ -33,8 +37,34 @@ export function Sidebar({
   activeKey: string | null;
   onOpenSummary: (summary: Summary) => void;
   onSelectOpen: (key: string) => void;
+  onDeleteSession: (path: string) => void;
+  onDeleteSessions: (paths: string[]) => void;
 }) {
+  const [selecting, setSelecting] = useState(false);
+  const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    setSelecting(false);
+    setSelectedChats(new Set());
+  }, [selected?.path]);
+  useEffect(() => {
+    setSelectedChats((current) =>
+      pruneSelection(current, [
+        ...openSessions.map((session) => session.path),
+        ...recentSessions.map((session) => session.path),
+      ]),
+    );
+  }, [openSessions, recentSessions]);
+  const toggleSelected = (path?: string) => {
+    if (!path) return;
+    setSelectedChats((current) => {
+      const next = new Set(current);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  };
   const pi = boot.pi;
+  const hasChats = openSessions.length > 0 || recentSessions.length > 0;
   const projects = [...boot.recents];
   if (selected && !projects.some((p) => p.path === selected.path)) {
     projects.unshift(selected);
@@ -120,6 +150,51 @@ export function Sidebar({
         <div className="mt-5 px-2">
           <div className="flex items-center justify-between pb-1.5">
             <SectionLabel>{t("Chats")}</SectionLabel>
+            {hasChats ? (
+              <div className="flex items-center gap-0.5">
+                {selecting ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelecting(false);
+                        setSelectedChats(new Set());
+                      }}
+                      className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
+                      aria-label={t("Cancel selection")}
+                      title={t("Cancel selection")}
+                    >
+                      <X size={12} />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={selectedChats.size === 0}
+                      onClick={() => onDeleteSessions([...selectedChats])}
+                      aria-label={t("Delete selected chats")}
+                      title={t("Delete selected chats")}
+                      className="flex h-6 items-center gap-1 rounded-md px-1.5 text-micro text-danger hover:bg-danger/10 disabled:opacity-40"
+                    >
+                      <Trash2 size={11} />
+                      {t("Delete")}
+                      {selectedChats.size > 0 ? ` ${selectedChats.size}` : ""}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedChats(new Set());
+                      setSelecting(true);
+                    }}
+                    className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
+                    aria-label={t("Select chats")}
+                    title={t("Select chats")}
+                  >
+                    <ListChecks size={12} />
+                  </button>
+                )}
+              </div>
+            ) : null}
           </div>
           {openSessions.length === 0 && recentSessions.length === 0 ? (
             <div className="rounded-lg px-2 py-2 text-label leading-4 text-faint">
@@ -130,17 +205,22 @@ export function Sidebar({
           ) : (
             <ul className="space-y-0.5">
               {openSessions.map((s) => (
-                <li key={s.key}>
-                  <button
-                    type="button"
-                    onClick={() => onSelectOpen(s.key)}
-                    className={cn(
-                      "group flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left transition-colors",
-                      activeKey === s.key
-                        ? "bg-surface-3/80 text-fg"
-                        : "text-subtle hover:bg-surface-2 hover:text-fg",
-                    )}
-                  >
+                <ChatRow
+                  key={s.key}
+                  id={s.path}
+                  title={s.name || t("New chat")}
+                  meta={
+                    s.dialogs.length > 0
+                      ? t("Needs input")
+                      : s.streaming
+                        ? t("Working")
+                        : s.status === "loading"
+                          ? t("Starting pi…")
+                          : s.status === "error" || s.status === "exited"
+                            ? t("Stopped")
+                            : t("Open")
+                  }
+                  leading={
                     <span
                       className={cn(
                         "mt-1.5 size-1.5 shrink-0 rounded-full",
@@ -155,48 +235,31 @@ export function Sidebar({
                                 : "bg-success/70",
                       )}
                     />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-label font-medium">
-                        {s.name || t("New chat")}
-                      </span>
-                      <span
-                        className={cn(
-                          "mt-0.5 block truncate text-micro",
-                          activeKey === s.key ? "text-subtle" : "text-faint",
-                        )}
-                      >
-                        {s.dialogs.length > 0
-                          ? t("Needs input")
-                          : s.streaming
-                            ? t("Working")
-                            : s.status === "loading"
-                              ? t("Starting pi…")
-                              : s.status === "error" || s.status === "exited"
-                                ? t("Stopped")
-                                : t("Open")}
-                      </span>
-                    </span>
-                  </button>
-                </li>
+                  }
+                  active={activeKey === s.key}
+                  selecting={selecting}
+                  selected={Boolean(s.path && selectedChats.has(s.path))}
+                  onOpen={() => onSelectOpen(s.key)}
+                  onToggle={() => toggleSelected(s.path)}
+                  onDelete={() => s.path && onDeleteSession(s.path)}
+                />
               ))}
               {recentSessions
                 .filter((r) => !openSessions.some((s) => s.path === r.path))
                 .map((r) => (
-                  <li key={r.path}>
-                    <button
-                      type="button"
-                      onClick={() => onOpenSummary(r)}
-                      className="group flex w-full items-start gap-2 rounded-lg px-2.5 py-2 text-left text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-                    >
-                      <MessageSquare size={12} className="mt-0.5 shrink-0 text-faint" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-label">{r.title}</span>
-                        <span className="mt-0.5 block truncate text-micro text-faint">
-                          {relativeTime(r.updatedAt)}
-                        </span>
-                      </span>
-                    </button>
-                  </li>
+                  <ChatRow
+                    key={r.path}
+                    id={r.path}
+                    title={r.title}
+                    meta={relativeTime(r.updatedAt)}
+                    leading={<MessageSquare size={12} className="mt-0.5 shrink-0 text-faint" />}
+                    active={false}
+                    selecting={selecting}
+                    selected={selectedChats.has(r.path)}
+                    onOpen={() => onOpenSummary(r)}
+                    onToggle={() => toggleSelected(r.path)}
+                    onDelete={() => onDeleteSession(r.path)}
+                  />
                 ))}
             </ul>
           )}
@@ -231,5 +294,81 @@ export function Sidebar({
         </div>
       </div>
     </aside>
+  );
+}
+
+function ChatRow({
+  id,
+  title,
+  meta,
+  leading,
+  active,
+  selecting,
+  selected,
+  onOpen,
+  onToggle,
+  onDelete,
+}: {
+  id?: string;
+  title: string;
+  meta: string;
+  leading: ReactNode;
+  active: boolean;
+  selecting: boolean;
+  selected: boolean;
+  onOpen: () => void;
+  onToggle: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <li className="group flex items-center gap-1">
+      {selecting && id ? (
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={onToggle}
+          className="ml-1 size-3.5 shrink-0 accent-[var(--brand)]"
+          aria-label={t("Select {name}", { name: title })}
+          title={t("Select {name}", { name: title })}
+        />
+      ) : null}
+      <button
+        type="button"
+        onClick={selecting ? onToggle : onOpen}
+        disabled={selecting && !id}
+        className={cn(
+          "flex min-w-0 flex-1 items-start gap-2 rounded-lg px-2.5 py-2 text-left transition-colors disabled:opacity-50",
+          active
+            ? "bg-surface-3/80 text-fg"
+            : selected
+              ? "bg-brand-soft/30 text-fg"
+              : "text-subtle hover:bg-surface-2 hover:text-fg",
+        )}
+      >
+        {leading}
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-label font-medium">{title}</span>
+          <span
+            className={cn(
+              "mt-0.5 block truncate text-micro",
+              active || selected ? "text-subtle" : "text-faint",
+            )}
+          >
+            {meta}
+          </span>
+        </span>
+      </button>
+      {!selecting && id ? (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-faint opacity-60 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+          aria-label={t("Delete {name}", { name: title })}
+          title={t("Delete chat")}
+        >
+          <Trash2 size={11} />
+        </button>
+      ) : null}
+    </li>
   );
 }

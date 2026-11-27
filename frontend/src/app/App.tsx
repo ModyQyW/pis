@@ -92,7 +92,8 @@ export function App() {
   const [modelPickerOpen, setModelPickerOpen] = useState(false);
   const [trustOpen, setTrustOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteTargets, setDeleteTargets] = useState<string[]>([]);
+  const [deleting, setDeleting] = useState(false);
   const [trustInfo, setTrustInfo] = useState<TrustInfo | null>(null);
   const trustResolver = useRef<((choice: { decided: boolean; trusted: boolean }) => void) | null>(
     null,
@@ -228,6 +229,7 @@ export function App() {
     return api.onAgentEvent((ev) => useChat.getState().applyEvent(ev));
   }, []);
 
+  const sessionRequest = useRef(0);
   const busySessions = useRef<Record<string, boolean>>({});
   useEffect(() => {
     const enabled = Boolean(boot?.settings.notifications);
@@ -290,19 +292,22 @@ export function App() {
   }, [colorPalette, boot]);
 
   const refreshSessions = useCallback(async () => {
-    if (!selected) {
+    const path = selected?.path;
+    const request = ++sessionRequest.current;
+    if (!path) {
       setRecentSessions([]);
       return;
     }
     try {
-      const list = await api.listSessions(selected.path, 80);
-      setRecentSessions(list);
+      const list = await api.listSessions(path, 80);
+      if (request === sessionRequest.current) setRecentSessions(list);
     } catch {
-      setRecentSessions([]);
+      if (request === sessionRequest.current) setRecentSessions([]);
     }
   }, [selected]);
 
   useEffect(() => {
+    setRecentSessions([]);
     void refreshSessions();
   }, [refreshSessions]);
 
@@ -439,17 +444,25 @@ export function App() {
   const handleOpenSummary = useCallback(
     async (summary: Summary) => {
       if (!selected) return;
-      const choice = await ensureTrust(selected);
+      const cwd = summary.cwd || selected.path;
+      const ws =
+        boot?.recents.find((item) => item.path === cwd) ??
+        ({
+          path: cwd,
+          name: cwd.split("/").pop() ?? cwd,
+          lastOpened: new Date().toISOString(),
+        } satisfies Workspace);
+      const choice = await ensureTrust(ws);
       if (!choice.decided) return;
+      setSelected(ws);
       await useChat.getState().openSummary({
         path: summary.path,
         title: summary.title,
-        cwd: selected.path,
+        cwd,
         trusted: choice.trusted,
       });
-      void refreshSessions();
     },
-    [selected, ensureTrust, refreshSessions],
+    [boot?.recents, selected, ensureTrust],
   );
 
   const submit = useCallback(async () => {
@@ -990,6 +1003,8 @@ export function App() {
                 closeNarrowSidebar();
                 void handleOpenSummary(summary);
               }}
+              onDeleteSession={(path) => setDeleteTargets([path])}
+              onDeleteSessions={(paths) => setDeleteTargets(paths)}
               onSelectOpen={(key) => {
                 closeNarrowSidebar();
                 const s = useChat.getState().sessions[key];
@@ -1027,7 +1042,7 @@ export function App() {
                 onExport={() => void handleExport()}
                 onReveal={() => void handleReveal()}
                 onClose={() => void useChat.getState().close(active.key)}
-                onDelete={() => setDeleteOpen(true)}
+                onDelete={() => active?.path && setDeleteTargets([active.path])}
               />
             ) : undefined
           }
@@ -1209,10 +1224,9 @@ export function App() {
           setSettingsOpen(false);
           setLoginOpen(true);
         }}
-        onPiConfig={() => {
-          setSettingsOpen(false);
-          setPiConfigOpen(true);
-        }}
+        workspace={displayWorkspace?.path}
+        confirmedHash={piConfigHash}
+        onConfirmed={setPiConfigHash}
       />
       <PiConfigDialog
         open={piConfigOpen}
@@ -1252,30 +1266,73 @@ export function App() {
         />
       </Suspense>
       <ConfirmDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        title={t("Delete this session?")}
+        open={deleteTargets.length > 0}
+        onOpenChange={(next) => {
+          if (!next && deleting) return;
+          if (!next) setDeleteTargets([]);
+        }}
+        busy={deleting}
+        title={
+          deleteTargets.length > 1
+            ? t("Delete {count} sessions?", { count: deleteTargets.length })
+            : t("Delete this session?")
+        }
         message={
-          active?.path
-            ? t("The session file moves to the Trash. Your project files are untouched.")
-            : t("There is no live session to delete.")
+          deleteTargets.length > 1
+            ? t("The session files move to the Trash. Your project files are untouched.")
+            : t("The session file moves to the Trash. Your project files are untouched.")
         }
         confirmLabel={t("Move to Trash")}
         danger
         onConfirm={async () => {
-          const s = active;
-          if (!s?.path) {
-            setDeleteOpen(false);
-            return;
-          }
+          if (deleting) return;
+          setDeleting(true);
+          const targets = [...deleteTargets];
+          let deleted = 0;
+          let failed = 0;
+          let firstError = "";
           try {
-            await useChat.getState().close(s.key);
-            await api.deleteSession(s.path);
-            toast.success(t("Session moved to Trash"));
-            setDeleteOpen(false);
+            const live = Object.values(useChat.getState().sessions).filter(
+              (item) => item.path && targets.includes(item.path),
+            );
+            await Promise.all(
+              live.map(async (item) => {
+                try {
+                  await useChat.getState().close(item.key);
+                } catch (err) {
+                  if (!firstError) firstError = err instanceof Error ? err.message : String(err);
+                }
+              }),
+            );
+            for (const path of targets) {
+              try {
+                await api.deleteSession(path);
+                deleted++;
+              } catch (err) {
+                failed++;
+                if (!firstError) firstError = err instanceof Error ? err.message : String(err);
+              }
+            }
+            if (failed > 0) {
+              toast.error(
+                t(
+                  failed === 1 ? "Session was not deleted." : "{count} sessions were not deleted.",
+                  { count: failed },
+                ),
+                firstError ? { description: firstError } : undefined,
+              );
+            }
+            if (deleted > 0) {
+              toast.success(
+                t(deleted === 1 ? "Session moved to Trash" : "{count} sessions moved to Trash", {
+                  count: deleted,
+                }),
+              );
+            }
+          } finally {
+            setDeleting(false);
+            setDeleteTargets([]);
             void refreshSessions();
-          } catch (err) {
-            toast.error(err instanceof Error ? err.message : String(err));
           }
         }}
       />

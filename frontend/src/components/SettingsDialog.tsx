@@ -1,6 +1,6 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { Check, Clipboard, FolderOpen, RefreshCw } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "../lib/toast";
 
 import { api } from "../lib/api";
@@ -9,6 +9,8 @@ import { platformName } from "../lib/format";
 import { t as tr } from "../lib/i18n";
 import type { Bootstrap, Diagnostics, Palette, Theme } from "../lib/types";
 import { DialogHeader, DialogOverlay, DialogSurface } from "./ui/dialog-shell";
+import { FormSection } from "./ui/form-section";
+import { PiConfigPanel } from "./PiConfigDialog";
 import { SectionLabel } from "./ui/section-label";
 
 const CODE_FONT_SIZES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
@@ -32,7 +34,9 @@ export function SettingsDialog({
   onReload,
   onLogin,
   onMCP,
-  onPiConfig,
+  workspace,
+  confirmedHash,
+  onConfirmed,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -44,11 +48,24 @@ export function SettingsDialog({
   onReload: () => void;
   onLogin?: () => void;
   onMCP?: () => void;
-  onPiConfig?: () => void;
+  workspace?: string;
+  confirmedHash: string;
+  onConfirmed: (hash: string) => void;
 }) {
   const [path, setPath] = useState(boot.settings.piPath ?? boot.pi.path ?? "");
   const [diag, setDiag] = useState<Diagnostics | null>(null);
   const [busy, setBusy] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [tab, setTab] = useState<"general" | "pi">("general");
+  const [piMounted, setPiMounted] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setTab("general");
+      setPiMounted(false);
+    }
+  }, [open]);
 
   useEffect(() => {
     setPath(boot.settings.piPath ?? boot.pi.path ?? "");
@@ -90,6 +107,7 @@ export function SettingsDialog({
 
   const check = async () => {
     setBusy(true);
+    setChecking(true);
     try {
       const status = await api.checkPi();
       onReload();
@@ -101,6 +119,7 @@ export function SettingsDialog({
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     } finally {
+      setChecking(false);
       setBusy(false);
     }
   };
@@ -142,15 +161,47 @@ export function SettingsDialog({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <DialogOverlay />
-        <DialogSurface width="lg">
+        <DialogSurface width={tab === "pi" ? "xl" : "lg"}>
           <DialogHeader
             title={tr("Settings")}
             description={`PiS ${boot.appVersion} · ${platformName(boot.platform)}`}
             closeLabel={tr("Close settings")}
           />
 
-          <div className="min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4">
-            <Section title={tr("Appearance")}>
+          <div className="flex shrink-0 items-center gap-1 border-b border-border px-5 pt-1">
+            {(
+              [
+                ["general", "General"],
+                ["pi", "Pi configuration"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => {
+                  if (value === "pi") setPiMounted(true);
+                  setTab(value);
+                }}
+                aria-pressed={tab === value}
+                className={cn(
+                  "-mb-px border-b-2 px-2.5 py-2 text-label transition-colors",
+                  tab === value
+                    ? "border-brand text-fg"
+                    : "border-transparent text-subtle hover:text-fg",
+                )}
+              >
+                {tr(label)}
+              </button>
+            ))}
+          </div>
+
+          <div
+            className={cn(
+              "min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4",
+              tab !== "general" && "hidden",
+            )}
+          >
+            <FormSection title={tr("Appearance")}>
               <div className="flex gap-1.5">
                 {(["system", "light", "dark"] as const).map((option) => (
                   <button
@@ -294,9 +345,9 @@ export function SettingsDialog({
               >
                 {tr("Test notification")}
               </button>
-            </Section>
+            </FormSection>
 
-            <Section
+            <FormSection
               title={tr("Text and input")}
               description={tr(
                 "Code size covers Markdown code blocks, diffs, tool output, and previews. Interface size scales the whole window.",
@@ -349,9 +400,9 @@ export function SettingsDialog({
                   </span>
                 </label>
               </div>
-            </Section>
+            </FormSection>
 
-            <Section
+            <FormSection
               title={tr("Providers")}
               description={tr(
                 "PiS uses pi's own credentials. Sign-in runs pi's terminal login and stores nothing itself.",
@@ -371,35 +422,9 @@ export function SettingsDialog({
                     : tr("Locate pi first")}
                 </span>
               </div>
-            </Section>
+            </FormSection>
 
-            <Section
-              title={tr("Pi resources")}
-              description={tr(
-                "Review the models, providers, skills, packages, and MCP servers pi loads. PiS writes pi's own files only when you save.",
-              )}
-            >
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onPiConfig}
-                  disabled={!onPiConfig || !boot.pi.compatible}
-                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
-                >
-                  {tr("Models, providers, skills…")}
-                </button>
-                <button
-                  type="button"
-                  onClick={onMCP}
-                  disabled={!onMCP}
-                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
-                >
-                  {tr("MCP servers…")}
-                </button>
-              </div>
-            </Section>
-
-            <Section
+            <FormSection
               title={tr("pi executable")}
               description={tr("PiS uses the pi you already have. It never installs or updates it.")}
             >
@@ -421,11 +446,11 @@ export function SettingsDialog({
                 </button>
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || checking}
                   onClick={check}
                   className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
-                  <RefreshCw size={12} />
+                  <RefreshCw size={12} className={checking ? "animate-spin" : ""} />
                   {tr("Check")}
                 </button>
               </div>
@@ -445,9 +470,9 @@ export function SettingsDialog({
               {boot.pi.error ? (
                 <p className="mt-1.5 text-label leading-4 text-danger">{boot.pi.error}</p>
               ) : null}
-            </Section>
+            </FormSection>
 
-            <Section
+            <FormSection
               title={tr("Approvals")}
               description={tr(
                 "PiS can ask before destructive or out-of-workspace actions. It never replaces an existing guard unless you enable it here.",
@@ -531,9 +556,9 @@ export function SettingsDialog({
                   })}
                 </p>
               ) : null}
-            </Section>
+            </FormSection>
 
-            <Section
+            <FormSection
               title={tr("Updates")}
               description={tr(
                 "Updates come from GitHub Releases. PiS checks once a day in the background.",
@@ -542,27 +567,29 @@ export function SettingsDialog({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  disabled={busy}
+                  disabled={busy || updating}
                   onClick={async () => {
                     setBusy(true);
+                    setUpdating(true);
                     try {
                       await api.checkUpdates();
                     } catch (err) {
                       toast.error(err instanceof Error ? err.message : String(err));
                     } finally {
+                      setUpdating(false);
                       setBusy(false);
                     }
                   }}
                   className="flex h-8 items-center gap-1.5 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-50"
                 >
-                  <RefreshCw size={12} />
+                  <RefreshCw size={12} className={updating ? "animate-spin" : ""} />
                   {tr("Check for updates…")}
                 </button>
                 <span className="text-micro text-faint">PiS {boot.appVersion}</span>
               </div>
-            </Section>
+            </FormSection>
 
-            <Section
+            <FormSection
               title={tr("Diagnostics")}
               description={tr(
                 "Paths and versions only. Prompts and credentials are never included.",
@@ -598,30 +625,31 @@ export function SettingsDialog({
                   {tr("Reveal data folder")}
                 </button>
               </div>
-            </Section>
+            </FormSection>
           </div>
+          {piMounted ? (
+            <div
+              className={cn(
+                "min-h-0 flex-1 overflow-y-auto scroll-thin px-5 py-4",
+                tab !== "pi" && "hidden",
+              )}
+            >
+              <p className="mb-3 text-label leading-4 text-faint">
+                {tr(
+                  "These controls read and write pi's own settings. The file paths are shown below.",
+                )}
+              </p>
+              <PiConfigPanel
+                workspace={workspace}
+                confirmedHash={confirmedHash}
+                onConfirmed={onConfirmed}
+                onOpenMCP={onMCP}
+                embedded
+              />
+            </div>
+          ) : null}
         </DialogSurface>
       </Dialog.Portal>
     </Dialog.Root>
-  );
-}
-
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="mb-6 last:mb-1">
-      <SectionLabel>{title}</SectionLabel>
-      {description ? (
-        <p className="mt-1 max-w-[560px] text-label leading-4 text-faint">{description}</p>
-      ) : null}
-      <div className="mt-2.5">{children}</div>
-    </section>
   );
 }

@@ -1,5 +1,6 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 
 import { t } from "../lib/i18n";
@@ -11,6 +12,7 @@ export function ConfirmDialog({
   message,
   confirmLabel,
   danger,
+  busy,
   onConfirm,
 }: {
   open: boolean;
@@ -19,6 +21,7 @@ export function ConfirmDialog({
   message: string;
   confirmLabel?: string;
   danger?: boolean;
+  busy?: boolean;
   onConfirm: () => void | Promise<void>;
 }) {
   return (
@@ -33,15 +36,17 @@ export function ConfirmDialog({
             </Dialog.Description>
             <div className="mt-4 flex justify-end gap-2">
               <Dialog.Close asChild>
-                <Button variant="outline" size="md">
+                <Button variant="outline" size="md" disabled={busy}>
                   {t("Cancel")}
                 </Button>
               </Dialog.Close>
               <Button
                 variant={danger ? "destructive" : "primary"}
                 size="md"
+                disabled={busy}
                 onClick={() => void onConfirm()}
               >
+                {busy ? <Loader2 size={12} className="animate-spin" /> : null}
                 {confirmLabel ?? t("Confirm")}
               </Button>
             </div>

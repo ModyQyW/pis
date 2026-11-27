@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { cn } from "../lib/cn";
 import { t } from "../lib/i18n";
+import { toast } from "../lib/toast";
 import type { Model } from "../mygo";
 import type { ChatSession } from "../store/chat";
 
@@ -27,6 +28,7 @@ export function ModelPickerDialog({
 }) {
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const grouped = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -77,12 +79,22 @@ export function ModelPickerDialog({
             />
             <button
               type="button"
-              onClick={() => void onRefresh()}
-              className="flex size-6 items-center justify-center rounded text-faint hover:bg-surface-2 hover:text-fg"
+              disabled={refreshing}
+              onClick={async () => {
+                setRefreshing(true);
+                try {
+                  await onRefresh();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : String(err));
+                } finally {
+                  setRefreshing(false);
+                }
+              }}
+              className="flex size-6 items-center justify-center rounded text-faint hover:bg-surface-2 hover:text-fg disabled:opacity-50"
               aria-label={t("Refresh models")}
               title={t("Refresh models")}
             >
-              <RefreshCw size={12} />
+              <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
             </button>
           </div>
 

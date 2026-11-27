@@ -375,7 +375,6 @@ const zh: Record<string, string> = {
   "Project set to untrusted": "项目已设为不受信任",
   "The session file moves to the Trash. Your project files are untouched.":
     "会话文件会移到废纸篓，项目文件不受影响。",
-  "There is no live session to delete.": "没有可删除的活动会话。",
   "pi {version} is ready": "pi {version} 已就绪",
   "Using pi {version}": "正在使用 pi {version}",
   "Run failed": "运行失败",
@@ -401,11 +400,13 @@ const zh: Record<string, string> = {
   "session info": "会话信息",
   custom: "自定义",
   label: "标记",
-  "Pi resources": "pi 资源",
-  "Models, providers, skills…": "模型、提供商、技能…",
-  "Review the models, providers, skills, packages, and MCP servers pi loads. PiS writes pi's own files only when you save.":
-    "查看 pi 加载的模型、提供商、技能、包和 MCP 服务器。PiS 只在你保存时写入 pi 自己的文件。",
+  General: "通用",
+  "These controls read and write pi's own settings. The file paths are shown below.":
+    "这些控件读取并写入 pi 自己的设置。文件路径显示在下方。",
   "Pi configuration": "pi 配置",
+  "Refresh pi configuration": "刷新 pi 配置",
+  "Reveal pi config folder": "在文件管理器中显示 pi 配置文件夹",
+  "PiS writes these files directly and does not copy them.": "PiS 直接写入这些文件，不复制它们。",
   "Close pi configuration": "关闭 pi 配置",
   "PiS reads this from pi's own files. Changes are written only when you save.":
     "PiS 从 pi 自己的文件读取这些内容。只有你保存时才会写入更改。",
@@ -425,6 +426,7 @@ const zh: Record<string, string> = {
   "Default model": "默认模型",
   Automatic: "自动",
   "Save defaults": "保存默认值",
+  "Loading models…": "正在加载模型…",
   "Default model saved": "默认模型已保存",
   "Models and providers": "模型和提供商",
   "Providers configured in models.json. Built-in providers use pi sign-in.":
@@ -485,6 +487,9 @@ const zh: Record<string, string> = {
   "Settings are written to pi's own files. PiS does not copy or cache them.":
     "设置会写入 pi 自己的文件。PiS 不复制也不缓存这些设置。",
   "Remove path": "移除路径",
+  "Remove configured path?": "移除配置路径？",
+  "This removes {path} from pi's settings. Skills or extensions inside it stop loading.":
+    "这会从 pi 的设置中移除 {path}。其中的技能或扩展会停止加载。",
   "Path added": "路径已添加",
   "Path removed": "路径已移除",
   "Package added": "包已添加",
@@ -504,6 +509,19 @@ const zh: Record<string, string> = {
   minimal: "极低",
   xhigh: "极高",
   max: "最高",
+  "Select chats": "选择对话",
+  "Cancel selection": "取消选择",
+  "Delete selected chats": "删除所选对话",
+  "Delete chat": "删除对话",
+  "Select {name}": "选择 {name}",
+  "Delete {name}": "删除 {name}",
+  "Delete {count} sessions?": "删除 {count} 个对话？",
+  "The session files move to the Trash. Your project files are untouched.":
+    "会话文件会移到废纸篓，项目文件不受影响。",
+  "{count} sessions were not deleted.": "{count} 个对话未删除。",
+  "Session was not deleted.": "对话未删除。",
+  "{count} sessions moved to Trash": "{count} 个对话已移到废纸篓",
+  Delete: "删除",
 };
 
 let locale: Locale = "en";
