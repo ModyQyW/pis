@@ -19,14 +19,14 @@ pi, keep a second configuration, or install a second agent runtime. It writes
 pi's `settings.json`, `models.json`, and `mcp.json` only after you save a change
 in the app.
 
-## Status (2026-11-26)
+## Status (2026-11-27)
 
 V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.7](https://github.com/ModyQyW/pis/releases/tag/v0.0.7)**
-(arm64 DMG 7.2 MB). The update feed resolves to `0.0.7`. The release and
+Current public release: **[0.0.8](https://github.com/ModyQyW/pis/releases/tag/v0.0.8)**
+(arm64 DMG 7.3 MB). The update feed resolves to `0.0.8`. The release and
 update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
 one-time approval. English is the default. Chinese is available in Settings.
 See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and

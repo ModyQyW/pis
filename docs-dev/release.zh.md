@@ -4,8 +4,8 @@
 
 ## 当前状态
 
-- 当前 tag 为 `v0.0.7`。
-- `0.0.7` 是公开 Release，也是 latest。
+- 当前 tag 为 `v0.0.8`。
+- `0.0.8` 是公开 Release，也是 latest。
 - macOS 使用 ad-hoc 签名。Windows 安装器未签名。Linux 使用 tar、deb、rpm 和 `install.sh`。
 
 发布前用 `git tag` 和 `gh release list` 确认当前状态。
@@ -65,7 +65,7 @@ git log --oneline -5
 非交互环境：
 
 ```sh
-PIS_VERSION=0.0.7 ./scripts/release.sh
+PIS_VERSION=0.0.8 ./scripts/release.sh
 ```
 
 脚本执行顺序：

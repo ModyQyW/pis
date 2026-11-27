@@ -60,8 +60,9 @@ Every risky path has a test or a manual check: session parsing, streaming, appro
 | `0.0.5` | Manual update check, authoritative pi path, login-shell PATH, one-shot release script |
 | `0.0.6` | Bilingual guides and UI, session and file hardening, CHANGELOG-driven releases |
 | `0.0.7` | Palettes and a shared design system, download notes in releases, no delta assets |
+| `0.0.8` | Pi configuration dialog, skills guide, extension compatibility, MCP and config hardening |
 
-The `0.0.3` tag was never published as a GitHub release. `0.0.7` is the current public release and latest.
+The `0.0.3` tag was never published as a GitHub release. `0.0.8` is the current public release and latest.
 
 ## Current state
 

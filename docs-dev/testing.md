@@ -188,6 +188,7 @@ Last full macOS arm64 validation: 2026-11-22 to 2026-11-24.
 | DMG for 0.0.5 arm64 | 7.2 MB |
 | DMG for 0.0.6 arm64 | 7.2 MB |
 | DMG for 0.0.7 arm64 | 7.2 MB |
+| DMG for 0.0.8 arm64 | 7.3 MB |
 
 These numbers are historical. They describe the machine and build above. Re-run the gate and the relevant manual checks before a release.
 
