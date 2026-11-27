@@ -39,6 +39,7 @@ import { EmptyState } from "../components/EmptyState";
 import { ExtensionStatusRail } from "../components/ExtensionStatusRail";
 import { MCPDialog } from "../components/MCPDialog";
 import { ModelPickerDialog } from "../components/ModelPickerDialog";
+import { PiConfigDialog } from "../components/PiConfigDialog";
 import { RenameDialog } from "../components/RenameDialog";
 import { RightPanel } from "../components/RightPanel";
 import { SessionActions } from "../components/SessionActions";
@@ -82,6 +83,9 @@ export function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mcpOpen, setMCPOpen] = useState(false);
+  const [piConfigOpen, setPiConfigOpen] = useState(false);
+  const [piConfigHash, setPiConfigHash] = useState("");
+  const piConfigChecked = useRef(false);
   const [worktreeOpen, setWorktreeOpen] = useState(false);
   const [treeOpen, setTreeOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -152,7 +156,34 @@ export function App() {
 
   useEffect(() => {
     if (boot) setLocale(boot.settings.language);
-  }, [boot?.settings.language, boot]);
+    if (boot) setPiConfigHash(boot.settings.piConfigHash ?? "");
+  }, [boot?.settings.language, boot?.settings.piConfigHash, boot]);
+
+  // Review pi's configuration once per app session when it changed since the
+  // last confirmation. This reads only; the dialog writes after a user action.
+  useEffect(() => {
+    if (!boot || !insideShell || boot.pi.checking || !boot.pi.compatible) return;
+    if (piConfigChecked.current) return;
+    piConfigChecked.current = true;
+    void api
+      .piConfigInspect(selected?.path ?? "")
+      .then((snap) => {
+        // An empty configuration has nothing to review; do not interrupt.
+        const empty =
+          !snap.defaults.provider &&
+          !snap.defaults.model &&
+          !snap.defaults.thinking &&
+          snap.providers.length === 0 &&
+          snap.skills.length === 0 &&
+          snap.extensions.length === 0 &&
+          snap.packages.length === 0 &&
+          snap.mcp.every((server) => server.source !== "user");
+        if (!empty && snap.fingerprint !== (boot.settings.piConfigHash ?? "")) {
+          setPiConfigOpen(true);
+        }
+      })
+      .catch(() => {});
+  }, [boot, selected?.path]);
 
   useLayoutEffect(() => {
     if (!boot) return;
@@ -1177,6 +1208,21 @@ export function App() {
         onLogin={() => {
           setSettingsOpen(false);
           setLoginOpen(true);
+        }}
+        onPiConfig={() => {
+          setSettingsOpen(false);
+          setPiConfigOpen(true);
+        }}
+      />
+      <PiConfigDialog
+        open={piConfigOpen}
+        onOpenChange={setPiConfigOpen}
+        workspace={displayWorkspace?.path}
+        confirmedHash={piConfigHash}
+        onConfirmed={setPiConfigHash}
+        onOpenMCP={() => {
+          setPiConfigOpen(false);
+          setMCPOpen(true);
         }}
       />
       <MCPDialog open={mcpOpen} onOpenChange={setMCPOpen} workspace={displayWorkspace?.path} />

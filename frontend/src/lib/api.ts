@@ -3,6 +3,7 @@ import { isMyGo } from "mygo-runtime";
 import {
   Agent,
   Auth,
+  PiConfig,
   Desktop,
   Files,
   Git,
@@ -10,6 +11,7 @@ import {
   Sessions,
   events,
   type AddRequest,
+  type AvailableModel,
   type Bootstrap,
   type Diagnostics,
   type Event,
@@ -23,8 +25,10 @@ import {
   type PiStatus,
   type Preferences,
   type PromptRequest,
+  type ProviderInput,
   type SearchHit,
   type Server,
+  type Snapshot as PiConfigSnapshot,
   type SessionInfo,
   type StartRequest,
   type Status,
@@ -307,6 +311,42 @@ export const api = {
   async mcpAdd(workspace: string, req: AddRequest): Promise<void> {
     if (!insideShell) return;
     await MCP.add(workspace, req);
+  },
+  async piConfigInspect(workspace: string): Promise<PiConfigSnapshot> {
+    if (!insideShell && MOCK) return (await loadMock()).mockPiConfig();
+    return PiConfig.inspect(workspace);
+  },
+  async piConfigModels(): Promise<AvailableModel[]> {
+    if (!insideShell && MOCK) return (await loadMock()).mockPiModels();
+    return PiConfig.models();
+  },
+  async piConfigSetDefaults(provider: string, model: string, thinking: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.setDefaults(provider, model, thinking);
+  },
+  async piConfigSaveProvider(input: ProviderInput): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.saveProvider(input);
+  },
+  async piConfigRemoveProvider(id: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.removeProvider(id);
+  },
+  async piConfigAddPath(kind: string, path: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.addPath(kind, path);
+  },
+  async piConfigRemovePath(kind: string, path: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.removePath(kind, path);
+  },
+  async piConfigAddPackage(source: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.addPackage(source);
+  },
+  async piConfigRemovePackage(source: string): Promise<void> {
+    if (!insideShell) return;
+    await PiConfig.removePackage(source);
   },
   async gitStatus(workspace: string): Promise<Status> {
     if (!insideShell && MOCK) return (await loadMock()).mockGitStatus();

@@ -32,6 +32,7 @@ export function SettingsDialog({
   onReload,
   onLogin,
   onMCP,
+  onPiConfig,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -43,6 +44,7 @@ export function SettingsDialog({
   onReload: () => void;
   onLogin?: () => void;
   onMCP?: () => void;
+  onPiConfig?: () => void;
 }) {
   const [path, setPath] = useState(boot.settings.piPath ?? boot.pi.path ?? "");
   const [diag, setDiag] = useState<Diagnostics | null>(null);
@@ -363,6 +365,29 @@ export function SettingsDialog({
                 >
                   {tr("Sign in to a provider…")}
                 </button>
+                <span className="text-micro text-faint">
+                  {boot.pi.compatible
+                    ? tr("Credentials live in pi's auth store")
+                    : tr("Locate pi first")}
+                </span>
+              </div>
+            </Section>
+
+            <Section
+              title={tr("Pi resources")}
+              description={tr(
+                "Review the models, providers, skills, packages, and MCP servers pi loads. PiS writes pi's own files only when you save.",
+              )}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onPiConfig}
+                  disabled={!onPiConfig || !boot.pi.compatible}
+                  className="h-8 rounded-md border border-control px-3 text-label text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+                >
+                  {tr("Models, providers, skills…")}
+                </button>
                 <button
                   type="button"
                   onClick={onMCP}
@@ -371,11 +396,6 @@ export function SettingsDialog({
                 >
                   {tr("MCP servers…")}
                 </button>
-                <span className="text-micro text-faint">
-                  {boot.pi.compatible
-                    ? tr("Credentials live in pi's auth store")
-                    : tr("Locate pi first")}
-                </span>
               </div>
             </Section>
 
