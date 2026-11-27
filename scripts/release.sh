@@ -121,7 +121,7 @@ need() {
 }
 
 release_notes_header() {
-  sed -e "s/__VERSION__/$PIS_VERSION/g" -e "s|__REPO__|$repo|g" scripts/release-notes-header.md
+  sed -e "s/__VERSION__/$PIS_VERSION/g" -e "s/PISVERSION/$PIS_VERSION/g" -e "s|__REPO__|$repo|g" scripts/release-notes-header.md
 }
 
 changelog_section() {
