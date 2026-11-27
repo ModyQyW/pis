@@ -2,6 +2,16 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.9 (2026-11-27)
+
+- Add a Pi configuration tab to Settings with current defaults, providers and models, skills, extensions, packages, and MCP servers, plus the pi file paths.
+- Add single-chat delete buttons and multi-select bulk delete in the sidebar.
+- Spin refresh icons while a refresh runs and add tooltips to icon-only buttons.
+- Link every download table row to its release asset and repair the tables on existing releases.
+- Keep the delete confirmation open until deletion finishes; close live sessions in parallel and show the first error.
+- Preserve symlinked pi settings, model, and MCP files; reject non-regular files in previews.
+- Cache the available model list for 60 seconds; the Pi configuration refresh forces a reload.
+
 ## 0.0.8 (2026-11-27)
 
 - Add the Pi configuration dialog: review pi's default model, custom providers, skills, extensions, packages, and MCP servers, and confirm the list when it changes.
