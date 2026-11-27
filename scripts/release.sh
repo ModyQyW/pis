@@ -193,6 +193,13 @@ tag_run_id() {
     --json databaseId,headBranch --jq "[.[] | select(.headBranch == \"$1\")][0].databaseId // empty"
 }
 
+# Drafts are not always discoverable by tag; the releases list still returns
+# them while the tag association is being finalized.
+release_id() {
+  gh api --paginate "repos/$repo/releases?per_page=100" \
+    --jq ".[] | select(.tag_name == \"$1\") | .id" | sed -n '1p'
+}
+
 wait_for_run() {
   tag=$1
   run_id=$(tag_run_id "$tag")
@@ -218,7 +225,9 @@ wait_for_run() {
 verify_assets() {
   tag=$1
   v=$2
-  assets=$(gh release view "$tag" --json assets --jq '.assets[].name') || fail "release $tag not found"
+  rel_id=$(release_id "$tag")
+  [ -n "$rel_id" ] || fail "release $tag not found"
+  assets=$(gh api "repos/$repo/releases/$rel_id" --jq '.assets[].name')
   if printf '%s\n' "$assets" | grep -q '\.delta$'; then
     fail "draft $tag has delta assets; keep updates.deltas at 0"
   fi
@@ -243,7 +252,11 @@ verify_assets() {
   names=$(mktemp)
   listed=$(mktemp)
   trap 'rm -f "$sums" "$names" "$listed"' EXIT
-  gh release download "$tag" -p SHA256SUMS -O "$sums" --clobber >/dev/null ||
+  sums_id=$(gh api "repos/$repo/releases/$rel_id/assets" \
+    --jq '.[] | select(.name == "SHA256SUMS") | .id' | sed -n '1p')
+  [ -n "$sums_id" ] || fail "draft $tag has no SHA256SUMS"
+  gh api -H "Accept: application/octet-stream" \
+    "repos/$repo/releases/assets/$sums_id" >"$sums" ||
     fail "could not download SHA256SUMS from draft $tag"
   awk '{print $2}' "$sums" | sort >"$names"
   printf '%s\n' "$assets" | grep -vx SHA256SUMS | grep -v '^update-.*\.json$' | sort >"$listed"
@@ -312,29 +325,33 @@ publish_release() {
     check_changelog_translation
   fi
 
-  if gh release view "$tag" --json isDraft --jq .isDraft 2>/dev/null | grep -qx false; then
-    echo "release: $tag is already published: $(gh release view "$tag" --json url --jq .url)"
+  rel_id=$(release_id "$tag")
+  if [ -n "$rel_id" ] && [ "$(gh api "repos/$repo/releases/$rel_id" --jq '.draft')" = "false" ]; then
+    echo "release: $tag is already published: $(gh api "repos/$repo/releases/$rel_id" --jq '.html_url')"
     return
   fi
 
   wait_for_run "$tag"
   verify_assets "$tag" "$PIS_VERSION"
 
+  rel_id=$(release_id "$tag")
+  [ -n "$rel_id" ] || fail "release $tag not found after the workflow"
+
   notes=$(mktemp)
   trap 'rm -f "$notes"' EXIT
   changelog_section "$notes"
 
   echo "release: publishing $tag"
-  gh release edit "$tag" \
-    --title "PiS $PIS_VERSION" \
-    --notes-file "$notes" \
-    --latest \
-    --draft=false >/dev/null
+  gh api -X PATCH "repos/$repo/releases/$rel_id" \
+    -F draft=false \
+    -F make_latest=true \
+    -f name="PiS $PIS_VERSION" \
+    -f body="$(cat "$notes")" >/dev/null
 
-  draft=$(gh release view "$tag" --json isDraft --jq .isDraft)
+  draft=$(gh api "repos/$repo/releases/$rel_id" --jq '.draft')
   latest=$(gh release list --limit 1 --json tagName,isLatest --jq '.[0] | select(.isLatest) | .tagName')
-  published=$(gh release view "$tag" --json publishedAt --jq .publishedAt)
-  url=$(gh release view "$tag" --json url --jq .url)
+  published=$(gh api "repos/$repo/releases/$rel_id" --jq '.published_at')
+  url=$(gh api "repos/$repo/releases/$rel_id" --jq '.html_url')
   [ "$draft" = "false" ] || fail "$tag is still a draft"
   [ "$latest" = "$tag" ] || fail "$tag is not the latest release"
   [ -n "$published" ] && [ "$published" != "null" ] || fail "$tag has no publication time"

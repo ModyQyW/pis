@@ -269,11 +269,13 @@ gh run rerun <run-id> --failed
 
 脚本发现失败的 workflow 时，会先重跑失败的 job。
 
-发布步骤失败时，重新运行同一个版本：
+发布步骤失败时，重跑同一版本：
 
 ```sh
 PIS_VERSION=X.Y.Z ./scripts/release.sh
 ```
+
+本地 `GH_TOKEN` 会覆盖已保存的 `gh` 账号。它没有 Release 权限时，发布会失败，请在发布前取消设置。草稿 Release 在 GitHub 关联 tag 前也可能无法按 tag 查询；脚本会通过 releases 列表按 ID 查找草稿。
 
 tag 已存在且指向 `HEAD` 时，脚本跳过提交和 tag，继续等待和校验。
 

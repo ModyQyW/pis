@@ -274,6 +274,8 @@ When the publish step fails, rerun the same version:
 PIS_VERSION=X.Y.Z ./scripts/release.sh
 ```
 
+A local `GH_TOKEN` shadows the stored `gh` account. If it lacks release access, unset it before publishing. A draft release can also be missing from by-tag lookups until GitHub associates its tag; the script finds drafts through the releases list by ID.
+
 If the tag exists and points to `HEAD`, the script skips the commit and tag, then continues the wait and checks.
 
 ## Signing and Gatekeeper
