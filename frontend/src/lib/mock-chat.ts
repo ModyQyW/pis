@@ -148,6 +148,7 @@ export function mockTranscript(path: string): Transcript {
     leafId: "a3",
     entries,
     truncated: false,
+    context: { system: 1800, tools: 7400, skills: 900, project: 2200 },
   };
 }
 

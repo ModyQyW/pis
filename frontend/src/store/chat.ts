@@ -1,7 +1,7 @@
 import { toast } from "../lib/toast";
 import { create } from "zustand";
 
-import type { Entry, Event, Model } from "../mygo";
+import type { ContextBreakdown, Entry, Event, Model } from "../mygo";
 import { api } from "../lib/api";
 import {
   normalizeUsage,
@@ -42,6 +42,7 @@ export type ChatSession = {
   autoCompaction: boolean;
   draft: string;
   stats?: SessionStats;
+  context?: ContextBreakdown;
   commands: CommandInfo[];
   queues: { steering: string[]; followUp: string[] };
   retry?: { attempt: number; maxAttempts: number; message?: string };
@@ -78,6 +79,7 @@ type Store = {
   ) => Promise<void>;
   dismissDialog: (key: string, dialogId: string) => void;
   refreshTranscript: (key: string, leafId?: string) => Promise<void>;
+  refreshContext: (key: string) => Promise<void>;
   fork: (key: string, entryId: string) => Promise<void>;
   clone: (key: string) => Promise<void>;
   navigateTree: (key: string, entryId: string, summarize: boolean) => Promise<void>;
@@ -192,7 +194,7 @@ export const useChat = create<Store>((set, get) => ({
         return {
           sessions: {
             ...state.sessions,
-            [tempKey]: { ...s, entries: tr.entries, name: s.name || tr.name },
+            [tempKey]: { ...s, entries: tr.entries, name: s.name || tr.name, context: tr.context },
           },
         };
       });
@@ -215,6 +217,7 @@ export const useChat = create<Store>((set, get) => ({
           appId: info.id,
           path: info.file || path,
           name: info.name || s.name,
+          context: s.context ?? transcript?.context,
           draft: s.draft || loadDraft({ ...s, path: info.file || path }),
           model: info.model,
           thinking: info.thinkingLevel,
@@ -247,6 +250,7 @@ export const useChat = create<Store>((set, get) => ({
         return;
       }
       void loadModelData(set, info.id);
+      refreshStats(set, info.id, info.id);
       void api.getCommands(info.id).then((raw) => {
         const commands = (raw as { commands?: CommandInfo[] } | null)?.commands ?? [];
         set((state) => {
@@ -319,6 +323,7 @@ export const useChat = create<Store>((set, get) => ({
         return;
       }
       void loadModelData(set, info.id);
+      refreshStats(set, info.id, info.id);
       void api.getCommands(info.id).then((raw) => {
         const commands = (raw as { commands?: CommandInfo[] } | null)?.commands ?? [];
         set((state) => {
@@ -456,9 +461,21 @@ export const useChat = create<Store>((set, get) => ({
       return {
         sessions: {
           ...state.sessions,
-          [key]: { ...cur, entries: tr.entries, name: cur.name || tr.name },
+          [key]: { ...cur, entries: tr.entries, name: cur.name || tr.name, context: tr.context },
         },
       };
+    });
+  },
+
+  async refreshContext(key) {
+    const s = get().sessions[key];
+    if (!s?.path) return;
+    const tr = await api.readSessionAt(s.path, "").catch(() => null);
+    if (!tr?.context) return;
+    set((state) => {
+      const cur = state.sessions[key];
+      if (!cur) return state;
+      return { sessions: { ...state.sessions, [key]: { ...cur, context: tr.context } } };
     });
   },
 
@@ -479,6 +496,7 @@ export const useChat = create<Store>((set, get) => ({
             name: info.name || "Forked chat",
             model: info.model,
             entries: tr.entries,
+            context: tr.context,
             live: null,
             streaming: info.streaming,
           },
@@ -504,6 +522,7 @@ export const useChat = create<Store>((set, get) => ({
             name: info.name || cur.name,
             model: info.model,
             entries: tr.entries,
+            context: tr.context,
             live: null,
             streaming: info.streaming,
           },
@@ -670,17 +689,7 @@ export const useChat = create<Store>((set, get) => ({
     const next = reduceEvent(cur, event);
     set((s) => ({ sessions: { ...s.sessions, [key]: next } }));
     if (event.type === "agent_settled" && cur.appId) {
-      void api
-        .getStats(cur.appId)
-        .then((raw) => {
-          const stats = raw as SessionStats | null;
-          set((s) => {
-            const latest = s.sessions[key];
-            if (!latest || !stats) return s;
-            return { sessions: { ...s.sessions, [key]: { ...latest, stats } } };
-          });
-        })
-        .catch(() => {});
+      refreshStats(set, key, cur.appId);
     }
   },
 
@@ -765,6 +774,10 @@ function reduceEvent(cur: ChatSession, event: PiEvent): ChatSession {
         type: "message",
         message: normalized,
         role: msg.role,
+        timestamp:
+          typeof msg.timestamp === "number" && Number.isFinite(msg.timestamp)
+            ? new Date(msg.timestamp).toISOString()
+            : new Date(now()).toISOString(),
       };
       if (msg.role === "assistant") {
         const usage = normalizeUsage(msg.usage);
@@ -890,6 +903,20 @@ function reduceEvent(cur: ChatSession, event: PiEvent): ChatSession {
             durationMs: event.durationMs,
           },
         },
+      };
+    }
+    case "entry_appended": {
+      const entry = event.entry;
+      if (!entry || entry.type !== "custom_message") return cur;
+      const extra = entry as Entry & { content?: unknown; details?: unknown; display?: boolean };
+      if (extra.display === false) return cur;
+      if (cur.entries.some((item) => item.id === entry.id)) return cur;
+      return {
+        ...cur,
+        entries: [
+          ...cur.entries,
+          { ...entry, message: entry.message ?? extra.content, data: entry.data ?? extra.details },
+        ],
       };
     }
     case "queue_update":
@@ -1041,6 +1068,25 @@ function closeLateStart(appId: string) {
     return { orphan };
   });
   void api.closeSession(appId).catch(() => {});
+}
+
+function refreshStats(
+  set: (fn: (state: Store) => Partial<Store>) => void,
+  key: string,
+  appId: string,
+) {
+  void api
+    .getStats(appId)
+    .then((raw) => {
+      const stats = raw as SessionStats | null;
+      if (!stats) return;
+      set((state) => {
+        const latest = state.sessions[key];
+        if (!latest) return state;
+        return { sessions: { ...state.sessions, [key]: { ...latest, stats } } };
+      });
+    })
+    .catch(() => {});
 }
 
 async function loadModelData(

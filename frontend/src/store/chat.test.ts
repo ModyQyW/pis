@@ -56,6 +56,7 @@ beforeEach(() => {
   mocks.getModels.mockResolvedValue([]);
   mocks.getThinkingLevels.mockResolvedValue([]);
   mocks.getCommands.mockResolvedValue({ commands: [] });
+  mocks.getStats.mockResolvedValue(null);
   mocks.readSession.mockResolvedValue({ entries: [], name: "" });
   mocks.readSessionAt.mockResolvedValue({ entries: [], name: "" });
 });
@@ -84,6 +85,82 @@ describe("chat store", () => {
     expect(session?.error).toBe("pi exited");
   });
 
+  it("keeps a timestamp on completed messages", async () => {
+    mocks.startSession.mockResolvedValue(info("time-1"));
+    await useChat.getState().startNew({ cwd: "/work", trusted: false });
+
+    useChat.getState().applyEvent({
+      sessionId: "time-1",
+      kind: "event",
+      raw: {
+        type: "message_end",
+        message: { role: "user", content: "hello", timestamp: 1730000000000 },
+      },
+    });
+
+    const item = useChat.getState().items("time-1")[0];
+    expect(item?.kind).toBe("user");
+    if (item?.kind === "user") {
+      expect(item.timestamp).toBe(new Date(1730000000000).toISOString());
+    }
+  });
+
+  it("keeps the context breakdown from the session transcript", async () => {
+    mocks.startSession.mockResolvedValue(info("ctx-1"));
+    mocks.readSession.mockResolvedValue({
+      entries: [],
+      name: "Session",
+      context: { system: 100, tools: 200, skills: 50, project: 25 },
+    });
+
+    await useChat.getState().openSummary({
+      path: "/sessions/ctx-1.jsonl",
+      title: "Session",
+      cwd: "/work",
+      trusted: false,
+    });
+
+    expect(useChat.getState().sessions["ctx-1"]?.context).toEqual({
+      system: 100,
+      tools: 200,
+      skills: 50,
+      project: 25,
+    });
+  });
+
+  it("refreshes the context breakdown on demand", async () => {
+    mocks.startSession.mockResolvedValue(info("ctx-2"));
+    await useChat.getState().startNew({ cwd: "/work", trusted: false });
+    mocks.readSessionAt.mockResolvedValue({
+      entries: [],
+      name: "",
+      context: { system: 1, tools: 2, skills: 3, project: 4 },
+    });
+
+    await useChat.getState().refreshContext("ctx-2");
+
+    expect(useChat.getState().sessions["ctx-2"]?.context).toEqual({
+      system: 1,
+      tools: 2,
+      skills: 3,
+      project: 4,
+    });
+  });
+
+  it("loads context stats when a session starts", async () => {
+    mocks.startSession.mockResolvedValue(info("stats-1"));
+    mocks.getStats.mockResolvedValue({
+      contextUsage: { tokens: 12000, contextWindow: 200000, percent: 6 },
+    });
+
+    await useChat.getState().startNew({ cwd: "/work", trusted: false });
+
+    await vi.waitFor(() => {
+      expect(useChat.getState().sessions["stats-1"]?.stats?.contextUsage?.tokens).toBe(12000);
+    });
+    expect(mocks.getStats).toHaveBeenCalledWith("stats-1");
+  });
+
   it("closes a process that finishes starting after its tab was closed", async () => {
     const start = Promise.withResolvers<SessionInfo>();
     mocks.startSession.mockReturnValue(start.promise);
@@ -108,6 +185,34 @@ describe("chat store", () => {
       status: "exited",
     });
     expect(useChat.getState().orphan["closed-1"]).toBeUndefined();
+  });
+
+  it("appends a background task notification from a live entry event", async () => {
+    mocks.startSession.mockResolvedValue(info("notice-1"));
+    await useChat.getState().startNew({ cwd: "/work", trusted: false });
+
+    useChat.getState().applyEvent({
+      sessionId: "notice-1",
+      kind: "event",
+      raw: {
+        type: "entry_appended",
+        entry: {
+          id: "n1",
+          type: "custom_message",
+          customType: "background-task-notification",
+          display: true,
+          content:
+            "<background-task-notification><task-name>Build</task-name><status>failed</status></background-task-notification>",
+          details: { name: "Build", status: "failed" },
+        },
+      },
+    });
+
+    expect(useChat.getState().items("notice-1")[0]).toMatchObject({
+      kind: "notification",
+      name: "Build",
+      status: "failed",
+    });
   });
 
   it("dismisses a dialog without answering it", async () => {

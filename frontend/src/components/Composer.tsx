@@ -20,8 +20,12 @@ import {
   AttachmentMedia,
   AttachmentTitle,
 } from "@/components/ui/attachment";
+import { buttonVariants } from "@/components/ui/button";
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
+import type { ContextBreakdown } from "../mygo";
 import type { Attachment, CommandInfo } from "../lib/pi-types";
 
 export function Composer({
@@ -33,7 +37,11 @@ export function Composer({
   disabled,
   modelLabel,
   thinking,
-  contextPercent,
+  contextUsage,
+  contextBreakdown,
+  compacting,
+  onCompact,
+  onContextOpen,
   onOpenModelPicker,
   workspace,
   commands,
@@ -53,7 +61,15 @@ export function Composer({
   disabled: boolean;
   modelLabel: string;
   thinking?: string;
-  contextPercent?: number | null;
+  contextUsage?: {
+    tokens: number | null;
+    contextWindow: number;
+    percent: number | null;
+  } | null;
+  contextBreakdown?: ContextBreakdown | null;
+  compacting?: boolean;
+  onCompact?: () => void;
+  onContextOpen?: () => void;
   onOpenModelPicker?: () => void;
   workspace?: string;
   commands?: CommandInfo[];
@@ -154,6 +170,37 @@ export function Composer({
   }, [draft]);
 
   const canSend = (draft.trim().length > 0 || (attachments?.length ?? 0) > 0) && !disabled;
+  const contextPercent = contextUsage?.percent ?? null;
+  const contextTotal = contextUsage?.tokens ?? null;
+  const contextWindow = contextUsage?.contextWindow ?? null;
+  const systemTokens = contextBreakdown
+    ? contextBreakdown.system +
+      contextBreakdown.tools +
+      contextBreakdown.skills +
+      contextBreakdown.project
+    : null;
+  const messageTokens =
+    contextTotal != null && systemTokens != null ? Math.max(0, contextTotal - systemTokens) : null;
+  const freeTokens =
+    contextTotal != null && contextWindow != null
+      ? Math.max(0, contextWindow - contextTotal)
+      : null;
+  const totalLabel =
+    contextTotal == null
+      ? t("Waiting for usage data")
+      : t("Context: {used} / {max} tokens ({percent}%)", {
+          used: contextTotal.toLocaleString(),
+          max: contextWindow?.toLocaleString() ?? "?",
+          percent: Math.round(contextPercent ?? 0),
+        });
+  const breakdownRows = contextBreakdown
+    ? [
+        { label: t("System prompt"), value: contextBreakdown.system },
+        { label: t("Tools"), value: contextBreakdown.tools },
+        { label: t("Skills"), value: contextBreakdown.skills },
+        { label: t("Project context"), value: contextBreakdown.project },
+      ]
+    : [];
 
   const readFiles = async (files: FileList | File[]) => {
     for (const file of Array.from(files)) {
@@ -348,88 +395,93 @@ export function Composer({
           ) : null}
 
           <div className="flex flex-wrap items-center gap-1 gap-y-1.5 px-2.5 pb-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                const el = ref.current;
-                const at = el ? el.selectionStart : draft.length;
-                const next = `${draft.slice(0, at)}@${draft.slice(at)}`;
-                onDraft(next);
-                requestAnimationFrame(() => {
-                  el?.focus();
-                  el?.setSelectionRange(at + 1, at + 1);
-                  setCursor(at + 1);
-                });
-              }}
-              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-              title={t("Mention a project file")}
-              aria-label={t("Mention a project file")}
-            >
-              <Plus size={15} />
-            </button>
-            <button
-              type="button"
-              onClick={() => fileInput.current?.click()}
-              className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-              title={t("Attach a file")}
-              aria-label={t("Attach a file")}
-            >
-              <Paperclip size={14} />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => {
+                  const el = ref.current;
+                  const at = el ? el.selectionStart : draft.length;
+                  const next = `${draft.slice(0, at)}@${draft.slice(at)}`;
+                  onDraft(next);
+                  requestAnimationFrame(() => {
+                    el?.focus();
+                    el?.setSelectionRange(at + 1, at + 1);
+                    setCursor(at + 1);
+                  });
+                }}
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+                aria-label={t("Mention a project file")}
+              >
+                <Plus size={15} />
+              </TooltipTrigger>
+              <TooltipContent>{t("Mention a project file")}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => fileInput.current?.click()}
+                className="flex size-7 shrink-0 items-center justify-center rounded-lg text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+                aria-label={t("Attach a file")}
+              >
+                <Paperclip size={14} />
+              </TooltipTrigger>
+              <TooltipContent>{t("Attach a file")}</TooltipContent>
+            </Tooltip>
 
             <div className="ml-1 flex min-w-0 items-center gap-1">
-              <button
-                type="button"
-                onClick={onOpenModelPicker}
-                className="flex h-7 max-w-[240px] items-center gap-1.5 rounded-lg px-2 text-label text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
-                title={t("Model and thinking")}
-              >
-                <span className="size-1.5 rounded-full bg-brand/70" />
-                <span className="truncate">{modelLabel}</span>
-              </button>
-              {thinking ? (
-                <button
-                  type="button"
+              <Tooltip>
+                <TooltipTrigger
                   onClick={onOpenModelPicker}
-                  className="hidden h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-micro capitalize text-faint transition-colors hover:bg-surface-2 hover:text-fg sm:flex"
-                  title={t("Thinking level")}
+                  className="flex h-7 max-w-[240px] items-center gap-1.5 rounded-lg px-2 text-label text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
                 >
-                  {thinking}
-                </button>
+                  <span className="size-1.5 rounded-full bg-brand/70" />
+                  <span className="truncate">{modelLabel}</span>
+                </TooltipTrigger>
+                <TooltipContent>{t("Model and thinking")}</TooltipContent>
+              </Tooltip>
+              {thinking ? (
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={onOpenModelPicker}
+                    className="hidden h-7 shrink-0 items-center gap-1 rounded-lg px-2 text-micro capitalize text-faint transition-colors hover:bg-surface-2 hover:text-fg sm:flex"
+                  >
+                    {thinking}
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Thinking level")}</TooltipContent>
+                </Tooltip>
               ) : null}
-              <button
-                type="button"
-                onClick={() => {
-                  if (externalPlanCommand) {
-                    const next = draft.trim()
-                      ? `${draft.replace(/\s+$/, "")} /${externalPlanCommand} `
-                      : `/${externalPlanCommand} `;
-                    onDraft(next);
-                    requestAnimationFrame(() => {
-                      const el = ref.current;
-                      if (el) {
-                        el.focus();
-                        el.setSelectionRange(next.length, next.length);
-                        setCursor(next.length);
-                      }
-                    });
-                  } else {
-                    onTogglePlan?.();
-                  }
-                }}
-                className={cn(
-                  "hidden h-7 shrink-0 items-center gap-1.5 rounded-lg px-2 text-label transition-colors hover:bg-surface-2 sm:flex",
-                  planMode ? "bg-brand-soft text-brand-ink" : "text-subtle hover:text-fg",
-                )}
-                title={
-                  externalPlanCommand
+              <Tooltip>
+                <TooltipTrigger
+                  onClick={() => {
+                    if (externalPlanCommand) {
+                      const next = draft.trim()
+                        ? `${draft.replace(/\s+$/, "")} /${externalPlanCommand} `
+                        : `/${externalPlanCommand} `;
+                      onDraft(next);
+                      requestAnimationFrame(() => {
+                        const el = ref.current;
+                        if (el) {
+                          el.focus();
+                          el.setSelectionRange(next.length, next.length);
+                          setCursor(next.length);
+                        }
+                      });
+                    } else {
+                      onTogglePlan?.();
+                    }
+                  }}
+                  className={cn(
+                    "hidden h-7 shrink-0 items-center gap-1.5 rounded-lg px-2 text-label transition-colors hover:bg-surface-2 sm:flex",
+                    planMode ? "bg-brand-soft text-brand-ink" : "text-subtle hover:text-fg",
+                  )}
+                >
+                  <Target size={12} />
+                  {planMode ? t("Planning") : t("Plan")}
+                </TooltipTrigger>
+                <TooltipContent>
+                  {externalPlanCommand
                     ? t("Use the installed /{command} command", { command: externalPlanCommand })
-                    : t("Plan mode: read-only until you approve")
-                }
-              >
-                <Target size={12} />
-                {planMode ? t("Planning") : t("Plan")}
-              </button>
+                    : t("Plan mode: read-only until you approve")}
+                </TooltipContent>
+              </Tooltip>
             </div>
 
             <div className="ml-auto flex shrink-0 items-center gap-2">
@@ -440,36 +492,96 @@ export function Composer({
                     ? t("Enter sends · Shift+Enter newline")
                     : t("⌘Enter sends · Enter newline")}
               </span>
-              <div
-                className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-micro font-medium tabular-nums text-faint"
-                title={t("Context used")}
-              >
-                {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
-              </div>
-              {running ? (
-                <button
-                  type="button"
-                  onClick={onStop}
-                  className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-[1.03]"
-                  aria-label={t("Stop run")}
-                  title={t("Stop")}
+              <Popover onOpenChange={(open) => open && onContextOpen?.()}>
+                <PopoverTrigger
+                  aria-label={totalLabel}
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full border border-border text-micro font-medium tabular-nums text-faint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
                 >
-                  <Square size={11} fill="currentColor" />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={onSubmit}
-                  disabled={!canSend}
-                  className={cn(
-                    "flex size-8 shrink-0 items-center justify-center rounded-full transition-all",
-                    canSend ? "bg-fg text-canvas hover:scale-[1.03]" : "bg-surface-3 text-faint",
+                  {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
+                </PopoverTrigger>
+                <PopoverContent className="w-72">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="text-label font-medium text-fg">{t("Context")}</span>
+                    <span className="text-micro tabular-nums text-faint">
+                      {contextPercent == null ? "0%" : `${Math.round(contextPercent)}%`}
+                    </span>
+                  </div>
+                  <div className="mt-0.5 text-micro tabular-nums text-faint">{totalLabel}</div>
+                  {contextBreakdown ? (
+                    <div className="mt-3 space-y-1 text-micro tabular-nums">
+                      {breakdownRows.map((row) => (
+                        <div key={row.label} className="flex items-center justify-between gap-3">
+                          <span className="text-faint">{row.label}</span>
+                          <span className="text-subtle">~{countLabel(row.value)}</span>
+                        </div>
+                      ))}
+                      {messageTokens != null ? (
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-faint">{t("Messages")}</span>
+                          <span className="text-subtle">~{countLabel(messageTokens)}</span>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-micro leading-4 text-faint">
+                      {t("Context breakdown is not available yet.")}
+                    </p>
                   )}
-                  aria-label={t("Send")}
-                  title={t("Send")}
-                >
-                  <ArrowUp size={15} strokeWidth={2.2} />
-                </button>
+                  {freeTokens != null ? (
+                    <div className="mt-1.5 flex items-center justify-between border-t border-border/70 pt-1.5 text-micro tabular-nums">
+                      <span className="text-faint">{t("Free space")}</span>
+                      <span className="text-subtle">{countLabel(freeTokens)}</span>
+                    </div>
+                  ) : null}
+                  {contextBreakdown ? (
+                    <p className="mt-2 text-micro leading-4 text-faint">
+                      {t("Category values are estimates.")}
+                    </p>
+                  ) : null}
+                  <PopoverClose
+                    onClick={onCompact}
+                    disabled={!onCompact || compacting}
+                    className={buttonVariants({
+                      variant: "outline",
+                      size: "sm",
+                      className: "mt-3 w-full",
+                    })}
+                  >
+                    {compacting ? t("Compacting…") : t("Compact context")}
+                  </PopoverClose>
+                </PopoverContent>
+              </Popover>
+              {running ? (
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={onStop}
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform hover:scale-[1.03]"
+                    aria-label={t("Stop run")}
+                  >
+                    <Square size={11} fill="currentColor" />
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Stop")}</TooltipContent>
+                </Tooltip>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <button
+                        type="button"
+                        disabled={!canSend}
+                        onClick={onSubmit}
+                        aria-label={t("Send")}
+                      />
+                    }
+                    className={cn(
+                      "flex size-8 shrink-0 items-center justify-center rounded-full transition-all",
+                      canSend ? "bg-fg text-canvas hover:scale-[1.03]" : "bg-surface-3 text-faint",
+                    )}
+                  >
+                    <ArrowUp size={15} strokeWidth={2.2} />
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Send")}</TooltipContent>
+                </Tooltip>
               )}
             </div>
           </div>
@@ -485,6 +597,12 @@ export function Composer({
       </div>
     </div>
   );
+}
+
+function countLabel(value: number): string {
+  if (value < 1000) return String(value);
+  if (value < 1_000_000) return `${(value / 1000).toFixed(value < 10_000 ? 1 : 0)}k`;
+  return `${(value / 1_000_000).toFixed(1)}M`;
 }
 
 type Suggestion = {

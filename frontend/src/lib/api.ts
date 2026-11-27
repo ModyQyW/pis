@@ -423,7 +423,9 @@ export const api = {
     return Files.search(workspace, query, limit);
   },
   async getStats(id: string): Promise<unknown> {
-    if (!insideShell) return null;
+    if (!insideShell) {
+      return { contextUsage: { tokens: 128000, contextWindow: 200000, percent: 64 } };
+    }
     return Agent.getStats(id);
   },
   async getCommands(id: string): Promise<unknown> {

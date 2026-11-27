@@ -1152,7 +1152,14 @@ export function App() {
               disabled={!boot.pi.compatible || active?.status === "loading"}
               modelLabel={active?.model?.name ?? t("Choose model")}
               thinking={active?.thinking}
-              contextPercent={active?.stats?.contextUsage?.percent ?? null}
+              contextUsage={active?.stats?.contextUsage ?? null}
+              contextBreakdown={active?.context ?? null}
+              compacting={active?.compacting}
+              onCompact={() => void handleCompact()}
+              onContextOpen={() => {
+                const key = useChat.getState().activeKey;
+                if (key) void useChat.getState().refreshContext(key);
+              }}
               onOpenModelPicker={() => setModelPickerOpen(true)}
               workspace={selected?.path}
               commands={active?.commands}
