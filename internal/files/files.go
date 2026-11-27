@@ -299,6 +299,9 @@ func (s *Service) Read(workspace, rel string, maxBytes int) (FileView, error) {
 	if err != nil || info.IsDir() {
 		return FileView{}, errors.New("file not found")
 	}
+	if !info.Mode().IsRegular() {
+		return FileView{}, errors.New("not a regular file")
+	}
 	if maxBytes <= 0 || maxBytes > 2<<20 {
 		maxBytes = 512 << 10
 	}

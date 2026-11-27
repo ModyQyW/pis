@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 // RawJSON is a JSON value passed through without decoding. It marshals as the
@@ -121,4 +122,24 @@ func StripJSONC(data []byte) ([]byte, bool) {
 		clean = append(clean, c)
 	}
 	return clean, string(clean) != string(data)
+}
+
+// ResolvePath follows a symlink chain, including a final link whose target
+// does not exist. Writes must replace the target, not the link.
+func ResolvePath(path string) string {
+	for i := 0; i < 16; i++ {
+		info, err := os.Lstat(path)
+		if err != nil || info.Mode()&os.ModeSymlink == 0 {
+			return path
+		}
+		target, err := os.Readlink(path)
+		if err != nil {
+			return path
+		}
+		if !filepath.IsAbs(target) {
+			target = filepath.Join(filepath.Dir(path), target)
+		}
+		path = filepath.Clean(target)
+	}
+	return path
 }

@@ -261,6 +261,7 @@ func readConfig(path string) (configFile, error) {
 }
 
 func writeConfig(path string, cfg configFile) error {
+	path = jsonx.ResolvePath(path)
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
@@ -288,6 +289,10 @@ func writeConfig(path string, cfg configFile) error {
 		return err
 	}
 	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Sync(); err != nil {
 		tmp.Close()
 		return err
 	}

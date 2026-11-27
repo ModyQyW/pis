@@ -184,3 +184,23 @@ func TestListWithoutWorkspaceIgnoresLaunchProject(t *testing.T) {
 		t.Fatalf("servers = %#v", servers)
 	}
 }
+
+func TestWriteKeepsDanglingSymlink(t *testing.T) {
+	agentDir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
+	target := filepath.Join(t.TempDir(), "mcp.json")
+	link := filepath.Join(agentDir, "mcp.json")
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("symlink not available: %v", err)
+	}
+	if err := Add("", AddRequest{Name: "docs", Command: "tool"}); err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Lstat(link)
+	if err != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("the link must stay a symlink: %v %v", info, err)
+	}
+	if _, err := os.Stat(target); err != nil {
+		t.Fatalf("the target must be created: %v", err)
+	}
+}

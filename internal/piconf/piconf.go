@@ -1268,10 +1268,8 @@ func readObjectStrict(path string) (map[string]any, bool, error) {
 
 func writeObject(path string, root map[string]any) error {
 	// Dotfile setups often symlink the config into a repository. Replace the
-	// target, not the link, so the link keeps working.
-	if resolved, err := filepath.EvalSymlinks(path); err == nil {
-		path = resolved
-	}
+	// target, not the link, so the link keeps working even when it dangles.
+	path = jsonx.ResolvePath(path)
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return fmt.Errorf("create config directory: %w", err)
 	}

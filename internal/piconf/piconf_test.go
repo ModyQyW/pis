@@ -676,3 +676,26 @@ func TestSkillsWithoutDescriptionAreNotListed(t *testing.T) {
 		}
 	}
 }
+
+func TestSaveProviderKeepsDanglingSymlink(t *testing.T) {
+	agent := setupAgent(t)
+	target := filepath.Join(t.TempDir(), "models.json")
+	link := filepath.Join(agent, "models.json")
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("symlink not available: %v", err)
+	}
+	err := New(nil).SaveProvider(ProviderInput{
+		ID: "lab", BaseURL: "https://lab.example/v1",
+		Models: []ProviderModel{{ID: "fast"}},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	info, err := os.Lstat(link)
+	if err != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf("the link must stay a symlink: %v %v", info, err)
+	}
+	if _, err := os.Stat(target); err != nil {
+		t.Fatalf("the target must be created: %v", err)
+	}
+}
