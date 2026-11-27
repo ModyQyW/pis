@@ -1,19 +1,19 @@
 ## Download
 
-Download one file from **Assets**. `update-*.json`, `SHA256SUMS`, any `.delta` files, and the macOS/Windows `.tar.gz` files are for the in-app updater; you do not need them.
+Download one file from the table below. `update-*.json`, `SHA256SUMS`, any `.delta` files, and the macOS/Windows `.tar.gz` files are for the in-app updater; you do not need them.
 
-| System                     | File                                 |
-| -------------------------- | ------------------------------------ |
-| macOS, Apple Silicon       | `pis-__VERSION__-arm64.dmg`          |
-| macOS, Intel               | `pis-__VERSION__-amd64.dmg`          |
-| Windows, x64               | `pis-setup-__VERSION__-amd64.exe`    |
-| Windows, ARM64             | `pis-setup-__VERSION__-arm64.exe`    |
-| Linux, Debian/Ubuntu x64   | `pis___VERSION___amd64.deb`          |
-| Linux, Debian/Ubuntu ARM64 | `pis___VERSION___arm64.deb`          |
-| Linux, Fedora/RHEL x64     | `pis-__VERSION__-1.x86_64.rpm`       |
-| Linux, Fedora/RHEL ARM64   | `pis-__VERSION__-1.aarch64.rpm`      |
-| Linux, portable x64        | `pis-__VERSION__-linux-amd64.tar.gz` |
-| Linux, portable ARM64      | `pis-__VERSION__-linux-arm64.tar.gz` |
+| System                     | File                                                                                                                                |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| macOS, Apple Silicon       | [pis-**VERSION**-arm64.dmg](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-arm64.dmg)                   |
+| macOS, Intel               | [pis-**VERSION**-amd64.dmg](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-amd64.dmg)                   |
+| Windows, x64               | [pis-setup-**VERSION**-amd64.exe](https://github.com/__REPO__/releases/download/v__VERSION__/pis-setup-__VERSION__-amd64.exe)       |
+| Windows, ARM64             | [pis-setup-**VERSION**-arm64.exe](https://github.com/__REPO__/releases/download/v__VERSION__/pis-setup-__VERSION__-arm64.exe)       |
+| Linux, Debian/Ubuntu x64   | [pis___VERSION___amd64.deb](https://github.com/__REPO__/releases/download/v__VERSION__/pis___VERSION___amd64.deb)                   |
+| Linux, Debian/Ubuntu ARM64 | [pis___VERSION___arm64.deb](https://github.com/__REPO__/releases/download/v__VERSION__/pis___VERSION___arm64.deb)                   |
+| Linux, Fedora/RHEL x64     | [pis-**VERSION**-1.x86_64.rpm](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-1.x86_64.rpm)             |
+| Linux, Fedora/RHEL ARM64   | [pis-**VERSION**-1.aarch64.rpm](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-1.aarch64.rpm)           |
+| Linux, portable x64        | [pis-**VERSION**-linux-amd64.tar.gz](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-linux-amd64.tar.gz) |
+| Linux, portable ARM64      | [pis-**VERSION**-linux-arm64.tar.gz](https://github.com/__REPO__/releases/download/v__VERSION__/pis-__VERSION__-linux-arm64.tar.gz) |
 
 Or install the latest release from a terminal:
 
