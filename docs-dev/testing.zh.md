@@ -192,6 +192,7 @@ bun run dev:web
 | 0.0.7 arm64 DMG | 7.2 MB |
 | 0.0.8 arm64 DMG | 7.3 MB |
 | 0.0.9 arm64 DMG | 7.3 MB |
+| 0.0.10 arm64 DMG | 7.3 MB |
 
 这些数字是历史结果，对应上述机器和构建。发布前重新运行门禁和相关手工检查。
 
@@ -225,6 +226,7 @@ bun run dev:web
 
 - `bun run check`：通过（Go 格式、构建、vet、测试、前端检查、bridge 测试、Vitest、前端和文档构建）。
 - Mock Web UI：设置分区与搜索、按提供商过滤的模型选择器、Select/Combobox/Checkbox、窄顶栏、工具输出折叠。
+- Release `v0.0.10` 已发布为 latest；发布脚本校验了各平台资产和 `SHA256SUMS`。
 - 从 0.0.9 更新：跳过。此环境没有安装旧版本。
 
 ## CI

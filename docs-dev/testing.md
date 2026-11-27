@@ -192,6 +192,7 @@ Last full macOS arm64 validation: 2026-11-22 to 2026-11-24.
 | DMG for 0.0.7 arm64 | 7.2 MB |
 | DMG for 0.0.8 arm64 | 7.3 MB |
 | DMG for 0.0.9 arm64 | 7.3 MB |
+| DMG for 0.0.10 arm64 | 7.3 MB |
 
 These numbers are historical. They describe the machine and build above. Re-run the gate and the relevant manual checks before a release.
 
@@ -225,6 +226,7 @@ The budget is not an automated test. When you measure, record:
 
 - `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest, frontend and docs builds).
 - Mock web UI: settings sections and search, provider-filtered model picker, Select/Combobox/Checkbox, narrow top bar, and clamped tool output.
+- Release `v0.0.10` is published as latest; the release script verified the platform assets and `SHA256SUMS`.
 - Update from 0.0.9: skipped. No installed previous version in this environment.
 
 ## CI

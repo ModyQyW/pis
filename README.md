@@ -26,7 +26,7 @@ builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessio
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
 Current public release: **[0.0.10](https://github.com/ModyQyW/pis/releases/tag/v0.0.10)**
-(macOS arm64 DMG). The update feed resolves to `0.0.10`. The release and
+(arm64 DMG 7.3 MB). The update feed resolves to `0.0.10`. The release and
 update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
 one-time approval. English is the default. Chinese is available in Settings.
 See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
