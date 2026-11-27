@@ -2,6 +2,16 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.11 (2026-11-27)
+
+- Center tool rows, hide tool output until a card expands, and page question cards one question at a time.
+- Fold intermediate assistant text into its thinking row, show stop reasons, show message times, and add icons to message actions and usage.
+- Render background task notifications as compact notices instead of raw XML.
+- Replace native tooltips with Base UI Tooltip and Popover primitives; composer controls use the shared primitives.
+- Add a context usage panel with system prompt, tools, skills, project context, messages, and free space, plus a Compact context action. Category values are estimates.
+- Load session stats when a session opens and refresh the context panel when it opens.
+- Require real desktop QA and Base UI primitives in AGENTS.md and the design docs.
+
 ## 0.0.10 (2026-11-27)
 
 - Rebuild Settings as searchable sections: a left section list, search across setting names, and one section at a time instead of one long scroll.

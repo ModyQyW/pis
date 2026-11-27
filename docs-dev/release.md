@@ -4,8 +4,8 @@
 
 ## Current state
 
-- The current tag is `v0.0.10`.
-- `0.0.10` is the public release and the latest release.
+- The current tag is `v0.0.11`.
+- `0.0.11` is the public release and the latest release.
 - macOS uses an ad-hoc signature. The Windows installer is unsigned. Linux uses tar, deb, rpm, and `install.sh`.
 
 Before a release, confirm the state with `git tag` and `gh release list`.
@@ -65,7 +65,7 @@ The script asks for a version. Press Enter to accept the suggested patch version
 Non-interactive:
 
 ```sh
-PIS_VERSION=0.0.10 ./scripts/release.sh
+PIS_VERSION=0.0.11 ./scripts/release.sh
 ```
 
 The script:
