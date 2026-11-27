@@ -1,4 +1,5 @@
 import * as Dialog from "@/components/ui/dialog-compat";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { GitBranch, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -106,15 +107,14 @@ export function SessionTreeDialog({
           </div>
 
           <div className="flex items-center gap-3 border-t border-border px-4 py-2.5">
-            <label className="flex items-center gap-2 text-label text-subtle">
-              <input
-                type="checkbox"
-                checked={summarize}
-                onChange={(e) => setSummarize(e.target.checked)}
-                className="size-3.5 accent-[var(--brand)]"
-              />
+            <CheckboxField
+              checked={summarize}
+              onCheckedChange={setSummarize}
+              className="flex items-center gap-2 text-label text-subtle"
+              ariaLabel={t("Summarize the branch I leave")}
+            >
               {t("Summarize the branch I leave")}
-            </label>
+            </CheckboxField>
             <button
               type="button"
               onClick={async () => {

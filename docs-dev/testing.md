@@ -221,6 +221,12 @@ The budget is not an automated test. When you measure, record:
 - Command.
 - Result.
 
+## 0.0.10 checks
+
+- `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest, frontend and docs builds).
+- Mock web UI: settings sections and search, provider-filtered model picker, Select/Combobox/Checkbox, narrow top bar, and clamped tool output.
+- Update from 0.0.9: skipped. No installed previous version in this environment.
+
 ## CI
 
 `.github/workflows/ci.yml` runs:

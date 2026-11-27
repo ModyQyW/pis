@@ -9,6 +9,11 @@ Open Settings:
 
 ![Settings panel](/images/settings.png)
 
+The dialog has a section list on the left. Click a section to show only that
+section. The search field filters sections by their titles and settings. The
+first match opens at once, so you do not need to switch sections or scroll
+through the whole dialog.
+
 ## Appearance
 
 The theme mode has three choices:
@@ -77,13 +82,14 @@ Sign in to a provider… opens the pi sign-in terminal.
 
 PiS uses the pi credential store. It does not keep a second copy of the
 credentials and does not log the sign-in terminal output. A custom provider
-key that you save in the Pi configuration tab goes to pi's `models.json`; PiS does not
+key that you save in a Pi configuration section goes to pi's `models.json`; PiS does not
 read it back. See [Models and sign-in](/guide/models).
 
 ## Pi configuration
 
-Open Settings, then select the Pi configuration tab. It reads pi's own files
-and shows:
+Open Settings, then select a Pi configuration section in the left list. The
+sections are Defaults, Models and providers, Skills, Extensions, and MCP
+servers. They read pi's own files and show:
 
 - Default provider, model, and thinking level.
 - Custom providers and models from `models.json`.
@@ -91,16 +97,20 @@ and shows:
 - Extension files, configured paths, and package sources.
 - MCP servers from `mcp.json`.
 
-The tab shows the pi agent directory and the full paths of `settings.json`,
-`models.json`, and `mcp.json`. It also shows the project `.pi` paths when a
-project is open. Reveal pi config folder selects that directory in the file
-manager.
+The Defaults section shows the pi agent directory and the full paths of
+`settings.json`, `models.json`, and `mcp.json`. It also shows the project
+`.pi` paths when a project is open. Reveal pi config folder selects that
+directory in the file manager.
+
+The default provider and model fields are searchable. The model list shows
+only the selected provider. When the provider is Automatic, the model popup
+has a provider list on the left; select a provider there to filter the models.
 
 Changes write pi's files directly. PiS writes pi's `settings.json` and
 `models.json` only when you save, and it preserves fields it does not edit.
-The Open MCP servers button in the tab opens the MCP dialog; see
+The Open MCP servers button in the MCP servers section opens the MCP dialog; see
 [MCP servers](/guide/mcp). If a trusted project sets its own startup model,
-the tab shows a note; the project value wins for new sessions in that project.
+the Defaults section shows a note; the project value wins for new sessions in that project.
 
 When pi's configuration changed since your last confirmation, a separate Pi
 configuration dialog opens at launch. Review the list and click Use this

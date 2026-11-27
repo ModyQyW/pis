@@ -19,7 +19,7 @@ pi 的常用位置：
 
 ## 查看和添加扩展
 
-打开「设置 → pi 配置」。该标签列出：
+打开「设置 → pi 配置 → 扩展」。该分区列出：
 
 - pi 用户文件夹中的扩展文件。信任项目后，也会列出项目的扩展文件。pi 发现 `.ts` 和 `.js` 文件，以及包含 `index.ts`、`index.js` 或 `package.json` `pi.extensions` 条目的包目录。
 - `settings.json` 中配置的路径。

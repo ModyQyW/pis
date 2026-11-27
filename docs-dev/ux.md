@@ -95,11 +95,18 @@ Icons:
 - MCP and worktree managers are dialogs, not new top-level pages. They show source (`user` / `project`) and put destructive actions behind confirmation.
 - Per-file revert is a hover action with a danger confirmation. It is never the default action.
 
+## Settings
+
+- Settings uses a section list on the left. Each section renders alone; the body does not hold every control in one scroll.
+- The search field matches section titles and setting names in the current language. The first match opens, so the reader does not switch sections or scroll to find a control.
+- Dropdowns use the shared Base UI Select or Combobox surface. There are no native `<select>` elements. The default provider and model fields are searchable.
+- When the default provider is Automatic, the model popup shows a provider list on the left. It filters the model list to one provider; the full model list never appears at once.
+
 ## Transcript
 
 - Messages use a readable column. User messages are muted bubbles; assistant messages are open text.
-- Tool calls appear as compact cards. Expand for output, diff, images, and arguments.
-- Thinking blocks are collapsed; the reader opens them on demand.
+- Tool calls appear as compact cards. Expand for output, diff, images, and arguments. Long output starts at a fixed height with a Show all control; Show less collapses it.
+- Thinking blocks are collapsed and quiet; the title shows the approximate assistant message duration.
 - Compaction and branch summaries appear as separators, not messages.
 - The scroll position is respected. New tokens do not pull a reader who scrolled up. A "scroll to latest" button appears when needed.
 - Long sessions use TanStack Virtual. Rows measure themselves.

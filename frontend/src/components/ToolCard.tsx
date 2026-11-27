@@ -22,6 +22,7 @@ import { DiffView } from "./DiffView";
 
 export function ToolCard({ tool }: { tool: ToolBlock }) {
   const [open, setOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const questions = tool.name === "ask_user_question" ? parseQuestions(tool.args) : [];
   if (questions.length > 0) return <QuestionCard tool={tool} questions={questions} />;
   const result = tool.result;
@@ -34,6 +35,7 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
   const target = toolTarget(tool.name, tool.args);
   const Icon = iconFor(tool.name);
   const hasBody = Boolean(output || diff || result?.images.length || Object.keys(tool.args).length);
+  const longOutput = output.length > 900 || output.split("\n").length > 12;
 
   return (
     <div className="my-1.5 overflow-hidden rounded-lg border border-border/80 bg-surface/70">
@@ -49,10 +51,14 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
           <Icon size={11} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2">
-            <span className="text-label font-medium">{t(labelFor(tool.name))}</span>
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="shrink-0 whitespace-nowrap text-label font-medium">
+              {t(labelFor(tool.name))}
+            </span>
             {target ? (
-              <span className="truncate font-mono text-micro text-subtle">{target}</span>
+              <span className="min-w-0 truncate font-mono text-micro text-subtle" title={target}>
+                {target}
+              </span>
             ) : null}
           </span>
           {!open && output && !diff ? (
@@ -78,9 +84,32 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
         <div className="border-t border-border/70 px-2.5 py-2">
           {diff ? <DiffView diff={diff} /> : null}
           {!diff && output ? (
-            <pre className="max-h-[420px] overflow-auto scroll-thin whitespace-pre-wrap break-words rounded-md border border-border bg-canvas px-2.5 py-2 font-mono code-text-dense leading-[1.55] text-subtle">
-              {output}
-            </pre>
+            <>
+              <div className="relative">
+                <pre
+                  className={cn(
+                    "scroll-thin whitespace-pre-wrap break-words rounded-md border border-border bg-canvas px-2.5 py-2 font-mono code-text-dense leading-[1.55] text-subtle",
+                    longOutput && !expanded
+                      ? "max-h-48 overflow-hidden"
+                      : "max-h-[70vh] overflow-auto",
+                  )}
+                >
+                  {output}
+                </pre>
+                {longOutput && !expanded ? (
+                  <div className="pointer-events-none absolute inset-x-px bottom-px h-10 rounded-b-md bg-gradient-to-t from-canvas to-transparent" />
+                ) : null}
+              </div>
+              {longOutput ? (
+                <button
+                  type="button"
+                  onClick={() => setExpanded((v) => !v)}
+                  className="mt-1 flex h-6 w-full items-center justify-center rounded-md text-micro text-subtle transition-colors hover:bg-surface-2 hover:text-fg"
+                >
+                  {expanded ? t("Show less") : t("Show all")}
+                </button>
+              ) : null}
+            </>
           ) : null}
           {result?.images.length ? (
             <div className="mt-2 grid grid-cols-2 gap-2">

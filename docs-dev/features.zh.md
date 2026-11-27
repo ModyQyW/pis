@@ -55,6 +55,9 @@ pi 把 token 增量作为 `message_update` 事件发送。Go coalescer 按会话
 
 `SessionTranscript` 使用 TanStack Virtual。它渲染可见区域和 overscan，测量动态行，并在读者停留在底部时固定视口。
 
+思考行把助手消息的 `durationMs` 显示为近似时长；pi 没有单独的思考计时。长工具输出限制为固定高度，
+并提供「展开全部」/「收起」控制。
+
 Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK 和 Mermaid 插件。代码字号来自 CSS 变量。
 
 测试：`frontend/src/lib/transcript.test.ts`。
@@ -71,6 +74,19 @@ Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK �
 工具目标来自常见参数：`command`、`path`、`pattern`、`questions` 和 `description`。
 
 测试：`frontend/src/lib/questions.test.ts`、`frontend/src/lib/transcript.test.ts`。
+
+## 设置
+
+`SettingsDialog.tsx` 保存分区表、搜索和通用分区。pi 配置分区通过
+`PiConfigPanel` 的 `section` 参数渲染。首次访问后面板保持挂载，切换分区不会丢失编辑。
+
+搜索按当前语言匹配分区标签和设置关键词，并打开第一个匹配项。
+
+`Select` 包装 Base UI Select；`Combobox` 包装 Base UI Combobox，支持过滤和可选的弹窗侧栏。
+默认提供商和模型使用 `Combobox`。模型列表限定到一个提供商。提供商为「自动」时，
+模型弹窗显示提供商侧栏，读者选择一个提供商来过滤列表。
+
+不使用原生 select 和 checkbox。`Checkbox` 包装 Base UI Checkbox；在忙碌的 fieldset 中显式禁用。
 
 ## 输入框
 

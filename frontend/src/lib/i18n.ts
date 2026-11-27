@@ -521,6 +521,11 @@ const zh: Record<string, string> = {
   "{count} sessions were not deleted.": "{count} 个对话未删除。",
   "Session was not deleted.": "对话未删除。",
   "{count} sessions moved to Trash": "{count} 个对话已移到废纸篓",
+  "Show all": "展开全部",
+  "Show less": "收起",
+  "Search settings…": "搜索设置…",
+  "Clear search": "清除搜索",
+  "No settings match": "没有匹配的设置",
   Delete: "删除",
 };
 

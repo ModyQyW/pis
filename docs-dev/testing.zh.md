@@ -221,6 +221,12 @@ bun run dev:web
 - 测量命令。
 - 结果。
 
+## 0.0.10 检查
+
+- `bun run check`：通过（Go 格式、构建、vet、测试、前端检查、bridge 测试、Vitest、前端和文档构建）。
+- Mock Web UI：设置分区与搜索、按提供商过滤的模型选择器、Select/Combobox/Checkbox、窄顶栏、工具输出折叠。
+- 从 0.0.9 更新：跳过。此环境没有安装旧版本。
+
 ## CI
 
 `.github/workflows/ci.yml` 运行：

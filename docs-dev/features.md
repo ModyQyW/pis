@@ -55,6 +55,10 @@ It pairs tool calls with tool results by id. An orphan tool result becomes its o
 
 `SessionTranscript` uses TanStack Virtual. It renders the visible area and overscan, measures dynamic rows, and keeps the viewport pinned while the reader stays at the bottom.
 
+Thinking rows show the assistant message `durationMs` as an approximate
+duration; pi records no separate thinking timer. Long tool output is clamped
+to a fixed height with a Show all / Show less control.
+
 Markdown is lazy. `Markdown.tsx` configures Streamdown with code, math, CJK, and Mermaid plugins. The code font size comes from a CSS variable.
 
 Tests: `frontend/src/lib/transcript.test.ts`.
@@ -71,6 +75,25 @@ Tool data comes from two sources:
 The tool target comes from common argument shapes: `command`, `path`, `pattern`, `questions`, and `description`.
 
 Tests: `frontend/src/lib/questions.test.ts`, `frontend/src/lib/transcript.test.ts`.
+
+## Settings
+
+`SettingsDialog.tsx` holds the section table, search, and the general sections.
+Pi configuration sections render through `PiConfigPanel` with a `section`
+prop. The panel stays mounted after the first visit so edits survive a
+section switch.
+
+Search matches section labels and setting keywords in the current language
+and opens the first match.
+
+`Select` wraps Base UI Select; `Combobox` wraps Base UI Combobox with filtering
+and an optional popup side rail. The provider and model defaults use
+`Combobox`. The model list is scoped to one provider. When the provider is
+Automatic, the model popup shows a provider rail and the reader selects one
+provider to filter the list.
+
+Native selects and checkboxes are not used. `Checkbox` wraps Base UI Checkbox
+and is disabled explicitly inside busy fieldsets.
 
 ## Composer
 

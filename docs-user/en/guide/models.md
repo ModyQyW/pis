@@ -12,8 +12,8 @@ you last confirmed it, the Pi configuration dialog opens. It lists:
 - Skills, extensions, and packages.
 - MCP servers from `mcp.json`.
 
-Click Use this configuration to record the review. You can also open the
-tab from Settings → Pi configuration.
+Click Use this configuration to record the review. You can also open
+Settings → Pi configuration → Defaults.
 
 PiS writes pi's files only when you save in the dialog. It never writes
 pi's `auth.json`, `trust.json`, or session files.
@@ -61,13 +61,16 @@ After sign-in, PiS refreshes the model list.
 
 ## Configure defaults and custom providers
 
-Open Settings → Pi configuration.
+Open Settings → Pi configuration → Defaults.
 
 Defaults:
 
 - Default provider and model: the startup choice for pi and new sessions.
 - Thinking level: the startup level. Automatic uses pi's own choice.
 - Empty values remove the setting, so pi chooses automatically.
+- The provider and model fields are searchable. The model list shows only the
+  selected provider. When the provider is Automatic, the model popup shows a
+  provider list on the left; select a provider there to filter the models.
 
 Models and providers:
 

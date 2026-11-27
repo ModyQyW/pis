@@ -72,7 +72,10 @@ The desktop body size is intentionally below the 16 px web baseline. Do not intr
 | `Button` | `components/ui/button.tsx` | Variants: primary, secondary, outline, ghost, brand, destructive, quiet. Sizes: xs, sm, md, lg, icon, icon-xs, icon-sm, icon-lg. |
 | `DialogSurface` / `DialogHeader` | `components/ui/dialog-shell.tsx` | Widths 440, 600, 720, 900. Shared border, header, close button, body and footer rhythm. |
 | `DialogOverlay` | `components/ui/dialog-shell.tsx` | The only scrim implementation. |
-| `Field`, `TextInput`, `Select`, `Textarea` | `components/ui/field.tsx` | Linked label via `htmlFor`, 3:1 control border, brand focus. |
+| `Field`, `TextInput`, `Textarea` | `components/ui/field.tsx` | Linked label via `htmlFor`, 3:1 control border, brand focus. |
+| `Select` | `components/ui/select.tsx` | Base UI single select. Do not use native `<select>`. |
+| `Combobox` | `components/ui/combobox.tsx` | Base UI searchable single select. Supports a side rail in the popup. |
+| `Checkbox` | `components/ui/checkbox.tsx` | Base UI checkbox. Do not use native `type="checkbox"`. |
 | `SectionLabel` | `components/ui/section-label.tsx` | 11 px uppercase grouping label. |
 | `Kbd` | `components/ui/kbd.tsx` | Keycap with consistent border and size. |
 | `StatusPill` | `components/ui/status-pill.tsx` | Tones: neutral, ready, brand, success, warning, danger, faint. |

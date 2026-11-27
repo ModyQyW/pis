@@ -25,8 +25,8 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.9](https://github.com/ModyQyW/pis/releases/tag/v0.0.9)**
-(arm64 DMG 7.3 MB). The update feed resolves to `0.0.9`. The release and
+Current public release: **[0.0.10](https://github.com/ModyQyW/pis/releases/tag/v0.0.10)**
+(macOS arm64 DMG). The update feed resolves to `0.0.10`. The release and
 update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
 one-time approval. English is the default. Chinese is available in Settings.
 See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
@@ -37,10 +37,12 @@ See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
 - **Real pi sessions**: start, resume, rename, fork, clone, tree navigation,
   export HTML, delete to Trash, and multiple concurrent sessions.
 - **Streaming chat**: Streamdown Markdown with GFM tables, Shiki code, KaTeX
-  math, Mermaid diagrams, CJK line breaking, thinking blocks, images, tool cards,
-  live shell output, diffs, compaction, retries, usage and cost.
+  math, Mermaid diagrams, CJK line breaking, thinking blocks with an
+  approximate duration, images, tool cards, live shell output, diffs,
+  compaction, retries, usage and cost.
 - **Tool cards** for `bash`, `read`, `edit`, `write`, `grep`, `find`, `ls`,
   `todo`, `ask_user_question`, subagents, and any extension tool (generic card).
+  Long output starts at a fixed height with Show all and Show less controls.
 - **Composer**: `@file` search, pi slash commands, image paste/drop, text
   attachments, per-session drafts, model and thinking pickers, and Settings
   controls for code/interface size and Enter-to-send.
@@ -62,8 +64,10 @@ See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
 - **Pi configuration**: review the defaults, custom providers and models,
   skills, extensions, packages, and MCP servers pi loads, and confirm them when
   they change. Edit startup defaults, compatible providers and their models,
-  skill and extension paths, and package sources. Writes go to pi's own files
-  only when you save; stored API keys are never read back.
+  skill and extension paths, and package sources. Settings has a section list
+  and search; the provider and model fields are searchable, and the model popup
+  filters by provider. Writes go to pi's own files only when you save; stored
+  API keys are never read back.
 - **MCP and worktrees**: manage user/project MCP entries (add, enable, remove;
   advanced fields stay in `mcp.json`), and list/create/open/remove Git
   worktrees. Removal refuses a worktree with uncommitted files; forcing asks a

@@ -2,6 +2,15 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.10 (2026-11-27)
+
+- Rebuild Settings as searchable sections: a left section list, search across setting names, and one section at a time instead of one long scroll.
+- Replace native selects and checkboxes with shared Base UI Select, Combobox, and Checkbox components.
+- Make the default provider and model fields searchable. Show only one provider's models, with a provider rail when the provider is Automatic.
+- Keep tool names and targets on one line, clamp long tool output with Show all and Show less, and show an approximate thinking duration.
+- Prevent state and command labels from wrapping in narrow windows, and align sidebar chat icons.
+- Exclude the `.agents` skill assets from gofmt and vite-plus checks.
+
 ## 0.0.9 (2026-11-27)
 
 - Add a Pi configuration tab to Settings with current defaults, providers and models, skills, extensions, packages, and MCP servers, plus the pi file paths.

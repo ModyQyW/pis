@@ -182,7 +182,7 @@ Run these checks after installation:
 2. A short message returns a streaming answer.
 3. A tool card expands and shows output.
 4. Settings shows a compatible pi version.
-5. The Pi configuration tab lists the skills, providers, and packages from pi.
+5. The Pi configuration sections list the skills, providers, and packages from pi.
 6. The light and dark themes switch.
 7. Closing a running session shows the quit guard.
 

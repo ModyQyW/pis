@@ -2,6 +2,7 @@ import { FolderGit2, GitBranch, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import * as Dialog from "@/components/ui/dialog-compat";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { api } from "../lib/api";
 import { t } from "../lib/i18n";
@@ -145,15 +146,14 @@ export function WorktreeDialog({
                     />
                   </div>
                   <div className="mt-2 flex items-center gap-3">
-                    <label className="flex items-center gap-1.5 text-micro text-subtle">
-                      <input
-                        type="checkbox"
-                        checked={createBranch}
-                        onChange={(e) => setCreateBranch(e.target.checked)}
-                        className="size-3.5 accent-[var(--brand)]"
-                      />
+                    <CheckboxField
+                      checked={createBranch}
+                      onCheckedChange={setCreateBranch}
+                      className="flex items-center gap-1.5 text-micro text-subtle"
+                      ariaLabel={t("Create branch")}
+                    >
                       {t("Create branch")}
-                    </label>
+                    </CheckboxField>
                     <button
                       type="button"
                       disabled={!path.trim() || (createBranch && !branch.trim())}

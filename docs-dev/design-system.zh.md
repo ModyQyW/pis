@@ -72,7 +72,10 @@
 | `Button` | `components/ui/button.tsx` | 变体：primary、secondary、outline、ghost、brand、destructive、quiet。尺寸：xs、sm、md、lg、icon、icon-xs、icon-sm、icon-lg。 |
 | `DialogSurface` / `DialogHeader` | `components/ui/dialog-shell.tsx` | 宽度 440、600、720、900。共用边框、标题栏、关闭按钮、正文和底部节奏。 |
 | `DialogOverlay` | `components/ui/dialog-shell.tsx` | 唯一的遮罩实现。 |
-| `Field`、`TextInput`、`Select`、`Textarea` | `components/ui/field.tsx` | 通过 `htmlFor` 关联标签，控件边界 3:1，品牌色焦点。 |
+| `Field`、`TextInput`、`Textarea` | `components/ui/field.tsx` | 通过 `htmlFor` 关联标签，控件边界 3:1，品牌色焦点。 |
+| `Select` | `components/ui/select.tsx` | Base UI 单选下拉。不要使用原生 `<select>`。 |
+| `Combobox` | `components/ui/combobox.tsx` | Base UI 可搜索单选下拉。弹窗支持侧栏。 |
+| `Checkbox` | `components/ui/checkbox.tsx` | Base UI 复选框。不要使用原生 `type="checkbox"`。 |
 | `SectionLabel` | `components/ui/section-label.tsx` | 11 px 大写分组标签。 |
 | `Kbd` | `components/ui/kbd.tsx` | 统一边框和尺寸的键帽。 |
 | `StatusPill` | `components/ui/status-pill.tsx` | 色调：neutral、ready、brand、success、warning、danger、faint。 |

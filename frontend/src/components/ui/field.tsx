@@ -1,10 +1,5 @@
 import { cn } from "../../lib/cn";
-import type {
-  InputHTMLAttributes,
-  ReactNode,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from "react";
+import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 
 const controlClass =
   "w-full rounded-md border border-control bg-canvas px-2.5 text-body text-fg outline-none transition-colors placeholder:text-faint focus:border-brand focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--focus-ring)] disabled:opacity-60";
@@ -35,14 +30,6 @@ export function Field({
 
 export function TextInput({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(controlClass, "h-8", className)} {...props} />;
-}
-
-export function Select({ className, children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select className={cn(controlClass, "h-8 pr-2", className)} {...props}>
-      {children}
-    </select>
-  );
 }
 
 export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {

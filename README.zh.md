@@ -17,22 +17,22 @@ PiS 是围绕 pi 的小型原生外壳，并提供完整的 Web UI。它通过 R
 
 V1 已完成，并针对 macOS arm64 打包验证。Release workflow 为 macOS、Windows 和 Linux 构建 amd64 与 arm64 产物。核心会话、流式 Markdown、扩展、审批、计划模式、更改、MCP 配置、工作树、会话搜索和桌面外壳均可用。
 
-当前公开版本是 **[0.0.9](https://github.com/ModyQyW/pis/releases/tag/v0.0.9)**（arm64 DMG 7.3 MB）。更新 feed 指向 `0.0.9`。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
+当前公开版本是 **[0.0.10](https://github.com/ModyQyW/pis/releases/tag/v0.0.10)**（macOS arm64 DMG）。更新 feed 指向 `0.0.10`。Release 和更新 feed 公开。macOS 使用 ad-hoc 签名，Gatekeeper 需要一次手动放行。默认语言是英文，设置中可切换中文。
 
 验证证据见 [`docs-dev/testing.zh.md`](docs-dev/testing.zh.md)。项目历史见 [`docs-dev/history.zh.md`](docs-dev/history.zh.md)。
 
 ## 可用功能
 
 - **真实 pi 会话**：新建、恢复、重命名、分叉、克隆、会话树导航、导出 HTML、删除到废纸篓，以及多个并发会话。
-- **流式聊天**：Streamdown Markdown、GFM 表格、Shiki 代码、KaTeX 数学、Mermaid 图、CJK 换行、思考块、图片、工具卡片、实时 shell 输出、diff、压缩、重试、用量和费用。
-- **工具卡片**：`bash`、`read`、`edit`、`write`、`grep`、`find`、`ls`、`todo`、`ask_user_question`、子代理，以及任意扩展工具（通用卡片）。
+- **流式聊天**：Streamdown Markdown、GFM 表格、Shiki 代码、KaTeX 数学、Mermaid 图、CJK 换行、思考块（近似时长）、图片、工具卡片、实时 shell 输出、diff、压缩、重试、用量和费用。
+- **工具卡片**：`bash`、`read`、`edit`、`write`、`grep`、`find`、`ls`、`todo`、`ask_user_question`、子代理，以及任意扩展工具（通用卡片）。长输出默认限制高度，并提供「展开全部」和「收起」。
 - **输入框**：`@file` 搜索、pi 斜杠命令、图片粘贴和拖放、文本附件、按会话保存草稿、模型和思考级别选择器，以及设置中的代码字号、界面大小和发送键。
 - **扩展**：现有 pi 扩展原样加载。RPC 对话框显示在内联坞中，状态和 widget 安静显示，扩展错误可见。内置 bridge 只以 `pis-*` 名称提供会话树、计划模式和可选 Smart 审批。
 - **项目信任**：加载项目级 pi 资源前显示明确对话框。pi 自己的信任存储只读，不写入。
 - **审批**：可选 Smart / Ask all / Allow all 策略，支持一次和会话内授权，不自动拒绝。检测到 `cc-safety-net` 等 guard 时，PiS 的内置 guard 默认关闭，除非在设置中启用。
 - **计划模式**：只读探索和计划。常见修改类工具和 shell 命令会被阻止。它是工作流保护，不是沙箱。
 - **更改与文件**：Git 分支和状态、逐文件统一 diff、复制 patch、逐文件还原到 HEAD 并确认、显示文件、文件列表和只读预览。
-- **pi 配置**：查看 pi 加载的默认值、自定义提供商和模型、技能、扩展、包和 MCP 服务器，并在配置变化时确认。可以修改启动默认值、兼容提供商及其模型、技能和扩展路径、包来源。只有你保存时，写入才进入 pi 自己的文件；已保存的 API 密钥不会读回。
+- **pi 配置**：查看 pi 加载的默认值、自定义提供商和模型、技能、扩展、包和 MCP 服务器，并在配置变化时确认。可以修改启动默认值、兼容提供商及其模型、技能和扩展路径、包来源。设置提供分区列表和搜索；提供商和模型字段可搜索，模型弹窗按提供商过滤。只有你保存时，写入才进入 pi 自己的文件；已保存的 API 密钥不会读回。
 - **MCP 与工作树**：管理用户级和项目级 MCP 条目（添加、启用、删除；高级字段留在 `mcp.json`），以及列出、创建、打开和移除 Git 工作树。移除有未提交文件的工作树会被拒绝；强制移除需要第二次确认。
 - **会话搜索和计划**：命令面板全文搜索会话分支；Plan 和 Agents 标签读取 pi 的 todo 状态和子代理活动；`ask_user_question` 显示为内联卡片，并标出已选答案。
 - **通知和语言**：后台运行结束时发送原生通知，设置中有测试按钮，界面支持英文和中文。

@@ -2,6 +2,7 @@ import { Loader2, Plus, Server, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import * as Dialog from "@/components/ui/dialog-compat";
+import { Checkbox, CheckboxField } from "@/components/ui/checkbox";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { api } from "../lib/api";
 import { cn } from "../lib/cn";
@@ -120,15 +121,14 @@ export function MCPDialog({
                           key={`${server.source}:${server.name}`}
                           className="flex items-start gap-2 rounded-lg border border-border bg-surface-2/40 px-3 py-2"
                         >
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={server.enabled}
-                            onChange={(e) =>
+                            onCheckedChange={(checked) =>
                               void api
                                 .mcpSetEnabled(
                                   workspace,
                                   server.name,
-                                  e.target.checked,
+                                  checked,
                                   server.source === "project",
                                 )
                                 .then(load)
@@ -136,8 +136,8 @@ export function MCPDialog({
                                   toast.error(err instanceof Error ? err.message : String(err)),
                                 )
                             }
-                            className="mt-0.5 size-3.5 accent-[var(--brand)]"
-                            aria-label={t("Enable {name}", { name: server.name })}
+                            className="mt-0.5"
+                            ariaLabel={t("Enable {name}", { name: server.name })}
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
@@ -206,15 +206,14 @@ export function MCPDialog({
                     />
                   </div>
                   <div className="mt-2 flex items-center gap-3">
-                    <label className="flex items-center gap-1.5 text-micro text-subtle">
-                      <input
-                        type="checkbox"
-                        checked={local}
-                        onChange={(e) => setLocal(e.target.checked)}
-                        className="size-3.5 accent-[var(--brand)]"
-                      />
+                    <CheckboxField
+                      checked={local}
+                      onCheckedChange={setLocal}
+                      className="flex items-center gap-1.5 text-micro text-subtle"
+                      ariaLabel={t("Project-local (.pi/mcp.json)")}
+                    >
                       {t("Project-local (.pi/mcp.json)")}
-                    </label>
+                    </CheckboxField>
                     <button
                       type="button"
                       disabled={!name.trim() || (!command.trim() && !url.trim())}

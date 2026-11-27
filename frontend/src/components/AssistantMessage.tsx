@@ -8,6 +8,7 @@ import {
   TraceCollapsible,
   TraceCollapsibleContent,
   TraceCollapsibleTrigger,
+  TraceDescription,
   TraceIcon,
   TraceLine,
   TraceTitle,
@@ -40,7 +41,14 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
             );
           }
           if (block.kind === "thinking") {
-            return <ThinkingBlock key={i} text={block.text} redacted={block.redacted} />;
+            return (
+              <ThinkingBlock
+                key={i}
+                text={block.text}
+                redacted={block.redacted}
+                durationMs={item.durationMs}
+              />
+            );
           }
           if (block.kind === "image") {
             return (
@@ -72,18 +80,31 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
   );
 }
 
-function ThinkingBlock({ text, redacted }: { text: string; redacted?: boolean }) {
+function ThinkingBlock({
+  text,
+  redacted,
+  durationMs,
+}: {
+  text: string;
+  redacted?: boolean;
+  durationMs?: number;
+}) {
   const [open, setOpen] = useState(false);
   if (!text) return null;
   return (
-    <Trace className="my-1">
+    <Trace className="my-0.5">
       <TraceCollapsible open={open} onOpenChange={setOpen}>
-        <TraceCollapsibleTrigger>
-          <TraceLine>
+        <TraceCollapsibleTrigger className="text-faint hover:text-subtle [&_svg]:size-3">
+          <TraceLine className="gap-1.5 text-micro text-faint">
             <TraceIcon>
-              <Brain />
+              <Brain className="size-3" />
             </TraceIcon>
             <TraceTitle>{redacted ? t("Redacted thinking") : t("Thinking")}</TraceTitle>
+            {durationMs ? (
+              <TraceDescription className="text-micro text-faint">
+                ~{formatDuration(durationMs)}
+              </TraceDescription>
+            ) : null}
           </TraceLine>
         </TraceCollapsibleTrigger>
         <TraceCollapsibleContent className="whitespace-pre-wrap pt-1 text-label leading-5">
@@ -92,4 +113,10 @@ function ThinkingBlock({ text, redacted }: { text: string; redacted?: boolean })
       </TraceCollapsible>
     </Trace>
   );
+}
+
+function formatDuration(ms: number): string {
+  // pi stores one duration per assistant message, not per thinking block.
+  if (ms < 1000) return `${Math.round(ms)}ms`;
+  return `${(ms / 1000).toFixed(ms < 10_000 ? 1 : 0)}s`;
 }

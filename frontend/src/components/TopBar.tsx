@@ -63,13 +63,13 @@ export function TopBar({
       >
         <PanelLeft size={15} />
       </button>
-      <div className="flex min-w-0 items-center gap-1.5 text-label">
+      <div className="flex min-w-0 flex-1 items-center gap-1.5 text-label">
         <span className="truncate text-subtle">{workspace?.name ?? t("No project")}</span>
         <ChevronRight size={12} className="shrink-0 text-faint" />
         <span className="truncate font-medium text-fg">{title}</span>
       </div>
 
-      <div className="no-drag ml-auto flex items-center gap-1.5">
+      <div className="no-drag ml-auto flex shrink-0 items-center gap-1.5 whitespace-nowrap">
         {preview ? (
           <StatusPill tone="neutral" dot={false} className="mr-1">
             {t("Preview")}
@@ -83,11 +83,11 @@ export function TopBar({
         <button
           type="button"
           onClick={onPalette}
-          className="flex h-7 items-center gap-2 rounded-md border border-border bg-surface px-2 text-label text-subtle transition-colors hover:border-border-strong hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+          className="flex h-7 shrink-0 items-center gap-2 whitespace-nowrap rounded-md border border-border bg-surface px-2 text-label text-subtle transition-colors hover:border-border-strong hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
           title={t("Command palette")}
         >
           <Search size={12} />
-          <span className="hidden sm:inline">{t("Commands")}</span>
+          <span className="hidden whitespace-nowrap sm:inline">{t("Commands")}</span>
           <Kbd className="ml-0.5">
             <Command size={9} />K
           </Kbd>

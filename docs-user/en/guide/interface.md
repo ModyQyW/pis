@@ -32,8 +32,10 @@ The transcript shows the current session.
 
 - User messages appear as bubbles.
 - Assistant messages support Markdown, tables, code blocks, math, and Mermaid diagrams.
-- Thinking blocks are collapsed by default. Click the title to expand one.
+- Thinking blocks are collapsed by default. Click the title to expand one. The
+  title shows an approximate duration.
 - Tool calls appear as cards. Click a card title to expand arguments, output, diffs, and images.
+  Long output starts with a fixed height and a Show all button; use Show less to collapse it.
 - Context compaction, branch summaries, and extension messages appear as separators.
 - When you scroll up, new messages do not pull you back to the bottom. Click the down button at the bottom to return to the latest message.
 

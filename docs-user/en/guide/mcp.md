@@ -30,7 +30,7 @@ Open it from the command palette or Settings:
 
 1. Press `⌘K`.
 2. Select Manage MCP servers….
-3. Or open Settings → Pi configuration, then click Open MCP servers.
+3. Or open Settings → Pi configuration → MCP servers, then click Open MCP servers.
 
 The Pi configuration dialog shows the configured servers. Its Open MCP
 servers button opens the same dialog. It shows user servers without a project.

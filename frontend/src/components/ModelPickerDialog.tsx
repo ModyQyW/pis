@@ -1,4 +1,5 @@
 import * as Dialog from "@/components/ui/dialog-compat";
+import { CheckboxField } from "@/components/ui/checkbox";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { Check, RefreshCw, Search } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -175,15 +176,14 @@ export function ModelPickerDialog({
                   </button>
                 ))}
               </div>
-              <label className="ml-auto flex items-center gap-1.5 text-micro text-subtle">
-                <input
-                  type="checkbox"
-                  checked={session?.autoCompaction ?? true}
-                  onChange={(e) => void onToggleAutoCompaction(e.target.checked)}
-                  className="size-3.5 accent-[var(--brand)]"
-                />
+              <CheckboxField
+                checked={session?.autoCompaction ?? true}
+                onCheckedChange={(checked) => void onToggleAutoCompaction(checked)}
+                className="ml-auto flex items-center gap-1.5 text-micro text-subtle"
+                ariaLabel={t("Auto-compact")}
+              >
                 {t("Auto-compact")}
-              </label>
+              </CheckboxField>
             </div>
           </div>
         </DialogSurface>

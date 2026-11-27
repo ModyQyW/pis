@@ -9,6 +9,7 @@ import type { Summary } from "../mygo";
 import type { ChatSession } from "../store/chat";
 import type { Bootstrap, Workspace } from "../lib/types";
 import { BrandMark } from "./BrandMark";
+import { Checkbox } from "./ui/checkbox";
 import { SectionLabel } from "./ui/section-label";
 
 export function Sidebar({
@@ -223,7 +224,7 @@ export function Sidebar({
                   leading={
                     <span
                       className={cn(
-                        "mt-1.5 size-1.5 shrink-0 rounded-full",
+                        "size-1.5 shrink-0 rounded-full",
                         s.dialogs.length > 0
                           ? "bg-warning pulse-soft"
                           : s.status === "error" || s.status === "exited"
@@ -252,7 +253,7 @@ export function Sidebar({
                     id={r.path}
                     title={r.title}
                     meta={relativeTime(r.updatedAt)}
-                    leading={<MessageSquare size={12} className="mt-0.5 shrink-0 text-faint" />}
+                    leading={<MessageSquare size={12} className="shrink-0 text-faint" />}
                     active={false}
                     selecting={selecting}
                     selected={selectedChats.has(r.path)}
@@ -323,12 +324,11 @@ function ChatRow({
   return (
     <li className="group flex items-center gap-1">
       {selecting && id ? (
-        <input
-          type="checkbox"
+        <Checkbox
           checked={selected}
-          onChange={onToggle}
-          className="ml-1 size-3.5 shrink-0 accent-[var(--brand)]"
-          aria-label={t("Select {name}", { name: title })}
+          onCheckedChange={onToggle}
+          className="ml-1"
+          ariaLabel={t("Select {name}", { name: title })}
           title={t("Select {name}", { name: title })}
         />
       ) : null}
@@ -345,7 +345,7 @@ function ChatRow({
               : "text-subtle hover:bg-surface-2 hover:text-fg",
         )}
       >
-        {leading}
+        <span className="flex h-5 w-3 shrink-0 items-center justify-center">{leading}</span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-label font-medium">{title}</span>
           <span

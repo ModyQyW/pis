@@ -1,12 +1,16 @@
 import * as Dialog from "@/components/ui/dialog-compat";
 import { Button } from "@/components/ui/button";
+import { CheckboxField } from "@/components/ui/checkbox";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import { DialogHeader, DialogOverlay, DialogSurface } from "@/components/ui/dialog-shell";
 import { FormSection } from "@/components/ui/form-section";
 import { SectionLabel } from "@/components/ui/section-label";
+import { Select } from "@/components/ui/select";
 import { Boxes, Check, FolderOpen, Loader2, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { api } from "../lib/api";
+import { cn } from "../lib/cn";
 import { t } from "../lib/i18n";
 import { toast } from "../lib/toast";
 import type {
@@ -20,6 +24,8 @@ import type {
 import { ConfirmDialog } from "./ConfirmDialog";
 
 const THINKING_LEVELS = ["", "off", "minimal", "low", "medium", "high", "xhigh", "max"];
+
+export type PiConfigSection = "defaults" | "models" | "skills" | "extensions" | "mcp";
 let modelsCache: { at: number; models: AvailableModel[] } | null = null;
 const MODELS_TTL = 60_000;
 
@@ -68,6 +74,7 @@ export function PiConfigPanel({
   onOpenMCP,
   embedded = false,
   onClose,
+  section,
 }: {
   workspace?: string;
   confirmedHash: string;
@@ -75,6 +82,7 @@ export function PiConfigPanel({
   onOpenMCP?: () => void;
   embedded?: boolean;
   onClose?: () => void;
+  section?: PiConfigSection;
 }) {
   const [snapshot, setSnapshot] = useState<PiConfigSnapshot | null>(null);
   const [models, setModels] = useState<AvailableModel[]>([]);
@@ -85,6 +93,7 @@ export function PiConfigPanel({
 
   const [provider, setProvider] = useState("");
   const [model, setModel] = useState("");
+  const [modelProvider, setModelProvider] = useState("");
   const [thinking, setThinking] = useState("");
   const [editing, setEditing] = useState<ProviderInput | null>(null);
   const [editingMeta, setEditingMeta] = useState({ baseUrl: "", keySet: false });
@@ -277,10 +286,45 @@ export function PiConfigPanel({
     if (provider) ids.add(provider);
     return [...ids].sort();
   }, [snapshot?.providers, models, provider]);
-  const modelOptions = useMemo(() => {
-    const list = provider ? models.filter((m) => m.provider === provider) : models;
-    return list;
-  }, [models, provider]);
+  const providerOptions = useMemo<ComboboxOption[]>(
+    () => [
+      { value: "", label: t("Automatic") },
+      ...providerIDs.map((id) => ({ value: id, label: id })),
+    ],
+    [providerIDs],
+  );
+  const modelProviders = useMemo(
+    () => [...new Set(models.map((m) => m.provider))].sort(),
+    [models],
+  );
+  const scopedProvider =
+    provider ||
+    (modelProviders.includes(modelProvider) ? modelProvider : "") ||
+    models.find((m) => m.id === model)?.provider ||
+    modelProviders[0] ||
+    "";
+  const modelOptions = useMemo<ComboboxOption[]>(() => {
+    const list = scopedProvider ? models.filter((m) => m.provider === scopedProvider) : [];
+    const seen = new Set<string>();
+    const options: ComboboxOption[] = [{ value: "", label: t("Automatic") }];
+    for (const m of list) {
+      if (seen.has(m.id)) continue;
+      seen.add(m.id);
+      options.push({
+        value: m.id,
+        label: m.id,
+        detail: [m.context].filter(Boolean).join(" · "),
+      });
+    }
+    return options;
+  }, [models, scopedProvider]);
+  const selectedModel = useMemo(
+    () =>
+      modelOptions.find((option) => option.value === model) ??
+      (model ? { value: model, label: model } : null),
+    [modelOptions, model],
+  );
+  const show = (id: PiConfigSection) => !section || section === id;
 
   return (
     <>
@@ -341,392 +385,450 @@ export function PiConfigPanel({
           </div>
         ) : (
           <>
-            <div className="mb-5 rounded-lg border border-border bg-canvas px-3 py-2">
-              <div className="flex items-center gap-2">
-                <span
-                  className="min-w-0 flex-1 truncate font-mono text-micro text-subtle"
-                  title={snapshot.agentDir}
-                >
-                  {snapshot.agentDir}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    modelsCache = null;
-                    void load();
-                    void loadModels(true);
-                  }}
-                  disabled={loading || modelsLoading}
-                  aria-label={t("Refresh pi configuration")}
-                  title={t("Refresh pi configuration")}
-                  className="flex shrink-0 items-center gap-1 text-micro text-subtle hover:text-fg disabled:opacity-40"
-                >
-                  <RefreshCw size={11} className={loading || modelsLoading ? "animate-spin" : ""} />
-                  {t("Refresh")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void api.reveal(snapshot.agentDir).catch(() => {})}
-                  aria-label={t("Reveal pi config folder")}
-                  title={t("Reveal pi config folder")}
-                  className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
-                >
-                  <FolderOpen size={11} />
-                </button>
-              </div>
-              <p className="mt-1 text-micro leading-4 text-faint">
-                {t("PiS writes these files directly and does not copy them.")}
-              </p>
-              <div className="mt-1 space-y-0.5 font-mono text-micro text-faint">
-                <div className="truncate">{snapshot.agentDir}/settings.json</div>
-                <div className="truncate">{snapshot.agentDir}/models.json</div>
-                <div className="truncate">{snapshot.agentDir}/mcp.json</div>
-                {workspace ? <div className="truncate">{workspace}/.pi/settings.json</div> : null}
-                {workspace ? <div className="truncate">{workspace}/.pi/mcp.json</div> : null}
-              </div>
-            </div>
+            {show("defaults") ? (
+              <>
+                <div className="mb-5 rounded-lg border border-border bg-canvas px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="min-w-0 flex-1 truncate font-mono text-micro text-subtle"
+                      title={snapshot.agentDir}
+                    >
+                      {snapshot.agentDir}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        modelsCache = null;
+                        void load();
+                        void loadModels(true);
+                      }}
+                      disabled={loading || modelsLoading}
+                      aria-label={t("Refresh pi configuration")}
+                      title={t("Refresh pi configuration")}
+                      className="flex shrink-0 items-center gap-1 text-micro text-subtle hover:text-fg disabled:opacity-40"
+                    >
+                      <RefreshCw
+                        size={11}
+                        className={loading || modelsLoading ? "animate-spin" : ""}
+                      />
+                      {t("Refresh")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void api.reveal(snapshot.agentDir).catch(() => {})}
+                      aria-label={t("Reveal pi config folder")}
+                      title={t("Reveal pi config folder")}
+                      className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-fg"
+                    >
+                      <FolderOpen size={11} />
+                    </button>
+                  </div>
+                  <p className="mt-1 text-micro leading-4 text-faint">
+                    {t("PiS writes these files directly and does not copy them.")}
+                  </p>
+                  <div className="mt-1 space-y-0.5 font-mono text-micro text-faint">
+                    <div className="truncate">{snapshot.agentDir}/settings.json</div>
+                    <div className="truncate">{snapshot.agentDir}/models.json</div>
+                    <div className="truncate">{snapshot.agentDir}/mcp.json</div>
+                    {workspace ? (
+                      <div className="truncate">{workspace}/.pi/settings.json</div>
+                    ) : null}
+                    {workspace ? <div className="truncate">{workspace}/.pi/mcp.json</div> : null}
+                  </div>
+                </div>
 
-            {snapshot.warnings?.length ? (
-              <ul className="mb-5 space-y-1 rounded-lg border border-warning/25 bg-warning/5 px-3 py-2 text-micro leading-4 text-warning">
-                {snapshot.warnings.map((warning) => (
-                  <li key={warning}>{warning}</li>
-                ))}
-              </ul>
+                {snapshot.warnings?.length ? (
+                  <ul className="mb-5 space-y-1 rounded-lg border border-warning/25 bg-warning/5 px-3 py-2 text-micro leading-4 text-warning">
+                    {snapshot.warnings.map((warning) => (
+                      <li key={warning}>{warning}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </>
             ) : null}
 
-            <FormSection
-              divided
-              title={t("Defaults")}
-              description={t(
-                "The model pi and new sessions start with. Built-in models come from pi; custom models come from models.json.",
-              )}
-            >
-              <div className="grid gap-2 sm:grid-cols-3">
-                <label className="flex flex-col gap-1 text-micro text-subtle">
-                  {t("Default provider")}
-                  <select
-                    value={provider}
-                    onChange={(e) => {
-                      const next = e.target.value;
-                      setProvider(next);
-                      if (!next) setModel("");
-                      const candidates = models.filter((m) => m.provider === next);
-                      const first = candidates[0];
-                      if (first && !candidates.some((m) => m.id === model)) {
-                        setModel(first.id);
-                      }
-                    }}
-                    className="h-8 rounded-md border border-control bg-canvas px-2 text-label text-fg outline-none focus:border-brand"
-                  >
-                    <option value="">{t("Automatic")}</option>
-                    {providerIDs.map((id) => (
-                      <option key={id} value={id}>
-                        {id}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="flex flex-col gap-1 text-micro text-subtle">
-                  {t("Default model")}
-                  {modelOptions.length > 0 ? (
-                    <select
-                      value={model}
-                      onChange={(e) => {
-                        const id = e.target.value;
-                        setModel(id);
-                        if (!id) setProvider("");
-                        if (!provider && id) {
-                          const found = models.find((m) => m.id === id);
-                          if (found) setProvider(found.provider);
+            {show("defaults") ? (
+              <FormSection
+                divided
+                title={t("Defaults")}
+                description={t(
+                  "The model pi and new sessions start with. Built-in models come from pi; custom models come from models.json.",
+                )}
+              >
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <label className="flex flex-col gap-1 text-micro text-subtle">
+                    {t("Default provider")}
+                    <Combobox
+                      value={providerOptions.find((option) => option.value === provider) ?? null}
+                      options={providerOptions}
+                      onValueChange={(option) => {
+                        const next = option.value;
+                        setProvider(next);
+                        if (!next) {
+                          setModel("");
+                          setModelProvider("");
                         }
+                        const candidates = models.filter((m) => m.provider === next);
+                        const first = candidates[0];
+                        if (!candidates.some((m) => m.id === model)) setModel(first?.id ?? "");
                       }}
-                      className="h-8 rounded-md border border-control bg-canvas px-2 text-label text-fg outline-none focus:border-brand"
-                    >
-                      <option value="">{t("Automatic")}</option>
-                      {model && !modelOptions.some((m) => m.id === model) ? (
-                        <option value={model}>{model}</option>
-                      ) : null}
-                      {modelOptions.map((m) => (
-                        <option key={`${m.provider}/${m.id}`} value={m.id}>
-                          {m.id}
-                          {m.context ? ` · ${m.context}` : ""}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      placeholder={t("Model id")}
-                      className="h-8 rounded-md border border-control bg-canvas px-2 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
-                      spellCheck={false}
+                      ariaLabel={t("Default provider")}
+                      placeholder={t("Automatic")}
+                      emptyLabel={t("Nothing found.")}
+                      disabled={busy}
                     />
-                  )}
-                </label>
-                <label className="flex flex-col gap-1 text-micro text-subtle">
-                  {t("Thinking level")}
-                  <select
-                    value={thinking}
-                    onChange={(e) => setThinking(e.target.value)}
-                    className="h-8 rounded-md border border-control bg-canvas px-2 text-label text-fg outline-none focus:border-brand"
-                  >
-                    {THINKING_LEVELS.map((level) => (
-                      <option key={level} value={level}>
-                        {level ? t(level) : t("Automatic")}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <div className="mt-2 flex items-center gap-2">
-                <Button size="sm" disabled={busy} onClick={() => void saveDefaults()}>
-                  {t("Save defaults")}
-                </Button>
-                {modelsLoading ? (
-                  <span className="flex items-center gap-1 text-micro text-faint">
-                    <Loader2 size={11} className="animate-spin" />
-                    {t("Loading models…")}
-                  </span>
+                  </label>
+                  <label className="flex flex-col gap-1 text-micro text-subtle">
+                    {t("Default model")}
+                    {modelOptions.length > 1 ? (
+                      <Combobox
+                        value={selectedModel}
+                        options={modelOptions}
+                        onValueChange={(option) => {
+                          const id = option.value;
+                          setModel(id);
+                          if (!id) {
+                            setProvider("");
+                            return;
+                          }
+                          if (!provider) {
+                            setProvider(scopedProvider);
+                            setModelProvider(scopedProvider);
+                          }
+                        }}
+                        onOpenChange={(open) => {
+                          if (open && !provider) {
+                            setModelProvider(
+                              models.find((m) => m.id === model)?.provider ??
+                                modelProviders[0] ??
+                                "",
+                            );
+                          }
+                        }}
+                        ariaLabel={t("Default model")}
+                        placeholder={t("Automatic")}
+                        emptyLabel={t("Nothing found.")}
+                        disabled={busy}
+                        popupClassName={
+                          !provider && modelProviders.length > 1
+                            ? "w-[min(480px,var(--available-width))]"
+                            : undefined
+                        }
+                        popupStart={
+                          !provider && modelProviders.length > 1 ? (
+                            <div
+                              role="group"
+                              aria-label={t("Providers")}
+                              className="max-h-[min(22rem,var(--available-height))] w-36 shrink-0 overflow-y-auto scroll-thin border-r border-border py-1 pr-1"
+                            >
+                              <div className="px-2 pb-1 pt-1 text-micro font-medium uppercase tracking-label text-faint">
+                                {t("Providers")}
+                              </div>
+                              {modelProviders.map((id) => (
+                                <button
+                                  key={id}
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setModelProvider(id)}
+                                  aria-pressed={scopedProvider === id}
+                                  className={cn(
+                                    "flex w-full items-center rounded-md px-2 py-1.5 text-left text-micro transition-colors",
+                                    scopedProvider === id
+                                      ? "bg-surface-2 font-medium text-fg"
+                                      : "text-subtle hover:bg-surface-2 hover:text-fg",
+                                  )}
+                                >
+                                  <span className="truncate">{id}</span>
+                                </button>
+                              ))}
+                            </div>
+                          ) : null
+                        }
+                      />
+                    ) : (
+                      <input
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
+                        placeholder={t("Model id")}
+                        className="h-8 rounded-md border border-control bg-canvas px-2 font-mono text-label outline-none placeholder:text-faint focus:border-brand"
+                        spellCheck={false}
+                      />
+                    )}
+                  </label>
+                  <label className="flex flex-col gap-1 text-micro text-subtle">
+                    {t("Thinking level")}
+                    <Select
+                      value={thinking}
+                      options={THINKING_LEVELS.map((level) => ({
+                        value: level,
+                        label: level ? t(level) : t("Automatic"),
+                      }))}
+                      onValueChange={setThinking}
+                      ariaLabel={t("Thinking level")}
+                      disabled={busy}
+                    />
+                  </label>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <Button size="sm" disabled={busy} onClick={() => void saveDefaults()}>
+                    {t("Save defaults")}
+                  </Button>
+                  {modelsLoading ? (
+                    <span className="flex items-center gap-1 text-micro text-faint">
+                      <Loader2 size={11} className="animate-spin" />
+                      {t("Loading models…")}
+                    </span>
+                  ) : null}
+                </div>
+                {snapshot.projectDefaults ? (
+                  <p className="mt-2 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-micro leading-4 text-warning">
+                    {t(
+                      "This project sets its own startup default ({model}). It overrides the user default for new sessions in this project.",
+                      {
+                        model:
+                          [snapshot.projectDefaults.provider, snapshot.projectDefaults.model]
+                            .filter(Boolean)
+                            .join("/") || t("Automatic"),
+                      },
+                    )}
+                  </p>
                 ) : null}
-              </div>
-              {snapshot.projectDefaults ? (
-                <p className="mt-2 rounded-md border border-warning/25 bg-warning/5 px-2 py-1.5 text-micro leading-4 text-warning">
-                  {t(
-                    "This project sets its own startup default ({model}). It overrides the user default for new sessions in this project.",
-                    {
-                      model:
-                        [snapshot.projectDefaults.provider, snapshot.projectDefaults.model]
-                          .filter(Boolean)
-                          .join("/") || t("Automatic"),
-                    },
-                  )}
-                </p>
-              ) : null}
-            </FormSection>
+              </FormSection>
+            ) : null}
 
-            <FormSection
-              divided
-              title={t("Models and providers")}
-              description={t(
-                "Providers configured in models.json. Built-in providers use pi sign-in.",
-              )}
-              actions={
-                <Button
-                  size="xs"
-                  variant="outline"
-                  onClick={() => {
-                    setEditing(emptyProvider());
-                    setEditingMeta({ baseUrl: "", keySet: false });
-                    setNewProvider(true);
-                  }}
-                >
-                  <Plus size={11} />
-                  {t("Add provider")}
-                </Button>
-              }
-            >
-              {editing ? (
-                <ProviderForm
-                  input={editing}
-                  isNew={newProvider}
-                  storedKey={editingMeta.keySet}
-                  originalBaseUrl={editingMeta.baseUrl}
-                  busy={busy}
-                  onChange={setEditing}
-                  onCancel={() => {
-                    setEditing(null);
-                    setNewProvider(false);
-                  }}
-                  onSave={() => void saveProvider()}
-                />
-              ) : snapshot.providers.length === 0 ? (
-                <p className="text-label text-faint">{t("No custom providers configured.")}</p>
-              ) : (
-                <ul className="space-y-1.5">
-                  {snapshot.providers.map((p) => (
-                    <li
-                      key={p.id}
-                      className="flex items-start gap-2 rounded-lg border border-border bg-surface-2/40 px-3 py-2"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="text-label font-medium">{p.name || p.id}</span>
-                          <span className="rounded bg-surface-3 px-1 py-0.5 font-mono text-micro text-subtle">
-                            {p.id}
-                          </span>
-                          {p.apiKeySet ? (
-                            <span className="rounded bg-success/10 px-1 py-0.5 text-micro text-success">
-                              {p.apiKeyEnv ? t("Environment key") : t("API key is stored")}
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="mt-0.5 truncate font-mono text-micro text-faint">
-                          {[p.api, p.baseUrl].filter(Boolean).join(" · ") || "—"}
-                        </p>
-                        <p className="mt-0.5 text-micro text-faint">
-                          {p.models.length} {p.models.length === 1 ? t("model") : t("models")}
-                          {p.models.length
-                            ? `: ${p.models
-                                .slice(0, 4)
-                                .map((m) => m.id)
-                                .join(", ")}${p.models.length > 4 ? "…" : ""}`
-                            : ""}
-                        </p>
-                      </div>
-                      <div className="flex shrink-0 gap-1">
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          onClick={() => {
-                            setEditing(editProvider(p));
-                            setEditingMeta({ baseUrl: p.baseUrl ?? "", keySet: p.apiKeySet });
-                            setNewProvider(false);
-                          }}
-                        >
-                          {t("Edit")}
-                        </Button>
-                        <button
-                          type="button"
-                          onClick={() => setRemovingProvider(p.id)}
-                          className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                          aria-label={t("Remove {name}", { name: p.id })}
-                          title={t("Remove provider")}
-                        >
-                          <Trash2 size={11} />
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </FormSection>
-
-            <FormSection
-              divided
-              title={t("Skills")}
-              description={t(
-                "Skills pi discovers in its folders and the paths configured in settings.json.",
-              )}
-            >
-              <ResourceList
-                items={snapshot.skills}
-                busy={busy}
-                onRemove={(path) => void removePath("skills", path)}
-                empty={t("No skills found.")}
-              />
-              <PathForm
-                value={skillPath}
-                onChange={setSkillPath}
-                placeholder={t("Path to a skill file or folder")}
-                button={t("Add skill path")}
-                busy={busy}
-                onAdd={() => void addPath("skills", skillPath)}
-              />
-            </FormSection>
-
-            <FormSection
-              divided
-              title={t("Extensions")}
-              description={t(
-                "Extension files and folders. Packages are installed by pi at session start.",
-              )}
-            >
-              <ResourceList
-                items={snapshot.extensions}
-                busy={busy}
-                onRemove={(path) => void removePath("extensions", path)}
-                empty={t("No extensions found.")}
-              />
-              <PathForm
-                value={extensionPath}
-                onChange={setExtensionPath}
-                placeholder={t("Path to an extension file or folder")}
-                button={t("Add extension path")}
-                busy={busy}
-                onAdd={() => void addPath("extensions", extensionPath)}
-              />
-              <div className="mt-3 border-t border-border pt-2.5">
-                <SectionLabel>{t("Pi packages")}</SectionLabel>
-                {snapshot.packages.length ? (
-                  <ul className="mt-1.5 space-y-1">
-                    {snapshot.packages.map((pkg) => (
+            {show("models") ? (
+              <FormSection
+                divided={!section}
+                title={t("Models and providers")}
+                description={t(
+                  "Providers configured in models.json. Built-in providers use pi sign-in.",
+                )}
+                actions={
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={() => {
+                      setEditing(emptyProvider());
+                      setEditingMeta({ baseUrl: "", keySet: false });
+                      setNewProvider(true);
+                    }}
+                  >
+                    <Plus size={11} />
+                    {t("Add provider")}
+                  </Button>
+                }
+              >
+                {editing ? (
+                  <ProviderForm
+                    input={editing}
+                    isNew={newProvider}
+                    storedKey={editingMeta.keySet}
+                    originalBaseUrl={editingMeta.baseUrl}
+                    busy={busy}
+                    onChange={setEditing}
+                    onCancel={() => {
+                      setEditing(null);
+                      setNewProvider(false);
+                    }}
+                    onSave={() => void saveProvider()}
+                  />
+                ) : snapshot.providers.length === 0 ? (
+                  <p className="text-label text-faint">{t("No custom providers configured.")}</p>
+                ) : (
+                  <ul className="space-y-1.5">
+                    {snapshot.providers.map((p) => (
                       <li
-                        key={`${pkg.project}:${pkg.source}`}
-                        className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
+                        key={p.id}
+                        className="flex items-start gap-2 rounded-lg border border-border bg-surface-2/40 px-3 py-2"
                       >
-                        <span className="min-w-0 flex-1 truncate font-mono text-micro text-subtle">
-                          {pkg.source}
-                        </span>
-                        <SourceBadge source={pkg.project ? "project" : "user"} />
-                        {!pkg.active ? <InactiveBadge /> : null}
-                        {!pkg.project ? (
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-label font-medium">{p.name || p.id}</span>
+                            <span className="rounded bg-surface-3 px-1 py-0.5 font-mono text-micro text-subtle">
+                              {p.id}
+                            </span>
+                            {p.apiKeySet ? (
+                              <span className="rounded bg-success/10 px-1 py-0.5 text-micro text-success">
+                                {p.apiKeyEnv ? t("Environment key") : t("API key is stored")}
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="mt-0.5 truncate font-mono text-micro text-faint">
+                            {[p.api, p.baseUrl].filter(Boolean).join(" · ") || "—"}
+                          </p>
+                          <p className="mt-0.5 text-micro text-faint">
+                            {p.models.length} {p.models.length === 1 ? t("model") : t("models")}
+                            {p.models.length
+                              ? `: ${p.models
+                                  .slice(0, 4)
+                                  .map((m) => m.id)
+                                  .join(", ")}${p.models.length > 4 ? "…" : ""}`
+                              : ""}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 gap-1">
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => {
+                              setEditing(editProvider(p));
+                              setEditingMeta({ baseUrl: p.baseUrl ?? "", keySet: p.apiKeySet });
+                              setNewProvider(false);
+                            }}
+                          >
+                            {t("Edit")}
+                          </Button>
                           <button
                             type="button"
-                            onClick={() => setRemovingPackage(pkg.source)}
-                            className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
-                            aria-label={t("Remove {name}", { name: pkg.source })}
-                            title={t("Remove package")}
+                            onClick={() => setRemovingProvider(p.id)}
+                            className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
+                            aria-label={t("Remove {name}", { name: p.id })}
+                            title={t("Remove provider")}
                           >
                             <Trash2 size={11} />
                           </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </FormSection>
+            ) : null}
+
+            {show("skills") ? (
+              <FormSection
+                divided={!section}
+                title={t("Skills")}
+                description={t(
+                  "Skills pi discovers in its folders and the paths configured in settings.json.",
+                )}
+              >
+                <ResourceList
+                  items={snapshot.skills}
+                  busy={busy}
+                  onRemove={(path) => void removePath("skills", path)}
+                  empty={t("No skills found.")}
+                />
+                <PathForm
+                  value={skillPath}
+                  onChange={setSkillPath}
+                  placeholder={t("Path to a skill file or folder")}
+                  button={t("Add skill path")}
+                  busy={busy}
+                  onAdd={() => void addPath("skills", skillPath)}
+                />
+              </FormSection>
+            ) : null}
+
+            {show("extensions") ? (
+              <FormSection
+                divided={!section}
+                title={t("Extensions")}
+                description={t(
+                  "Extension files and folders. Packages are installed by pi at session start.",
+                )}
+              >
+                <ResourceList
+                  items={snapshot.extensions}
+                  busy={busy}
+                  onRemove={(path) => void removePath("extensions", path)}
+                  empty={t("No extensions found.")}
+                />
+                <PathForm
+                  value={extensionPath}
+                  onChange={setExtensionPath}
+                  placeholder={t("Path to an extension file or folder")}
+                  button={t("Add extension path")}
+                  busy={busy}
+                  onAdd={() => void addPath("extensions", extensionPath)}
+                />
+                <div className="mt-3 border-t border-border pt-2.5">
+                  <SectionLabel>{t("Pi packages")}</SectionLabel>
+                  {snapshot.packages.length ? (
+                    <ul className="mt-1.5 space-y-1">
+                      {snapshot.packages.map((pkg) => (
+                        <li
+                          key={`${pkg.project}:${pkg.source}`}
+                          className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
+                        >
+                          <span className="min-w-0 flex-1 truncate font-mono text-micro text-subtle">
+                            {pkg.source}
+                          </span>
+                          <SourceBadge source={pkg.project ? "project" : "user"} />
+                          {!pkg.active ? <InactiveBadge /> : null}
+                          {!pkg.project ? (
+                            <button
+                              type="button"
+                              onClick={() => setRemovingPackage(pkg.source)}
+                              className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:bg-danger/10 hover:text-danger"
+                              aria-label={t("Remove {name}", { name: pkg.source })}
+                              title={t("Remove package")}
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-1.5 text-label text-faint">{t("No packages configured.")}</p>
+                  )}
+                  <PathForm
+                    value={packageSource}
+                    onChange={setPackageSource}
+                    placeholder={t("Package source")}
+                    button={t("Add package")}
+                    busy={busy}
+                    onAdd={() => void addPackage()}
+                  />
+                  <p className="mt-1.5 text-micro leading-4 text-faint">
+                    {t("Examples: npm:pi-web-access, git:github.com/user/repo, or a local path.")}
+                  </p>
+                </div>
+              </FormSection>
+            ) : null}
+
+            {show("mcp") ? (
+              <FormSection
+                divided={!section}
+                title={t("MCP servers")}
+                description={t(
+                  "Servers from pi's mcp.json. pi connects enabled servers at session start.",
+                )}
+                actions={
+                  onOpenMCP ? (
+                    <Button size="xs" variant="outline" onClick={onOpenMCP}>
+                      {t("Open MCP servers")}
+                    </Button>
+                  ) : null
+                }
+              >
+                {snapshot.mcp.length ? (
+                  <ul className="space-y-1">
+                    {snapshot.mcp.map((server) => (
+                      <li
+                        key={`${server.source}:${server.name}`}
+                        className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
+                      >
+                        <span className="text-label">{server.name}</span>
+                        <SourceBadge source={server.source} />
+                        <span className="text-micro uppercase tracking-label text-faint">
+                          {server.kind}
+                        </span>
+                        {!server.enabled ? (
+                          <span className="text-micro text-faint">{t("disabled")}</span>
+                        ) : null}
+                        {server.source === "project" && !snapshot.trusted ? (
+                          <InactiveBadge />
                         ) : null}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-1.5 text-label text-faint">{t("No packages configured.")}</p>
+                  <p className="text-label text-faint">{t("No MCP servers configured.")}</p>
                 )}
-                <PathForm
-                  value={packageSource}
-                  onChange={setPackageSource}
-                  placeholder={t("Package source")}
-                  button={t("Add package")}
-                  busy={busy}
-                  onAdd={() => void addPackage()}
-                />
-                <p className="mt-1.5 text-micro leading-4 text-faint">
-                  {t("Examples: npm:pi-web-access, git:github.com/user/repo, or a local path.")}
-                </p>
-              </div>
-            </FormSection>
-
-            <FormSection
-              divided
-              title={t("MCP servers")}
-              description={t(
-                "Servers from pi's mcp.json. pi connects enabled servers at session start.",
-              )}
-              actions={
-                onOpenMCP ? (
-                  <Button size="xs" variant="outline" onClick={onOpenMCP}>
-                    {t("Open MCP servers")}
-                  </Button>
-                ) : null
-              }
-            >
-              {snapshot.mcp.length ? (
-                <ul className="space-y-1">
-                  {snapshot.mcp.map((server) => (
-                    <li
-                      key={`${server.source}:${server.name}`}
-                      className="flex items-center gap-2 rounded-md bg-surface-2/40 px-2.5 py-1.5"
-                    >
-                      <span className="text-label">{server.name}</span>
-                      <SourceBadge source={server.source} />
-                      <span className="text-micro uppercase tracking-label text-faint">
-                        {server.kind}
-                      </span>
-                      {!server.enabled ? (
-                        <span className="text-micro text-faint">{t("disabled")}</span>
-                      ) : null}
-                      {server.source === "project" && !snapshot.trusted ? <InactiveBadge /> : null}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-label text-faint">{t("No MCP servers configured.")}</p>
-              )}
-            </FormSection>
+              </FormSection>
+            ) : null}
 
             <p className="mt-1 text-micro leading-4 text-faint">
               {t("Settings are written to pi's own files. PiS does not copy or cache them.")}
@@ -906,17 +1008,17 @@ function ProviderForm({
       </label>
       <div className="mt-1.5 flex flex-wrap items-center gap-3">
         {storedKey ? (
-          <label className="flex items-center gap-1.5 text-micro text-subtle">
-            <input
-              type="checkbox"
-              checked={input.clearKey}
-              onChange={(e) =>
-                patch({ clearKey: e.target.checked, ...(e.target.checked ? { apiKey: "" } : {}) })
-              }
-              className="size-3.5 accent-[var(--brand)]"
-            />
+          <CheckboxField
+            checked={input.clearKey}
+            onCheckedChange={(checked) =>
+              patch({ clearKey: checked, ...(checked ? { apiKey: "" } : {}) })
+            }
+            disabled={busy}
+            className="flex items-center gap-1.5 text-micro text-subtle"
+            ariaLabel={t("Remove stored key")}
+          >
             {t("Remove stored key")}
-          </label>
+          </CheckboxField>
         ) : null}
         <span className="text-micro text-faint">
           {t("Use $NAME for an environment variable. The key is written to pi's models.json.")}
@@ -993,15 +1095,15 @@ function ProviderForm({
                     className="h-7 w-24 rounded-md border border-control bg-canvas px-1.5 text-micro outline-none focus:border-brand"
                   />
                 </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    checked={model.reasoning}
-                    onChange={(e) => patchModel(index, { reasoning: e.target.checked })}
-                    className="size-3.5 accent-[var(--brand)]"
-                  />
+                <CheckboxField
+                  checked={model.reasoning}
+                  onCheckedChange={(checked) => patchModel(index, { reasoning: checked })}
+                  disabled={busy}
+                  className="flex items-center gap-1"
+                  ariaLabel={t("Reasoning")}
+                >
                   {t("Reasoning")}
-                </label>
+                </CheckboxField>
               </div>
             </div>
           ))}
