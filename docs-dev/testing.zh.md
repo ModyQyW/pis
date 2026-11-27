@@ -232,7 +232,9 @@ bun run dev:web
 - `bun run check`：通过（Go 格式、构建、vet、测试、前端检查、bridge 测试、Vitest、前端和文档构建）。
 - 浏览器预览（`bun run dev:web` + ego-browser）：侧边栏树、搜索、提示、外观/通知拆分、从 pi 加载的登录提供商、没有空白的字段搜索、技能搜索与 skills.sh、列表上方的扩展和包表单、MCP 文档链接，以及 10 px 上下文徽标和悬停样式。
 - 真实桌面应用（`bun run dev`）：打开真实会话，检查侧边栏树和搜索、设置分区、提供商和模型弹窗、「模型和提供商」登录入口、技能、扩展、包、MCP 文档和上下文徽标。
-- 发布：发布后见 0.0.12 发布记录。
+- Release workflow `45999293301` 通过。`v0.0.12` 草稿有 23 个资产：六个平台 archive、`SHA256SUMS`、六个更新 manifest、安装脚本和 macOS/Windows 安装器。没有 delta 文件。arm64 DMG 为 7,286,784 字节。
+- Release `v0.0.12` 已发布为 latest。`publishedAt` 为 2026-11-27T12:37:53Z。
+- 从 0.0.11 更新：未测试。此环境没有已安装的旧版本。
 
 ## 0.0.11 检查
 

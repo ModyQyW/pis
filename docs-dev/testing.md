@@ -232,7 +232,9 @@ The budget is not an automated test. When you measure, record:
 - `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest, frontend and docs builds).
 - Browser preview (`bun run dev:web` with ego-browser): sidebar tree, search, tooltips, Appearance/Notifications split, pi-loaded sign-in providers, combobox field search without the empty gap, skills search and skills.sh, extension and package forms above lists, MCP documentation link, and the 10 px context badge with hover styling.
 - Real desktop app (`bun run dev`): opened a real session and checked the sidebar tree and search, Settings sections, provider and model popups, the Models and providers sign-in entry, skills, extensions, packages, MCP documentation, and the context badge.
-- Release: see the 0.0.12 release record when published.
+- Release workflow `45999293301` passed. Draft `v0.0.12` had 23 assets, including the six platform archives, `SHA256SUMS`, six update manifests, install scripts, and macOS/Windows installers. No delta files. The arm64 DMG is 7,286,784 bytes.
+- Release `v0.0.12` is published as latest. `publishedAt` is 2026-11-27T12:37:53Z.
+- Update from 0.0.11: skipped. No installed previous version in this environment.
 
 ## 0.0.11 checks
 
