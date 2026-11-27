@@ -45,6 +45,7 @@ Rules:
 
 | Token | Size | Line height | Use |
 |---|---|---|---|
+| `text-nano` | 10 px | 1.4 | The compact context percentage badge only |
 | `text-micro` | 11 px | 1.45 | Uppercase labels, metadata, counts, keycaps |
 | `text-label` | 12 px | 1.45 | Buttons, form labels, dense rows |
 | `text-body` | 13.5 px | 1.7 | Markdown, composer, transcript |
@@ -53,7 +54,7 @@ Rules:
 | `text-heading` | 20 px | 1.25 | Section headings |
 | `text-display` | 30 px | 1.15 | Empty-state headline |
 
-The desktop body size is intentionally below the 16 px web baseline. Do not introduce smaller text: 11 px is the floor, and labels at that size still need 4.5:1 contrast. Code uses `--code-font-size`, set by the code font size setting. Markdown tables use `text-label`.
+The desktop body size is intentionally below the 16 px web baseline. Do not introduce smaller text: 10 px is the floor and is reserved for the compact context percentage badge; every other label uses 11 px or larger and still needs 4.5:1 contrast. Code uses `--code-font-size`, set by the code font size setting. Markdown tables use `text-label`.
 
 `cn` learns these custom text sizes from `frontend/src/lib/cn-tables.ts`; run `bun run cn:build` after changing a `--text-*` token so size and color utilities keep merging correctly.
 

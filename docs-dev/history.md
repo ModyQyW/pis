@@ -64,8 +64,9 @@ Every risky path has a test or a manual check: session parsing, streaming, appro
 | `0.0.9` | Pi configuration tab, chat deletion, release asset links, refresh and tooltips |
 | `0.0.10` | Searchable settings sections, shared Select/Combobox/Checkbox, provider-filtered model picker, quieter thinking rows, collapsible tool output |
 | `0.0.11` | Transcript refinements, Base UI tooltips and popovers, context usage panel with quick compact, real desktop QA rule |
+| `0.0.12` | Sidebar project tree and search, split notifications, pi-loaded sign-in providers, combobox field search, skills and MCP links |
 
-The `0.0.3` tag was never published as a GitHub release. `0.0.11` is the current public release and latest.
+The `0.0.3` tag was never published as a GitHub release. `0.0.12` is the current public release and latest.
 
 ## Current state
 

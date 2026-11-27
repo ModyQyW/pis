@@ -21,14 +21,14 @@ Click a project in the sidebar to switch the current project.
 After a switch:
 
 - The top bar shows the new project name.
-- The chat list shows sessions for the new project.
+- The project tree shows sessions for the new project.
 - The composer uses the new project as its working directory.
 
 Open sessions stay open. Each session has its own pi process and working directory.
 
 ## Recent projects
 
-The sidebar lists projects by last opened time. PiS keeps up to 20 recent projects.
+The sidebar lists projects by last opened time and expands each project into its open and recent chats. PiS keeps up to 20 recent projects.
 
 On the next launch, PiS restores the last project and the last opened session.
 

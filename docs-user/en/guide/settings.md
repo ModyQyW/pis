@@ -49,7 +49,9 @@ Show raw extension widgets controls extension widgets.
 - When it is on, an expandable widget area appears above the composer.
 - Widgets use a terminal layout and can take a lot of space.
 
-Desktop notifications controls system notifications when a background run finishes.
+## Notifications
+
+Notifications controls system notifications when a background run finishes.
 
 - The Test notification button checks permission.
 - The switch has no effect when the system does not allow notifications.
@@ -76,15 +78,6 @@ Send on Enter controls the send key.
 
 The composer shows the current key hint at the bottom right.
 
-## Providers
-
-Sign in to a provider… opens the pi sign-in terminal.
-
-PiS uses the pi credential store. It does not keep a second copy of the
-credentials and does not log the sign-in terminal output. A custom provider
-key that you save in a Pi configuration section goes to pi's `models.json`; PiS does not
-read it back. See [Models and sign-in](/guide/models).
-
 ## Pi configuration
 
 Open Settings, then select a Pi configuration section in the left list. The
@@ -102,9 +95,20 @@ The Defaults section shows the pi agent directory and the full paths of
 `.pi` paths when a project is open. Reveal pi config folder selects that
 directory in the file manager.
 
-The default provider and model fields are searchable. The model list shows
-only the selected provider. When the provider is Automatic, the model popup
-has a provider list on the left; select a provider there to filter the models.
+The default provider and model fields are searchable. Open the dropdown and
+type; the current label is selected, so typing replaces it and filters the
+list. The model list shows only the
+selected provider. When the provider is Automatic, the model popup has a
+provider list on the left; select a provider there to filter the models.
+
+Sign in in Models and providers selects a provider from the list that pi
+reports. PiS runs pi's own sign-in and does not store or log the credentials.
+See [Models and sign-in](/guide/models).
+
+The Skills section puts Add skill path above the list and filters the list as
+you type. The skills.sh link opens the public skills directory. The Extensions
+section puts the path and package forms above their lists. The MCP servers
+section links to pi's MCP documentation.
 
 Changes write pi's files directly. PiS writes pi's `settings.json` and
 `models.json` only when you save, and it preserves fields it does not edit.

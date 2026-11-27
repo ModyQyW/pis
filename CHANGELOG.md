@@ -2,6 +2,18 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.12 (2026-11-27)
+
+- Show projects and their chats as an expandable sidebar tree. Search filters project names, paths, and chat titles; bulk select moved to the Projects header.
+- Split Notifications from Appearance and remove the standalone Providers settings page. Sign in now lives in Models and providers.
+- Load the provider list for sign-in from pi and keep the picker searchable; anthropic stays the default until you choose another provider.
+- Make the provider and model combobox fields searchable: opening selects the current label, typing filters the list, and the blank area below short lists is gone.
+- Put skill paths and packages above their lists, add skill search and a skills.sh link, and align extension paths.
+- Add links to pi's MCP documentation.
+- Shrink the context percentage badge to 10 px and add hover feedback.
+- Replace the remaining native tooltips in the touched surfaces with the shared Tooltip.
+- Require browser and desktop verification after every UI change.
+
 ## 0.0.11 (2026-11-27)
 
 - Center tool rows, hide tool output until a card expands, and page question cards one question at a time.

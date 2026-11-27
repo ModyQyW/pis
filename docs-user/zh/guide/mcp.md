@@ -22,7 +22,7 @@ pi 读取两个文件：
 - 项目级条目可以只包含 `enabled`、`exposure` 或 `toolExposure`，并继承用户级的连接信息。
 - PiS 编辑文件时不删除未知字段。
 
-PiS 不会连接服务器，也不会保存 MCP 凭据。
+PiS 不会连接服务器，也不会保存 MCP 凭据。MCP 设置和对话框提供 pi 的 [MCP 文档](https://pi.dev/docs/latest/mcp)链接。
 
 ## 打开对话框
 

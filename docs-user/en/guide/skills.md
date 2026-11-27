@@ -34,17 +34,18 @@ read them.
 Open Settings → Pi configuration → Skills.
 
 The Skills list shows the name, description, path, and source of each skill.
-The sources are:
+Use the search field to filter the list. The skills.sh link opens the public
+skills directory for discovery. The sources are:
 
 - `user`: pi's user skills folder.
 - `agents`: the global `~/.agents/skills` directory.
 - `project`: a project or ancestor folder that loads after trust.
 - `configured`: a path from `settings.json`.
 
-To add a skill, enter the path to a skill file or folder and click Add skill
-path. A configured file can be a `SKILL.md` or a standalone Markdown skill.
-PiS writes the path to the `skills` list in pi's user `settings.json`.
-A relative path resolves from pi's agent directory.
+To add a skill, use Add skill path above the list. A configured file can be a
+`SKILL.md` or a standalone Markdown skill. PiS writes the path to the `skills`
+list in pi's user `settings.json`. A relative path resolves from pi's agent
+directory.
 
 To remove a path that you configured, click the remove button. Auto-discovered
 skills do not have a remove button. To stop loading one, delete or move its

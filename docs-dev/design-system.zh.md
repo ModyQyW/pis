@@ -45,6 +45,7 @@
 
 | Token | 字号 | 行高 | 用途 |
 |---|---|---|---|
+| `text-nano` | 10 px | 1.4 | 仅用于紧凑的上下文百分比徽标 |
 | `text-micro` | 11 px | 1.45 | 大写标签、元数据、计数、键帽 |
 | `text-label` | 12 px | 1.45 | 按钮、表单标签、紧凑列表 |
 | `text-body` | 13.5 px | 1.7 | Markdown、输入框、会话正文 |
@@ -53,7 +54,7 @@
 | `text-heading` | 20 px | 1.25 | 区块标题 |
 | `text-display` | 30 px | 1.15 | 空状态主标题 |
 
-桌面端正文有意低于网页 16 px 基线。不要再缩小：11 px 是下限，这个尺寸的标签仍需 4.5:1 对比度。代码字号使用 `--code-font-size`，由设置中的代码字号控制。Markdown 表格使用 `text-label`。
+桌面端正文有意低于网页 16 px 基线。不要再缩小：10 px 是下限，且只用于紧凑的上下文百分比徽标；其他标签使用 11 px 或更大，并仍需 4.5:1 对比度。代码字号使用 `--code-font-size`，由设置中的代码字号控制。Markdown 表格使用 `text-label`。
 
 `cn` 从 `frontend/src/lib/cn-tables.ts` 识别这些自定义字号；修改 `--text-*` token 后运行 `bun run cn:build`，字号与文字颜色类才能继续正确合并。
 

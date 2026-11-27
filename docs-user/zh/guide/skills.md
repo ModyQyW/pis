@@ -23,14 +23,14 @@ pi 还会读取仓库根目录之前的上级 `.agents/skills`、`settings.json`
 
 打开「设置 → pi 配置 → 技能」。
 
-技能列表显示每个技能的名称、描述、路径和来源：
+技能列表显示每个技能的名称、描述、路径和来源。搜索框可以过滤列表；skills.sh 链接打开公开技能目录，便于查找。来源包括：
 
 - `user`：pi 的用户技能文件夹。
 - `agents`：全局 `~/.agents/skills` 目录。
 - `project`：信任后加载的项目或上级文件夹。
 - `configured`：`settings.json` 中配置的路径。
 
-添加技能时，输入技能文件或文件夹路径，点击「添加技能路径」。配置的文件可以是 `SKILL.md`，也可以是独立的 Markdown 技能。PiS 把路径写入 pi 用户 `settings.json` 的 `skills` 列表。相对路径从 pi 的 agent 目录解析。
+添加技能时，使用列表上方的「添加技能路径」。配置的文件可以是 `SKILL.md`，也可以是独立的 Markdown 技能。PiS 把路径写入 pi 用户 `settings.json` 的 `skills` 列表。相对路径从 pi 的 agent 目录解析。
 
 移除自己配置的路径时，点击移除按钮。自动发现的技能没有移除按钮。要停止加载，删除或移动其文件夹。
 

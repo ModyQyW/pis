@@ -22,14 +22,14 @@ pi's `auth.json`, `trust.json`, or session files.
 
 There are two entry points:
 
-1. Sign in to a provider… in Settings.
+1. Settings → Pi configuration → Models and providers → Sign in.
 2. The Connect a provider prompt in the chat area.
 
 ![Provider sign-in](/images/login.png)
 
 Steps:
 
-1. Enter a provider ID, for example `anthropic`, `openai`, `google`, or `openrouter`.
+1. Choose a provider from the list. The list comes from pi and is searchable.
 2. Select a sign-in method.
 3. Click Start sign-in.
 4. Finish the sign-in in the terminal inside the app.

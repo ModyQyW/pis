@@ -133,7 +133,12 @@ Use real pi and a real project. Check:
 - MCP: add, enable, remove, reload session.
 - Worktrees: create, open, remove, dirty worktree second confirmation.
 - Extension dialogs, statuses, and widgets.
-- Settings: theme mode, all four palettes, language, font size, send key, notifications.
+- Settings: theme mode, all four palettes, language, font size, send key, notifications. Appearance and Notifications are separate sections; there is no standalone Providers page.
+- Sidebar tree: expand and collapse projects, search project names and chat titles, and bulk-select chats from the Projects header.
+- Provider sign-in: the provider list loads from pi, is searchable, and defaults to anthropic until you select another provider.
+- Settings comboboxes: the provider and model fields select the current label when opened, filter as you type, accept keyboard selection, and have no blank area when options exist.
+- Skills: search filters the list, skills.sh opens, and Add skill path is above the list. Extension paths and packages use forms above their lists. MCP servers link to pi's documentation.
+- Context badge: the percentage uses 10 px text and changes surface, border, and text color on hover.
 - Refresh icons spin while the request runs. Icon-only buttons show a tooltip.
 - Quit guard: running session warning.
 - Update check and Gatekeeper flow.
@@ -221,6 +226,13 @@ The budget is not an automated test. When you measure, record:
 - Cold or warm cache.
 - Command.
 - Result.
+
+## 0.0.12 checks
+
+- `bun run check`: pass (Go format, build, vet, tests, frontend checks, bridge tests, Vitest, frontend and docs builds).
+- Browser preview (`bun run dev:web` with ego-browser): sidebar tree, search, tooltips, Appearance/Notifications split, pi-loaded sign-in providers, combobox field search without the empty gap, skills search and skills.sh, extension and package forms above lists, MCP documentation link, and the 10 px context badge with hover styling.
+- Real desktop app (`bun run dev`): opened a real session and checked the sidebar tree and search, Settings sections, provider and model popups, the Models and providers sign-in entry, skills, extensions, packages, MCP documentation, and the context badge.
+- Release: see the 0.0.12 release record when published.
 
 ## 0.0.11 checks
 

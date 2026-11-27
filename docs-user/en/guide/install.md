@@ -152,7 +152,7 @@ If no model is available, the chat area shows a prompt.
 
 ![Provider sign-in](/images/login.png)
 
-Click Connect a provider, or open "Sign in to a provider…" in Settings. PiS runs:
+Click Connect a provider, or open Settings → Pi configuration → Models and providers and click Sign in. PiS runs:
 
 ```sh
 pi auth login <provider>

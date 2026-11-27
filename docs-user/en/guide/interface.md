@@ -9,8 +9,10 @@ The PiS window has five areas: the sidebar, the top bar, the transcript, the com
 The sidebar is on the left. You can hide it.
 
 - The top has the PiS name and the New chat button.
-- Projects lists recent projects. Click a project to switch workspace.
-- Chats lists recent sessions for the current project. Click a session to resume it.
+- The search field filters projects and their chats. Clearing it restores the tree.
+- Projects lists recent projects as expandable nodes. Click a project name to switch workspace; click the chevron to show or hide its chats.
+- Each project shows its open and recent chats. Click a chat to resume it. Expand or collapse a project with the chevron.
+- Select chats in the Projects header turns chat rows into checkboxes for bulk deletion.
 - The bottom has Settings and the current pi version.
 
 Press `⌘B` (`Ctrl+B` on Windows and Linux) to show or hide the sidebar.

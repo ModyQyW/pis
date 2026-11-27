@@ -75,7 +75,7 @@ xattr -dr com.apple.quarantine "/Applications/PiS.app"
 如果登录窗口无响应：
 
 1. 关闭登录窗口。
-2. 重新打开「登录提供商」。
+2. 打开设置 → pi 配置 →「模型和提供商」，再次点击「登录」。
 3. 再次开始登录。
 
 ## 没有可用模型

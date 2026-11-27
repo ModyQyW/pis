@@ -22,7 +22,7 @@ Rules:
 - A project entry can contain only fields such as `enabled`, and inherit connection details from the user entry.
 - PiS does not delete unknown fields when it edits a file.
 
-PiS does not connect to servers and does not store MCP credentials.
+PiS does not connect to servers and does not store MCP credentials. PiS links to pi's [MCP documentation](https://pi.dev/docs/latest/mcp) in the MCP settings and dialog.
 
 ## Open the dialog
 

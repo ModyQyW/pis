@@ -77,7 +77,7 @@ pi runs the sign-in. PiS does not store credentials and does not change the sign
 If the sign-in terminal does not respond:
 
 1. Close the sign-in window.
-2. Open Sign in to a provider again.
+2. Open Settings → Pi configuration → Models and providers, then click Sign in again.
 3. Start the sign-in again.
 
 ## No models available

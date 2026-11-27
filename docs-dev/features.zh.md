@@ -20,9 +20,11 @@ manager 把 app id 映射到进程。进程持有 stdin、stdout、stderr、等�
 
 测试：`internal/agent/manager_integration_test.go`（可选真实 pi）、`internal/agent/coalesce_test.go`、`internal/agent/process_test.go`。
 
-## 对话列表与删除
+## 对话树与删除
 
-`Sidebar` 显示打开中的会话和最近会话。对话行有垃圾桶图标，用于删除单个对话。「选择对话」把行变为复选框，并显示批量删除操作。
+`Sidebar` 以可展开的树节点显示项目。每个节点列出该项目的活动会话和最近会话。对话行有垃圾桶图标，用于删除单个对话。「选择对话」把行变为复选框，并显示批量删除操作。
+
+侧边栏搜索匹配项目名、项目路径和对话标题。项目名匹配时显示该项目全部对话；只有对话匹配时显示该项目和匹配的对话。`App.tsx` 并行读取每个最近项目最多 20 个会话，并在项目列表或打开会话的路径变化时刷新。
 
 `App.tsx` 为所有目标路径打开一个确认框。它用 `Agent.Close` 关闭每个活动会话，再调用 `Sessions.Delete` 删除文件。`Sessions.Delete` 把文件移到系统废纸篓；项目文件不受影响。
 
@@ -76,14 +78,15 @@ Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK �
 
 ## 设置
 
-`SettingsDialog.tsx` 保存分区表、搜索和通用分区。pi 配置分区通过
-`PiConfigPanel` 的 `section` 参数渲染。首次访问后面板保持挂载，切换分区不会丢失编辑。
+`SettingsDialog.tsx` 保存分区表、搜索和通用分区。「外观」和「通知」是独立分区；独立的「提供商」页已删除，登录入口放在 pi 配置 →「模型和提供商」。pi 配置分区通过 `PiConfigPanel` 的 `section` 参数渲染。首次访问后面板保持挂载，切换分区不会丢失编辑。
 
 搜索按当前语言匹配分区标签和设置关键词，并打开第一个匹配项。
 
 `Select` 包装 Base UI Select；`Combobox` 包装 Base UI Combobox，支持过滤和可选的弹窗侧栏。
 默认提供商和模型使用 `Combobox`。模型列表限定到一个提供商。提供商为「自动」时，
-模型弹窗显示提供商侧栏，读者选择一个提供商来过滤列表。
+模型弹窗显示提供商侧栏，读者选择一个提供商来过滤列表。展开 Combobox 时会选中当前标签，输入即过滤列表，不会追加到原值。会话模型选择器有自己的搜索框。
+
+「技能」把添加路径放在列表上方，输入时过滤技能，并链接 skills.sh。「扩展」把扩展路径和包的添加表单放在各自列表上方。「MCP 服务器」提供 pi 的 MCP 文档链接。
 
 不使用原生 select 和 checkbox。`Checkbox` 包装 Base UI Checkbox；在忙碌的 fieldset 中显式禁用。
 

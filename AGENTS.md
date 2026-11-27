@@ -25,7 +25,7 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 - Format: `bun run format`.
 - Full gate: `bun run check` (= `scripts/check.sh`: gofmt, Go build/vet/test, Vite+ format/lint/typecheck, bridge tests, Vitest, frontend build, docs build).
 - Focused checks: `bun run check:web`, `bun run test`, `bun run test:bridge`, `go test ./internal/... .`.
-- UI changes: run the real desktop window with `bun run dev` and inspect the changed surface there before reporting. `bun run dev:web` is a layout preview; it does not test the shipped mygo window.
+- UI changes: after every UI edit, verify the changed surface without being asked. First run `bun run dev:web` and operate the surface with the `ego-browser` skill (screenshots plus DOM checks). Then run the real desktop window with `bun run dev` and inspect the same surface. `bun run dev:web` is a layout preview; it does not test the shipped mygo window. Do not report a UI change until both checks are done; if a surface cannot be reached in the desktop window, say which check is missing.
 - The pre-commit hook runs the full gate. Do not bypass a failed format, lint, type, or test check.
 
 ## Generated files

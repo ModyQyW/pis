@@ -30,7 +30,7 @@ PiS is a calm, fast, native-feeling coding agent. It is not an IDE and not a cha
 └───────────────┴──────────────────────────────────────────────┴───────────────┘
 ```
 
-- Sidebar: 280 px default, 220–480 px, collapsible.
+- Sidebar: 280 px default, 220–480 px, collapsible. A search field filters projects and chats; projects expand into their sessions as a tree.
 - Right panel: 360 px default, 280–720 px, collapsible. Changes first, then Files.
 - Chat column: max 860 px. Code and diff can use the full column.
 - Empty home: product mark, open project, new chat, recent projects, and three concrete starters. No marketing copy.
@@ -52,9 +52,9 @@ Themes:
 Type:
 
 - System UI font on macOS; monospace for code.
-- One scale: micro 11, label 12, body 13.5, body-large 14, title 16, heading 20, display 30.
+- One scale: nano 10, micro 11, label 12, body 13.5, body-large 14, title 16, heading 20, display 30.
 - Body line height is 1.7 and Markdown uses 1.72. Code size follows the code font size setting.
-- Labels never drop below 11 px, and components do not use arbitrary font sizes.
+- Nano is only the compact context percentage badge. Other labels never drop below 11 px, and components do not use arbitrary font sizes.
 - Settings can change code font size and interface scale.
 
 Color:
@@ -99,8 +99,9 @@ Icons:
 
 - Settings uses a section list on the left. Each section renders alone; the body does not hold every control in one scroll.
 - The search field matches section titles and setting names in the current language. The first match opens, so the reader does not switch sections or scroll to find a control.
-- Dropdowns use the shared Base UI Select or Combobox surface. There are no native `<select>` elements. The default provider and model fields are searchable.
+- Dropdowns use the shared Base UI Select or Combobox surface. There are no native `<select>` elements. Combobox fields are searchable: opening selects the current label, and typing filters the list.
 - When the default provider is Automatic, the model popup shows a provider list on the left. It filters the model list to one provider; the full model list never appears at once.
+- Appearance and Notifications are separate sections. Provider sign-in lives in Models and providers, not a separate Providers page.
 
 ## Transcript
 
@@ -117,7 +118,7 @@ Icons:
 
 ## Composer
 
-- The composer shows the model, thinking level, plan mode, context usage, and send/stop action. Click the context percentage to open a panel with the exact used and total tokens, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context action. Category values are estimates.
+- The composer shows the model, thinking level, plan mode, context usage, and send/stop action. Click the context percentage to open a panel with the exact used and total tokens, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context action. The percentage uses the 10 px nano badge and gains a surface and border on hover. Category values are estimates.
 - Attachments and file suggestions appear above the input, not in a separate page.
 - The send key follows the setting: Enter sends, or Enter adds a line and `⌘Enter` sends.
 - Failed sends restore the draft and attachments.

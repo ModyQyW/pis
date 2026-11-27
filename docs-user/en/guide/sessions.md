@@ -20,13 +20,15 @@ A new session uses the default model and pi configuration of the project. You ca
 
 ## Resume a session
 
-The Chats list in the sidebar shows recent sessions for the current project. Click a session to resume it.
+The project tree in the sidebar shows open and recent sessions for each project. Click a project chevron to show its chats, then click a chat to resume it.
 
 PiS first reads the pi session JSONL file and shows the history. The pi process then starts and takes over new messages.
 
 The sidebar shows the session title and update time. A session without a title uses the first user message as the title.
 
 ## Search sessions
+
+Use the sidebar search field to filter projects and chats in the tree. It matches project names, project paths, and chat titles.
 
 Press `⌘K` to open the command palette, then type at least two characters.
 
@@ -125,7 +127,7 @@ You can also select Delete session… from the session actions menu.
 
 Several sessions:
 
-1. Click Select chats in the Chats header.
+1. Click Select chats in the Projects header.
 2. Check the sessions to delete.
 3. Click Delete.
 4. Confirm the deletion.

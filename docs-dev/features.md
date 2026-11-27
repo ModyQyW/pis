@@ -20,9 +20,11 @@ The manager maps the app id to the process. The process owns stdin, stdout, stde
 
 Tests: `internal/agent/manager_integration_test.go` (opt-in real pi), `internal/agent/coalesce_test.go`, `internal/agent/process_test.go`.
 
-## Chat list and deletion
+## Chat tree and deletion
 
-`Sidebar` renders open sessions and recent sessions. A chat row has a trash icon for single deletion. Select chats turns rows into checkboxes and shows a bulk delete action.
+`Sidebar` shows projects as expandable tree nodes. Each node lists its live and recent sessions. A chat row has a trash icon for single deletion. Select chats turns rows into checkboxes and shows a bulk delete action.
+
+The sidebar search matches project names, project paths, and chat titles. A project match shows all its chats; a chat-only match shows the project with the matching chats. `App.tsx` loads up to 20 sessions per recent project in parallel and refreshes them when the project list or open session paths change.
 
 `App.tsx` opens one confirmation for all target paths. It closes each live session with `Agent.Close`, then calls `Sessions.Delete` for the file. `Sessions.Delete` moves the file to the system Trash; project files are untouched.
 
@@ -81,22 +83,15 @@ Tests: `frontend/src/lib/questions.test.ts`, `frontend/src/lib/transcript.test.t
 
 ## Settings
 
-`SettingsDialog.tsx` holds the section table, search, and the general sections.
-Pi configuration sections render through `PiConfigPanel` with a `section`
-prop. The panel stays mounted after the first visit so edits survive a
-section switch.
+`SettingsDialog.tsx` holds the section table, search, and the general sections. Appearance and Notifications are separate sections; the standalone Providers page is gone, and signing in lives in Pi configuration → Models and providers. Pi configuration sections render through `PiConfigPanel` with a `section` prop. The panel stays mounted after the first visit so edits survive a section switch.
 
-Search matches section labels and setting keywords in the current language
-and opens the first match.
+Search matches section labels and setting keywords in the current language and opens the first match.
 
-`Select` wraps Base UI Select; `Combobox` wraps Base UI Combobox with filtering
-and an optional popup side rail. The provider and model defaults use
-`Combobox`. The model list is scoped to one provider. When the provider is
-Automatic, the model popup shows a provider rail and the reader selects one
-provider to filter the list.
+`Select` wraps Base UI Select; `Combobox` wraps Base UI Combobox with filtering and an optional popup side rail. The provider and model defaults use `Combobox`. The model list is scoped to one provider. When the provider is Automatic, the model popup shows a provider rail and the reader selects one provider to filter the list. Opening a combobox selects its current label, so typing filters the list instead of appending to the value. The session model picker has its own search field.
 
-Native selects and checkboxes are not used. `Checkbox` wraps Base UI Checkbox
-and is disabled explicitly inside busy fieldsets.
+The Skills section puts Add skill path above the list, filters skills as you type, and links to skills.sh. The Extensions section puts the extension path and package forms above their lists. The MCP section links to pi's MCP documentation.
+
+Native selects and checkboxes are not used. `Checkbox` wraps Base UI Checkbox and is disabled explicitly inside busy fieldsets.
 
 ## Composer
 
