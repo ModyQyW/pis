@@ -20,6 +20,14 @@ manager 把 app id 映射到进程。进程持有 stdin、stdout、stderr、等�
 
 测试：`internal/agent/manager_integration_test.go`（可选真实 pi）、`internal/agent/coalesce_test.go`、`internal/agent/process_test.go`。
 
+## 对话列表与删除
+
+`Sidebar` 显示打开中的会话和最近会话。对话行有垃圾桶图标，用于删除单个对话。「选择对话」把行变为复选框，并显示批量删除操作。
+
+`App.tsx` 为所有目标路径打开一个确认框。它用 `Agent.Close` 关闭每个活动会话，再调用 `Sessions.Delete` 删除文件。`Sessions.Delete` 把文件移到系统废纸篓；项目文件不受影响。
+
+测试：`frontend/src/store/chat.test.ts` 覆盖启动中关闭；删除复用现有会话服务。
+
 ## 流式输出
 
 pi 把 token 增量作为 `message_update` 事件发送。Go coalescer 按会话、类型和内容索引，在 16 ms 窗口内合并。
@@ -183,6 +191,7 @@ pi 发送 `extension_ui_request` 记录。Go 把它们作为 `extension-ui` 事�
 - `SetPreferences` 校验范围和语言值。
 - `App.tsx` 在绘制前应用 `--code-font-size` 和 `--ui-scale`。
 - 代码区域使用 `--code-font-size`；body 使用 `--ui-scale`。
+- 设置对话框有「通用」和「pi 配置」两个标签。pi 配置标签渲染 `PiConfigPanel`；启动检查用 `PiConfigDialog` 渲染同一个面板。
 
 前端字典在 `frontend/src/lib/i18n.ts`。`t()` 在渲染时调用。缺失键回退到英文源文本。
 

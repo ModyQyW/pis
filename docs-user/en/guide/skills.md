@@ -31,7 +31,7 @@ read them.
 
 ## Review and add skills
 
-Open Settings → Pi resources → Models, providers, skills….
+Open Settings → Pi configuration.
 
 The Skills list shows the name, description, path, and source of each skill.
 The sources are:

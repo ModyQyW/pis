@@ -21,7 +21,7 @@ pi 还会读取仓库根目录之前的上级 `.agents/skills`、`settings.json`
 
 ## 查看和添加技能
 
-打开「设置 → pi 资源 → 模型、提供商、技能…」。
+打开「设置 → pi 配置」。
 
 技能列表显示每个技能的名称、描述、路径和来源：
 
@@ -63,4 +63,4 @@ PiS 把文本发送给 pi。pi 报告技能命令后，它会出现在输入框�
 
 - [扩展](/guide/extensions)：添加工具和命令。
 - [模型与登录](/guide/models)：选择模型。
-- [设置](/guide/settings)：查看 pi 资源。
+- [设置](/guide/settings)：查看 pi 配置。

@@ -97,7 +97,7 @@ Filter rules:
 
 If the target version section already exists, the script keeps the manual text.
 
-At publish time, the script prepends the download header in `scripts/release-notes-header.md`, then extracts the matching CHANGELOG section to a temporary file. It passes that file to `gh release edit --notes-file`. The assembled notes file does not enter Git; the header template does.
+At publish time, the script prepends the download header in `scripts/release-notes-header.md`, then extracts the matching CHANGELOG section to a temporary file. The header links each download row to its release asset. It passes that file to `gh release edit --notes-file`. The assembled notes file does not enter Git; the header template does.
 
 The Chinese CHANGELOG is `CHANGELOG.zh.md`. Add the same version section before you run the script. Keep that edit uncommitted; the script commits it with the English section. It stops if the Chinese section is missing.
 
@@ -201,7 +201,7 @@ Checklist:
 - `SHA256SUMS` exists.
 - Six `update-*.json` manifests exist.
 - No delta files are attached (`updates.deltas` is 0).
-- The release notes start with the download table and contain no keys, internal paths, or unfinished claims.
+- The release notes start with the download table, and each row links to its asset. They contain no keys, internal paths, or unfinished claims.
 
 Asset names:
 

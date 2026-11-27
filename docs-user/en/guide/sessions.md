@@ -116,11 +116,23 @@ Closing stops the pi process. It does not delete the session file. Open the sess
 
 ## Delete a session
 
-Select Delete session….
+Single session:
 
-PiS closes the session, then moves the session file to the system Trash. Check the current session before you confirm.
+1. Move the mouse over the chat row in the sidebar.
+2. Click the trash icon.
 
-You can restore the file from the system Trash. PiS has no separate undo.
+You can also select Delete session… from the session actions menu.
+
+Several sessions:
+
+1. Click Select chats in the Chats header.
+2. Check the sessions to delete.
+3. Click Delete.
+4. Confirm the deletion.
+
+PiS closes open sessions, then moves the session files to the system Trash.
+Your project files are untouched. You can restore the files from the system
+Trash. PiS has no separate undo.
 
 ## Multiple sessions
 

@@ -19,7 +19,7 @@ Extensions have the same system permissions as pi. Read the source or the releas
 
 ## Review and add extensions
 
-Open Settings → Pi resources → Models, providers, skills…. The dialog lists:
+Open Settings → Pi configuration. The tab lists:
 
 - Extension files in pi's user folder. After you trust a project, its
   extension files are listed too. pi discovers `.ts` and `.js` files and

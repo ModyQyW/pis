@@ -97,7 +97,7 @@ CHANGELOG 是唯一的发布记录。脚本把上一个 `v*` tag 到 `HEAD` 的�
 
 目标版本的 CHANGELOG 小节已存在时，脚本保留手写内容。
 
-发布时，脚本先把 `scripts/release-notes-header.md` 中的下载指引放在最前，再把对应 CHANGELOG 小节提取到临时文件，并用 `gh release edit --notes-file` 写入 Release。组装后的 notes 文件不进入仓库，header 模板会提交。
+发布时，脚本先把 `scripts/release-notes-header.md` 中的下载指引放在最前，再把对应 CHANGELOG 小节提取到临时文件。下载表格的每一项链接到 Release 资产。脚本用 `gh release edit --notes-file` 写入 Release。组装后的 notes 文件不进入仓库，header 模板会提交。
 
 中文 CHANGELOG 是 `CHANGELOG.zh.md`。运行脚本前，先在中文文件加入同一个版本小节。这一处改动可以保持未提交；脚本会和英文小节一起提交。中文小节缺失时，脚本停止。
 
@@ -201,7 +201,7 @@ gh run watch <run-id> --exit-status
 - `SHA256SUMS` 存在。
 - 六个 `update-*.json` manifest 存在。
 - 不附带 delta 文件（`updates.deltas` 为 0）。
-- Release notes 以下载表格开头。
+- Release notes 以下载表格开头，每一项链接到对应资产。
 - CHANGELOG 版本小节没有密钥、内部路径或未完成声明。
 
 资产名称：

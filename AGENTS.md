@@ -73,7 +73,7 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 
 - `CHANGELOG.md` and `CHANGELOG.zh.md` are the release record. Add the same version section to both; `scripts/release.sh` refuses to publish without the Chinese section.
 - `scripts/release.sh` runs the full check, commits `chore(release): prepare <version>`, pushes `main` and the tag, waits for the Release workflow, verifies the draft, and publishes with generated notes.
-- Release notes are `scripts/release-notes-header.md` followed by the CHANGELOG section. Keep the header's asset names, install commands, and first-launch notes in sync with the build.
+- Release notes are `scripts/release-notes-header.md` followed by the CHANGELOG section. The header links each download row to its release asset. Keep the header's asset names, links, install commands, and first-launch notes in sync with the build.
 - Delta updates are off (`updates.deltas: 0`) and the draft check rejects `.delta` assets. Do not add them back without an explicit decision; updates download the full archive.
 - Never commit, print, or log update private keys or credentials. Signing and notarization are optional and read from environment variables.
 - Published release notes and assets are public history. Do not edit or delete them without an explicit request in the current task.

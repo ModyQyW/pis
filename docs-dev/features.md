@@ -20,6 +20,14 @@ The manager maps the app id to the process. The process owns stdin, stdout, stde
 
 Tests: `internal/agent/manager_integration_test.go` (opt-in real pi), `internal/agent/coalesce_test.go`, `internal/agent/process_test.go`.
 
+## Chat list and deletion
+
+`Sidebar` renders open sessions and recent sessions. A chat row has a trash icon for single deletion. Select chats turns rows into checkboxes and shows a bulk delete action.
+
+`App.tsx` opens one confirmation for all target paths. It closes each live session with `Agent.Close`, then calls `Sessions.Delete` for the file. `Sessions.Delete` moves the file to the system Trash; project files are untouched.
+
+Tests: `frontend/src/store/chat.test.ts` covers close during start; delete uses the existing session service.
+
 ## Streaming
 
 pi emits token deltas as `message_update` events. The Go coalescer merges them in a 16 ms window by session, type, and content index.
@@ -183,6 +191,7 @@ Tests: `internal/sessions/sessions_test.go`.
 - `SetPreferences` validates ranges and language values.
 - `App.tsx` applies `--code-font-size` and `--ui-scale` before paint.
 - Code surfaces use `--code-font-size`; the body uses `--ui-scale`.
+- The Settings dialog has General and Pi configuration tabs. The Pi tab renders `PiConfigPanel`; the launch review renders the same panel in `PiConfigDialog`.
 
 The frontend dictionary is in `frontend/src/lib/i18n.ts`. `t()` is called during render. Missing keys fall back to the English source.
 

@@ -13,7 +13,7 @@ you last confirmed it, the Pi configuration dialog opens. It lists:
 - MCP servers from `mcp.json`.
 
 Click Use this configuration to record the review. You can also open the
-dialog from Settings → Pi resources → Models, providers, skills….
+tab from Settings → Pi configuration.
 
 PiS writes pi's files only when you save in the dialog. It never writes
 pi's `auth.json`, `trust.json`, or session files.
@@ -61,7 +61,7 @@ After sign-in, PiS refreshes the model list.
 
 ## Configure defaults and custom providers
 
-Open Settings → Pi resources → Models, providers, skills….
+Open Settings → Pi configuration.
 
 Defaults:
 

@@ -77,13 +77,13 @@ Sign in to a provider… opens the pi sign-in terminal.
 
 PiS uses the pi credential store. It does not keep a second copy of the
 credentials and does not log the sign-in terminal output. A custom provider
-key that you save in Pi resources goes to pi's `models.json`; PiS does not
+key that you save in the Pi configuration tab goes to pi's `models.json`; PiS does not
 read it back. See [Models and sign-in](/guide/models).
 
-## Pi resources
+## Pi configuration
 
-Models, providers, skills… opens the Pi configuration dialog. It reads pi's
-own files and shows:
+Open Settings, then select the Pi configuration tab. It reads pi's own files
+and shows:
 
 - Default provider, model, and thinking level.
 - Custom providers and models from `models.json`.
@@ -91,14 +91,20 @@ own files and shows:
 - Extension files, configured paths, and package sources.
 - MCP servers from `mcp.json`.
 
-PiS writes pi's `settings.json` and `models.json` only when you save a change
-in this dialog. It preserves fields it does not edit. If a trusted project sets
-its own startup model, the dialog shows a note; the project value wins for new
-sessions in that project. MCP servers… opens the MCP dialog; see
-[MCP servers](/guide/mcp).
+The tab shows the pi agent directory and the full paths of `settings.json`,
+`models.json`, and `mcp.json`. It also shows the project `.pi` paths when a
+project is open. Reveal pi config folder selects that directory in the file
+manager.
 
-When pi's configuration changed since your last confirmation, the dialog
-opens at launch. Review the list and click Use this configuration.
+Changes write pi's files directly. PiS writes pi's `settings.json` and
+`models.json` only when you save, and it preserves fields it does not edit.
+The Open MCP servers button in the tab opens the MCP dialog; see
+[MCP servers](/guide/mcp). If a trusted project sets its own startup model,
+the tab shows a note; the project value wins for new sessions in that project.
+
+When pi's configuration changed since your last confirmation, a separate Pi
+configuration dialog opens at launch. Review the list and click Use this
+configuration.
 
 PiS does not write pi's `auth.json`, `trust.json`, or session files.
 

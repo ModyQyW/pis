@@ -128,11 +128,13 @@ Use real pi and a real project. Check:
 - Plan mode: read-only tools and change blocking.
 - Project trust: deny, allow, restart session.
 - Changes panel: diff, copy patch, revert, file preview.
-- Pi configuration: the confirmation banner appears on a changed configuration; defaults, provider, skill path, and package changes write pi's files; stored keys stay hidden.
+- Pi configuration tab: current defaults, providers, skills, extensions, packages, MCP, and pi file paths. Edits write pi's files; stored keys stay hidden. The launch dialog still confirms a changed configuration.
+- Chats: single delete from the row and multi-select bulk delete; both move files to Trash.
 - MCP: add, enable, remove, reload session.
 - Worktrees: create, open, remove, dirty worktree second confirmation.
 - Extension dialogs, statuses, and widgets.
 - Settings: theme mode, all four palettes, language, font size, send key, notifications.
+- Refresh icons spin while the request runs. Icon-only buttons show a tooltip.
 - Quit guard: running session warning.
 - Update check and Gatekeeper flow.
 
