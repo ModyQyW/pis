@@ -43,6 +43,13 @@ export interface Bootstrap {
   guard: GuardStatus;
 }
 
+export interface ContextBreakdown {
+  system: number;
+  tools: number;
+  skills: number;
+  project: number;
+}
+
 /** Defaults are pi's startup model choices. */
 export interface Defaults {
   provider?: string;
@@ -437,6 +444,7 @@ export interface Transcript {
   leafId: string;
   entries: Entry[];
   truncated: boolean;
+  context?: ContextBreakdown;
 }
 
 export type TrustDecision = string;

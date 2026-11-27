@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"pis/internal/jsonx"
 )
@@ -57,13 +58,24 @@ type Entry struct {
 
 // Transcript is the active branch of a session, oldest first.
 type Transcript struct {
-	Path      string  `json:"path"`
-	ID        string  `json:"id"`
-	Cwd       string  `json:"cwd"`
-	Name      string  `json:"name"`
-	LeafID    string  `json:"leafId"`
-	Entries   []Entry `json:"entries"`
-	Truncated bool    `json:"truncated"`
+	Path      string            `json:"path"`
+	ID        string            `json:"id"`
+	Cwd       string            `json:"cwd"`
+	Name      string            `json:"name"`
+	LeafID    string            `json:"leafId"`
+	Entries   []Entry           `json:"entries"`
+	Truncated bool              `json:"truncated"`
+	Context   *ContextBreakdown `json:"context,omitempty"`
+}
+
+// ContextBreakdown estimates the system-side context in tokens. Pi does not
+// expose exact per-category counts, so each value uses pi's character-based
+// estimate (one token per four characters).
+type ContextBreakdown struct {
+	System  int `json:"system"`
+	Tools   int `json:"tools"`
+	Skills  int `json:"skills"`
+	Project int `json:"project"`
 }
 
 type rawEntry struct {
@@ -496,6 +508,7 @@ func readAt(path, leafID string, maxBytes int64) (Transcript, error) {
 			out.Entries = append(out.Entries, entry)
 		}
 	}
+	out.Context = contextBreakdown(chain)
 	if out.Name == "" {
 		for _, entry := range out.Entries {
 			if entry.Role == "user" {
@@ -530,9 +543,11 @@ func displayEntry(re rawEntry) (Entry, bool) {
 		return e, true
 	case "custom_message":
 		var wrapper struct {
-			Message json.RawMessage `json:"message"`
-			Content json.RawMessage `json:"content"`
-			Display bool            `json:"display"`
+			Message    json.RawMessage `json:"message"`
+			Content    json.RawMessage `json:"content"`
+			Display    bool            `json:"display"`
+			CustomType string          `json:"customType"`
+			Details    json.RawMessage `json:"details"`
 		}
 		_ = json.Unmarshal(re.Raw, &wrapper)
 		if !wrapper.Display {
@@ -542,6 +557,10 @@ func displayEntry(re rawEntry) (Entry, bool) {
 			e.Message = jsonx.RawJSON(wrapper.Message)
 		} else {
 			e.Message = jsonx.RawJSON(wrapper.Content)
+		}
+		e.CustomType = wrapper.CustomType
+		if len(wrapper.Details) > 0 {
+			e.Data = jsonx.RawJSON(wrapper.Details)
 		}
 		return e, true
 	case "compaction":
@@ -615,6 +634,123 @@ func textFromContent(raw json.RawMessage) string {
 		return strings.Join(parts, "\n")
 	}
 	return ""
+}
+
+type rawSystemMessage struct {
+	Role         string             `json:"role"`
+	Content      json.RawMessage    `json:"content"`
+	Sections     map[string]*string `json:"sections"`
+	ToolsAdded   []json.RawMessage  `json:"toolsAdded"`
+	ToolsRemoved []json.RawMessage  `json:"toolsRemoved"`
+}
+
+type contextState struct {
+	contents []string
+	sections map[string]string
+	tools    map[string]json.RawMessage
+	seen     bool
+}
+
+func (s *contextState) apply(msg rawSystemMessage) {
+	if msg.Role != "system" {
+		return
+	}
+	s.seen = true
+	if text := textFromContent(msg.Content); text != "" {
+		s.contents = append(s.contents, text)
+	}
+	if s.sections == nil {
+		s.sections = map[string]string{}
+	}
+	for name, value := range msg.Sections {
+		if value == nil {
+			delete(s.sections, name)
+		} else {
+			s.sections[name] = *value
+		}
+	}
+	if s.tools == nil {
+		s.tools = map[string]json.RawMessage{}
+	}
+	for _, raw := range msg.ToolsRemoved {
+		var tool struct {
+			Name string `json:"name"`
+		}
+		if json.Unmarshal(raw, &tool) == nil && tool.Name != "" {
+			delete(s.tools, tool.Name)
+		}
+	}
+	for _, raw := range msg.ToolsAdded {
+		var tool struct {
+			Name string `json:"name"`
+		}
+		if json.Unmarshal(raw, &tool) == nil && tool.Name != "" {
+			s.tools[tool.Name] = raw
+		}
+	}
+}
+
+// contextBreakdown mirrors pi's getCurrentSystemMessage: system messages are
+// patches, and a compaction carries a full prompt snapshot.
+func contextBreakdown(chain []rawEntry) *ContextBreakdown {
+	var state contextState
+	for i := len(chain) - 1; i >= 0; i-- {
+		entry := chain[i]
+		switch entry.Type {
+		case "message":
+			var wrapper struct {
+				Message rawSystemMessage `json:"message"`
+			}
+			if json.Unmarshal(entry.Raw, &wrapper) == nil {
+				state.apply(wrapper.Message)
+			}
+		case "compaction":
+			var wrapper struct {
+				SystemMessage *rawSystemMessage `json:"systemMessage"`
+			}
+			if json.Unmarshal(entry.Raw, &wrapper) == nil && wrapper.SystemMessage != nil {
+				state.apply(*wrapper.SystemMessage)
+			}
+		}
+	}
+	if !state.seen {
+		return nil
+	}
+	promptChars := 0
+	for _, text := range state.contents {
+		promptChars += utf8.RuneCountInString(text)
+	}
+	if len(state.contents) > 1 {
+		promptChars += 2 * (len(state.contents) - 1)
+	}
+	toolsChars := 0
+	skillsChars := 0
+	projectChars := 0
+	for name, text := range state.sections {
+		switch name {
+		case "tools":
+			toolsChars += utf8.RuneCountInString(text)
+		case "skills":
+			skillsChars += utf8.RuneCountInString(text)
+		case "project_context":
+			projectChars += utf8.RuneCountInString(text)
+		default:
+			promptChars += utf8.RuneCountInString(text)
+		}
+	}
+	if len(state.tools) > 0 {
+		toolsChars += 2 + len(state.tools) - 1
+		for _, raw := range state.tools {
+			toolsChars += utf8.RuneCountInString(string(raw))
+		}
+	}
+	estimate := func(chars int) int { return (chars + 3) / 4 }
+	return &ContextBreakdown{
+		System:  estimate(promptChars),
+		Tools:   estimate(toolsChars),
+		Skills:  estimate(skillsChars),
+		Project: estimate(projectChars),
+	}
 }
 
 func oneLine(s string, max int) string {

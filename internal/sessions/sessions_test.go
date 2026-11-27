@@ -71,6 +71,93 @@ func TestReadActiveBranch(t *testing.T) {
 	}
 }
 
+func TestCustomMessageKeepsMetadata(t *testing.T) {
+	cwd := t.TempDir()
+	path := writeSession(t, t.TempDir(), "s.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "sess-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		{
+			"type": "custom_message", "id": "a", "parentId": "",
+			"timestamp":  "2026-01-01T00:00:00Z",
+			"customType": "background-task-notification",
+			"content":    "<background-task-notification>failed</background-task-notification>",
+			"display":    true,
+			"details":    map[string]any{"name": "Build", "status": "failed"},
+		},
+	}, cwd)
+	tr, err := Read(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(tr.Entries) != 1 {
+		t.Fatalf("entries = %d, want 1", len(tr.Entries))
+	}
+	entry := tr.Entries[0]
+	if entry.CustomType != "background-task-notification" {
+		t.Fatalf("customType = %q", entry.CustomType)
+	}
+	var details struct {
+		Name   string `json:"name"`
+		Status string `json:"status"`
+	}
+	if err := json.Unmarshal(entry.Data, &details); err != nil {
+		t.Fatal(err)
+	}
+	if details.Name != "Build" || details.Status != "failed" {
+		t.Fatalf("details = %+v", details)
+	}
+}
+
+func TestContextBreakdownMergesSystemPrompt(t *testing.T) {
+	cwd := t.TempDir()
+	path := writeSession(t, t.TempDir(), "s.jsonl", []map[string]any{
+		{"type": "session", "version": 3, "id": "sess-1", "timestamp": "2026-01-01T00:00:00Z", "cwd": cwd},
+		{
+			"type": "message", "id": "s1", "parentId": "", "timestamp": "2026-01-01T00:00:00Z",
+			"message": map[string]any{
+				"role":    "system",
+				"content": "",
+				"sections": map[string]any{
+					"preamble":        "abcdefgh",
+					"tools":           "12345678",
+					"skills":          "1234",
+					"project_context": "123456",
+					"ponytail":        "12",
+				},
+			},
+		},
+		{
+			"type": "message", "id": "s2", "parentId": "s1", "timestamp": "2026-01-01T00:00:01Z",
+			"message": map[string]any{
+				"role":    "system",
+				"content": "",
+				"sections": map[string]any{
+					"preamble": "abcdefghijkl",
+					"ponytail": nil,
+				},
+			},
+		},
+		{
+			"type": "compaction", "id": "c1", "parentId": "s2", "timestamp": "2026-01-01T00:00:02Z",
+			"summary": "older work", "tokensBefore": 100,
+			"systemMessage": map[string]any{
+				"role":    "system",
+				"content": "",
+				"sections": map[string]any{
+					"skills": "12345678",
+				},
+			},
+		},
+	}, cwd)
+	tr, err := Read(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := &ContextBreakdown{System: 3, Tools: 2, Skills: 2, Project: 2}
+	if tr.Context == nil || *tr.Context != *want {
+		t.Fatalf("context = %+v, want %+v", tr.Context, want)
+	}
+}
+
 func TestListExcludesNestedSubagentRuns(t *testing.T) {
 	base := t.TempDir()
 	t.Setenv("PI_CODING_AGENT_SESSION_DIR", base)
