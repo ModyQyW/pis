@@ -2,6 +2,7 @@ import { StrictMode, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 
 import { App } from "./app/App";
+import { TooltipProvider } from "./components/ui/tooltip";
 import { getLocale, subscribeLocale } from "./lib/i18n";
 import "./styles.css";
 
@@ -15,6 +16,8 @@ if (!root) throw new Error("missing #root");
 
 createRoot(root).render(
   <StrictMode>
-    <LocaleRoot />
+    <TooltipProvider>
+      <LocaleRoot />
+    </TooltipProvider>
   </StrictMode>,
 );

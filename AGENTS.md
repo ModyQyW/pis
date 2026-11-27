@@ -25,6 +25,7 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 - Format: `bun run format`.
 - Full gate: `bun run check` (= `scripts/check.sh`: gofmt, Go build/vet/test, Vite+ format/lint/typecheck, bridge tests, Vitest, frontend build, docs build).
 - Focused checks: `bun run check:web`, `bun run test`, `bun run test:bridge`, `go test ./internal/... .`.
+- UI changes: run the real desktop window with `bun run dev` and inspect the changed surface there before reporting. `bun run dev:web` is a layout preview; it does not test the shipped mygo window.
 - The pre-commit hook runs the full gate. Do not bypass a failed format, lint, type, or test check.
 
 ## Generated files
@@ -47,7 +48,8 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 - React 19, Zustand, Base UI, and Tailwind v4. IPC wrappers are in `frontend/src/lib/api.ts`; chat state is in `frontend/src/store/chat.ts`.
 - Use the semantic token layer in `frontend/src/styles.css` (`bg-surface`, `text-subtle`, `border-control`, …) and the type scale (`text-micro`, `text-label`, `text-body`, `text-body-lg`, `text-title`, `text-heading`, `text-display`). Do not add arbitrary font sizes, raw hex colors, or `text-[13px]` in components.
 - Palettes are applied through `data-palette` and `light-dark()`. Do not add per-palette component branches; add or change the tokens in `styles.css` instead.
-- Use the shared primitives in `frontend/src/components/ui/`: Button, DialogSurface/DialogHeader, Field/TextInput, Kbd, SectionLabel, and StatusPill. Import `cn` from `frontend/src/lib/cn.ts`, never from the `cn` package directly.
+- Use the shared primitives in `frontend/src/components/ui/`: Button, DialogSurface/DialogHeader, Field/TextInput, Kbd, SectionLabel, StatusPill, Tooltip, and Popover. Import `cn` from `frontend/src/lib/cn.ts`, never from the `cn` package directly.
+- Do not add native browser UI. Use the shadcn-style Base UI primitives in `frontend/src/components/ui/` for tooltips (`title=` is not allowed), selects, checkboxes, menus, popovers, and dialogs; do not use `window.confirm`/`alert`/`prompt`. If a primitive is missing, add a Base UI wrapper under `ui/`. Convert native controls in a component when you touch it.
 - All user-facing copy goes through `t()` in `frontend/src/lib/i18n.ts`. Add the Chinese entry in the same change and keep the English source string stable.
 - Follow the existing naming: PascalCase for component files, kebab-case for `lib/` and `store/` modules. Tests live next to the code as `*.test.ts` and mock the IPC boundary.
 - `bun run dev:web` uses `frontend/src/lib/mock.ts`. Mock data is for layout only; verify pi behavior with a real pi.

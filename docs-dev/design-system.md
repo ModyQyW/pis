@@ -76,11 +76,15 @@ The desktop body size is intentionally below the 16 px web baseline. Do not intr
 | `Select` | `components/ui/select.tsx` | Base UI single select. Do not use native `<select>`. |
 | `Combobox` | `components/ui/combobox.tsx` | Base UI searchable single select. Supports a side rail in the popup. |
 | `Checkbox` | `components/ui/checkbox.tsx` | Base UI checkbox. Do not use native `type="checkbox"`. |
+| `Tooltip` | `components/ui/tooltip.tsx` | Base UI tooltip with the shared delay and popup surface. Do not use native `title=`. |
+| `Popover` | `components/ui/popover.tsx` | Base UI popover for interactive panels; positions from the trigger and shares the popover surface. |
 | `SectionLabel` | `components/ui/section-label.tsx` | 11 px uppercase grouping label. |
 | `Kbd` | `components/ui/kbd.tsx` | Keycap with consistent border and size. |
 | `StatusPill` | `components/ui/status-pill.tsx` | Tones: neutral, ready, brand, success, warning, danger, faint. |
 | `Message`, `Bubble`, `Marker`, `Trace` | `components/ui/` | Transcript primitives. |
 | `Toast` | `components/ui/toast.tsx` | Uses popover surface and the popover shadow. |
+
+Do not use native browser UI: `title=` tooltips, native `<select>` and checkboxes, or `window.confirm`/`alert`/`prompt`. Use the Base UI wrapper in `components/ui/` instead.
 
 Product-specific surfaces (tool cards, diff, approval dock, extension rail, changes panel, composer) use the same tokens but keep their own layout.
 
@@ -92,7 +96,7 @@ Product-specific surfaces (tool cards, diff, approval dock, extension rail, chan
 - Every control has an accessible name. Inputs use `htmlFor` or `aria-label`.
 - Single-choice buttons expose `aria-pressed`.
 - Global focus: 2 px `--focus-ring` outline with a 2 px offset. Do not remove it.
-- Prefer real text over icon-only controls; icon-only buttons need `aria-label` and a title.
+- Prefer real text over icon-only controls; icon-only buttons need `aria-label` and a shared tooltip.
 
 ## Responsive behavior
 

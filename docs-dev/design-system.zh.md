@@ -76,11 +76,15 @@
 | `Select` | `components/ui/select.tsx` | Base UI 单选下拉。不要使用原生 `<select>`。 |
 | `Combobox` | `components/ui/combobox.tsx` | Base UI 可搜索单选下拉。弹窗支持侧栏。 |
 | `Checkbox` | `components/ui/checkbox.tsx` | Base UI 复选框。不要使用原生 `type="checkbox"`。 |
+| `Tooltip` | `components/ui/tooltip.tsx` | Base UI 工具提示，共用延迟和弹窗表面。不要使用原生 `title=`。 |
+| `Popover` | `components/ui/popover.tsx` | Base UI 浮层，用于可交互面板；从触发器定位，共用弹窗表面。 |
 | `SectionLabel` | `components/ui/section-label.tsx` | 11 px 大写分组标签。 |
 | `Kbd` | `components/ui/kbd.tsx` | 统一边框和尺寸的键帽。 |
 | `StatusPill` | `components/ui/status-pill.tsx` | 色调：neutral、ready、brand、success、warning、danger、faint。 |
 | `Message`、`Bubble`、`Marker`、`Trace` | `components/ui/` | 会话记录原语。 |
 | `Toast` | `components/ui/toast.tsx` | 使用 popover 表面和 popover 阴影。 |
+
+不要使用原生浏览器 UI：`title=` 工具提示、原生 `<select>`、原生复选框，或 `window.confirm`/`alert`/`prompt`。改用 `components/ui/` 中的 Base UI 封装。
 
 工具卡、diff、审批坞、扩展状态栏、更改面板和输入框等产品专用表面使用同一套 token，但保留自己的布局。
 
@@ -92,7 +96,7 @@
 - 每个控件都有可访问名称。输入框使用 `htmlFor` 或 `aria-label`。
 - 单选按钮暴露 `aria-pressed`。
 - 全局焦点：2 px `--focus-ring` 外框，偏移 2 px。不要移除。
-- 优先使用带文字的控件；纯图标按钮必须有 `aria-label` 和 `title`。
+- 优先使用带文字的控件；纯图标按钮必须有 `aria-label` 和共享工具提示。
 
 ## 响应式行为
 
