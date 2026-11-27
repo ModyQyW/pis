@@ -128,7 +128,7 @@ After compaction, the transcript shows a summary. PiS keeps the history on scree
 
 ## Context usage
 
-The bottom right of the composer shows the context usage percentage.
+The bottom right of the composer shows the context usage percentage. Click it to see the used and total token counts, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context button.
 
 The percentage comes from pi session statistics. It includes the system prompt, tool definitions, history, and the current answer.
 

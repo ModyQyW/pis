@@ -104,7 +104,7 @@ The model list comes from pi configuration and sign-in state. If no model is ava
 
 ## Context usage
 
-The bottom right of the composer shows the context usage percentage.
+The bottom right of the composer shows the context usage percentage. Click it to see the used and total token counts, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context button.
 
 - The percentage comes from pi session statistics.
 - pi can compact the context automatically near the limit.

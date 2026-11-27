@@ -51,13 +51,16 @@ Tests: `internal/agent/coalesce_test.go`, `frontend/src/lib/transcript.test.ts`,
 - Live assistant blocks.
 - Tool runs.
 
-It pairs tool calls with tool results by id. An orphan tool result becomes its own row. Compaction and branch summaries become separators. Extension `custom_message` entries render from top-level `content`; a legacy `{role, content}` object also works.
+It pairs tool calls with tool results by id. An orphan tool result becomes its own row. Compaction and branch summaries become separators. Extension `custom_message` entries render from top-level `content`; a legacy `{role, content}` object also works. A `background-task-notification` entry becomes a compact notice with the task name, status, error, and exit code instead of raw XML.
 
 `SessionTranscript` uses TanStack Virtual. It renders the visible area and overscan, measures dynamic rows, and keeps the viewport pinned while the reader stays at the bottom.
 
 Thinking rows show the assistant message `durationMs` as an approximate
-duration; pi records no separate thinking timer. Long tool output is clamped
-to a fixed height with a Show all / Show less control.
+duration; pi records no separate thinking timer. Intermediate text that
+accompanies a tool call folds into that segment's thinking row, so the final
+answer reads alone. Each message footer shows its local wall-clock time;
+assistant model, token, cost, and duration metadata appear on hover. A run that
+stops early shows its stop reason.
 
 Markdown is lazy. `Markdown.tsx` configures Streamdown with code, math, CJK, and Mermaid plugins. The code font size comes from a CSS variable.
 
@@ -70,7 +73,7 @@ Tool data comes from two sources:
 - `tool_execution_start`, `tool_execution_update`, and `tool_execution_end` events create a `runs` record.
 - Tool result messages in the transcript carry the final result.
 
-`ToolCard` shows the tool name, target, status, duration, output, diff or patch, images, and arguments. A tool call with `ask_user_question` becomes a question card with the selected answers.
+`ToolCard` shows the tool name, target, status, duration, output, diff or patch, images, and arguments. Cards start collapsed and show no output preview; expand one to see the result. Long output is clamped to a fixed height with a Show all / Show less control. A tool call with `ask_user_question` becomes a question card with the selected answers; multiple questions show one at a time with previous and next controls.
 
 The tool target comes from common argument shapes: `command`, `path`, `pattern`, `questions`, and `description`.
 
@@ -105,8 +108,9 @@ and is disabled explicitly inside busy fieldsets.
 - Images up to 10 MB and text files up to 512 KB become attachments.
 - The send key comes from `settings.sendOnEnter`.
 - While a session streams, a new prompt uses `streamingBehavior: "steer"`.
+- Clicking the context percentage opens a panel with the exact used and total token counts, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context action. `sessions.Read` reconstructs the current system prompt from system-message patches and the latest compaction snapshot; category values use pi's character-based estimate and are labeled as estimates.
 
-Tests: `frontend/src/store/chat.test.ts`, `internal/files/files_test.go`.
+Tests: `frontend/src/store/chat.test.ts`, `internal/files/files_test.go`, `internal/sessions/sessions_test.go`.
 
 ## Trust
 

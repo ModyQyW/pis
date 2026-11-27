@@ -33,10 +33,18 @@ The transcript shows the current session.
 - User messages appear as bubbles.
 - Assistant messages support Markdown, tables, code blocks, math, and Mermaid diagrams.
 - Thinking blocks are collapsed by default. Click the title to expand one. The
-  title shows an approximate duration.
-- Tool calls appear as cards. Click a card title to expand arguments, output, diffs, and images.
-  Long output starts with a fixed height and a Show all button; use Show less to collapse it.
-- Context compaction, branch summaries, and extension messages appear as separators.
+  title shows an approximate duration. Intermediate text that belongs to a tool
+  step is inside that thinking block.
+- Tool calls appear as single-line cards. Output stays hidden until you click a
+  card title. The expanded card shows arguments, output, diffs, and images. Long
+  output starts with a fixed height and a Show all button; use Show less to
+  collapse it.
+- A question card with several questions shows one at a time. Use the previous
+  and next buttons to move between them.
+- Each message shows its local time. Hover an assistant message to see its model,
+  token count, cost, and duration. A stopped run shows the stop reason.
+- Context compaction, branch summaries, extension messages, and background task
+  notices appear as separators.
 - When you scroll up, new messages do not pull you back to the bottom. Click the down button at the bottom to return to the latest message.
 
 Long sessions use a virtual list. PiS renders only the messages near the visible area.

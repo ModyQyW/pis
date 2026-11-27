@@ -51,12 +51,11 @@ pi 把 token 增量作为 `message_update` 事件发送。Go coalescer 按会话
 - 实时助手块。
 - 工具运行记录。
 
-工具调用和工具结果按 id 配对。孤立工具结果单独成行。压缩摘要和分支摘要显示为分隔行。扩展 `custom_message` 按顶层 `content` 渲染；旧的 `{role, content}` 对象也支持。
+工具调用和工具结果按 id 配对。孤立工具结果单独成行。压缩摘要和分支摘要显示为分隔行。扩展 `custom_message` 按顶层 `content` 渲染；旧的 `{role, content}` 对象也支持。`background-task-notification` 条目显示为紧凑提示，包含任务名、状态、错误和退出码，不再显示原始 XML。
 
 `SessionTranscript` 使用 TanStack Virtual。它渲染可见区域和 overscan，测量动态行，并在读者停留在底部时固定视口。
 
-思考行把助手消息的 `durationMs` 显示为近似时长；pi 没有单独的思考计时。长工具输出限制为固定高度，
-并提供「展开全部」/「收起」控制。
+思考行把助手消息的 `durationMs` 显示为近似时长；pi 没有单独的思考计时。伴随工具调用的中间文本折叠到该段思考行中，最后的回答单独显示。每条消息的页脚显示本地时间；助手的模型、token、费用和耗时信息在悬停时显示。提前停止的运行会显示停止原因。
 
 Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK 和 Mermaid 插件。代码字号来自 CSS 变量。
 
@@ -69,7 +68,7 @@ Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK �
 - `tool_execution_start`、`tool_execution_update` 和 `tool_execution_end` 事件生成 `runs` 记录。
 - 会话记录中的工具结果消息带有最终结果。
 
-`ToolCard` 显示工具名、目标、状态、耗时、输出、diff 或 patch、图片和参数。`ask_user_question` 调用显示为问题卡片，并标出已选答案。
+`ToolCard` 显示工具名、目标、状态、耗时、输出、diff 或 patch、图片和参数。卡片默认折叠，不显示输出预览；展开后查看结果。长输出限制为固定高度，并提供「展开全部」/「收起」控制。`ask_user_question` 调用显示为问题卡片，并标出已选答案；多个问题一次显示一个，可用上一个和下一个按钮翻页。
 
 工具目标来自常见参数：`command`、`path`、`pattern`、`questions` 和 `description`。
 
@@ -98,8 +97,9 @@ Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK �
 - 图片最大 10 MB，文本文件最大 512 KB，作为附件。
 - 发送键来自 `settings.sendOnEnter`。
 - 会话正在流式输出时，新 prompt 使用 `streamingBehavior: "steer"`。
+- 点击上下文百分比打开面板，显示精确的已用/总 token 数，以及按系统提示词、工具、技能、项目上下文和消息估算的拆分、可用空间和「压缩上下文」操作。`sessions.Read` 从系统消息补丁和最近的压缩快照重建当前系统提示词；分类值使用 pi 的字符估算，并标注为估算。
 
-测试：`frontend/src/store/chat.test.ts`、`internal/files/files_test.go`。
+测试：`frontend/src/store/chat.test.ts`、`internal/files/files_test.go`、`internal/sessions/sessions_test.go`。
 
 ## 项目信任
 

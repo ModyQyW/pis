@@ -105,8 +105,10 @@ Icons:
 ## Transcript
 
 - Messages use a readable column. User messages are muted bubbles; assistant messages are open text.
-- Tool calls appear as compact cards. Expand for output, diff, images, and arguments. Long output starts at a fixed height with a Show all control; Show less collapses it.
-- Thinking blocks are collapsed and quiet; the title shows the approximate assistant message duration.
+- Tool calls appear as compact single-line cards. Output is hidden until the card is expanded; diff, images, and arguments appear there too. Long output starts at a fixed height with a Show all control; Show less collapses it.
+- Thinking blocks are collapsed and quiet; the title shows the approximate assistant message duration. Intermediate text that belongs to a tool step folds into the thinking row, so the last answer reads alone. A stopped run shows the stop reason.
+- Question cards page one question at a time when the tool asks more than one.
+- Message footers show local time. Assistant model, token, cost, and duration details appear on hover.
 - Compaction and branch summaries appear as separators, not messages.
 - The scroll position is respected. New tokens do not pull a reader who scrolled up. A "scroll to latest" button appears when needed.
 - Long sessions use TanStack Virtual. Rows measure themselves.
@@ -115,7 +117,7 @@ Icons:
 
 ## Composer
 
-- The composer shows the model, thinking level, plan mode, context usage, and send/stop action.
+- The composer shows the model, thinking level, plan mode, context usage, and send/stop action. Click the context percentage to open a panel with the exact used and total tokens, an estimated split by system prompt, tools, skills, project context, and messages, the free space, and a Compact context action. Category values are estimates.
 - Attachments and file suggestions appear above the input, not in a separate page.
 - The send key follows the setting: Enter sends, or Enter adds a line and `⌘Enter` sends.
 - Failed sends restore the draft and attachments.
@@ -131,6 +133,7 @@ Icons:
 
 - Extension statuses appear above the composer. PiS caps them at six and strips ANSI.
 - Widgets are off by default.
+- Background task completion appears as a compact transcript notice with its status and error.
 - Background completion sends a system notification only when PiS is not in the foreground.
 - Toasts report short successes and errors. They do not replace an error banner in the session.
 
