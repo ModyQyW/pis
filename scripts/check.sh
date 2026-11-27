@@ -3,7 +3,7 @@ set -eu
 cd "$(dirname "$0")/.."
 
 echo "== gofmt"
-unformatted=$(gofmt -l $(git ls-files '*.go'))
+unformatted=$(gofmt -l $(git ls-files '*.go' ':(exclude).agents/**'))
 if [ -n "$unformatted" ]; then
   echo "$unformatted"
   echo "run 'go fmt ./...'"

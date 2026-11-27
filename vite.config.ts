@@ -3,6 +3,7 @@ import { defineConfig } from "vite-plus";
 export default defineConfig({
   fmt: {
     ignorePatterns: [
+      ".agents/**",
       "build/**",
       ".mygo/**",
       "frontend/dist/**",
@@ -18,6 +19,7 @@ export default defineConfig({
   },
   lint: {
     ignorePatterns: [
+      ".agents/**",
       "build/**",
       ".mygo/**",
       "frontend/dist/**",
