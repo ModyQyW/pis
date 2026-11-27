@@ -1,5 +1,16 @@
-import { Folder, ListChecks, MessageSquare, Plus, Settings2, Trash2, X } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  ListChecks,
+  MessageSquare,
+  Plus,
+  Search,
+  Settings2,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { cn } from "../lib/cn";
 import { relativeTime } from "../lib/format";
@@ -11,6 +22,18 @@ import type { Bootstrap, Workspace } from "../lib/types";
 import { BrandMark } from "./BrandMark";
 import { Checkbox } from "./ui/checkbox";
 import { SectionLabel } from "./ui/section-label";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+
+type SidebarChat = {
+  key: string;
+  path?: string;
+  title: string;
+  meta: string;
+  leading: ReactNode;
+  active: boolean;
+  liveKey?: string;
+  summary?: Summary;
+};
 
 export function Sidebar({
   boot,
@@ -19,7 +42,7 @@ export function Sidebar({
   onNewChat,
   onOpenProject,
   onSettings,
-  recentSessions,
+  projectSessions,
   openSessions,
   activeKey,
   onOpenSummary,
@@ -33,7 +56,7 @@ export function Sidebar({
   onNewChat: () => void;
   onOpenProject: () => void;
   onSettings: () => void;
-  recentSessions: Summary[];
+  projectSessions: Record<string, Summary[]>;
   openSessions: ChatSession[];
   activeKey: string | null;
   onOpenSummary: (summary: Summary) => void;
@@ -43,18 +66,123 @@ export function Sidebar({
 }) {
   const [selecting, setSelecting] = useState(false);
   const [selectedChats, setSelectedChats] = useState<Set<string>>(new Set());
+  const [query, setQuery] = useState("");
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const term = query.trim().toLowerCase();
+
+  const projects = useMemo(() => {
+    const list = [...boot.recents];
+    const known = new Set(list.map((project) => project.path));
+    for (const session of openSessions) {
+      if (!session.cwd || known.has(session.cwd)) continue;
+      known.add(session.cwd);
+      list.push({
+        path: session.cwd,
+        name: session.cwd.split("/").pop() ?? session.cwd,
+        lastOpened: new Date().toISOString(),
+      });
+    }
+    if (selected && !known.has(selected.path)) list.unshift(selected);
+    return list;
+  }, [boot.recents, openSessions, selected]);
+
+  const nodes = useMemo(
+    () =>
+      projects.map((project) => {
+        const live = openSessions.filter((session) => session.cwd === project.path);
+        const livePaths = new Set(live.map((session) => session.path).filter(Boolean));
+        const chats: SidebarChat[] = [
+          ...live.map((session) => ({
+            key: session.key,
+            path: session.path,
+            title: session.name || t("New chat"),
+            meta:
+              session.dialogs.length > 0
+                ? t("Needs input")
+                : session.streaming
+                  ? t("Working")
+                  : session.status === "loading"
+                    ? t("Starting pi…")
+                    : session.status === "error" || session.status === "exited"
+                      ? t("Stopped")
+                      : t("Open"),
+            leading: (
+              <span
+                className={cn(
+                  "size-1.5 shrink-0 rounded-full",
+                  session.dialogs.length > 0
+                    ? "bg-warning pulse-soft"
+                    : session.status === "error" || session.status === "exited"
+                      ? "bg-danger"
+                      : session.streaming
+                        ? "bg-brand pulse-soft"
+                        : session.status === "loading"
+                          ? "bg-warning pulse-soft"
+                          : "bg-success/70",
+                )}
+              />
+            ),
+            active: activeKey === session.key,
+            liveKey: session.key,
+          })),
+          ...(projectSessions[project.path] ?? [])
+            .filter((summary) => !livePaths.has(summary.path))
+            .map((summary) => ({
+              key: summary.path,
+              path: summary.path,
+              title: summary.title,
+              meta: relativeTime(summary.updatedAt),
+              leading: <MessageSquare size={12} className="shrink-0 text-faint" />,
+              active: false,
+              summary,
+            })),
+        ];
+        return { project, chats };
+      }),
+    [activeKey, openSessions, projectSessions, projects],
+  );
+
+  const visibleNodes = useMemo(() => {
+    if (!term) return nodes;
+    return nodes.flatMap((node) => {
+      const projectMatch = `${node.project.name} ${node.project.path}`.toLowerCase().includes(term);
+      const chats = projectMatch
+        ? node.chats
+        : node.chats.filter((chat) => chat.title.toLowerCase().includes(term));
+      return projectMatch || chats.length > 0 ? [{ ...node, chats }] : [];
+    });
+  }, [nodes, term]);
+
+  const allPaths = useMemo(
+    () => nodes.flatMap((node) => node.chats.map((chat) => chat.path)).filter(Boolean),
+    [nodes],
+  );
+  const hasChats = allPaths.length > 0;
+  const openCwds = useMemo(
+    () =>
+      openSessions
+        .map((session) => session.cwd)
+        .sort()
+        .join("\n"),
+    [openSessions],
+  );
+
   useEffect(() => {
     setSelecting(false);
     setSelectedChats(new Set());
   }, [selected?.path]);
   useEffect(() => {
-    setSelectedChats((current) =>
-      pruneSelection(current, [
-        ...openSessions.map((session) => session.path),
-        ...recentSessions.map((session) => session.path),
-      ]),
-    );
-  }, [openSessions, recentSessions]);
+    setSelectedChats((current) => pruneSelection(current, allPaths));
+  }, [allPaths]);
+  useEffect(() => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (selected?.path) next.add(selected.path);
+      for (const cwd of openCwds.split("\n")) if (cwd) next.add(cwd);
+      return next;
+    });
+  }, [selected?.path, openCwds]);
+
   const toggleSelected = (path?: string) => {
     if (!path) return;
     setSelectedChats((current) => {
@@ -64,12 +192,16 @@ export function Sidebar({
       return next;
     });
   };
+  const toggleExpanded = (path: string) => {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(path)) next.delete(path);
+      else next.add(path);
+      return next;
+    });
+  };
   const pi = boot.pi;
-  const hasChats = openSessions.length > 0 || recentSessions.length > 0;
-  const projects = [...boot.recents];
-  if (selected && !projects.some((p) => p.path === selected.path)) {
-    projects.unshift(selected);
-  }
+
   return (
     <aside className="drag flex w-[var(--sidebar-width)] shrink-0 flex-col border-r border-border bg-surface/60">
       <div className="sidebar-head select-none px-3 pb-2">
@@ -93,19 +225,93 @@ export function Sidebar({
         </button>
       </div>
 
-      <div className="no-drag mt-5 min-h-0 flex-1 overflow-y-auto scroll-thin px-2 pb-3">
+      <div className="no-drag mt-4 min-h-0 flex-1 overflow-y-auto scroll-thin px-2 pb-3">
+        <div className="relative px-2 pb-2">
+          <Search
+            size={13}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-faint"
+          />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={t("Search projects and chats…")}
+            aria-label={t("Search projects and chats…")}
+            className="h-8 w-full rounded-md border border-control bg-canvas pl-7 pr-7 text-label outline-none placeholder:text-faint focus:border-brand"
+          />
+          {query ? (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              aria-label={t("Clear search")}
+              className="absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-sm text-faint hover:bg-surface-2 hover:text-fg"
+            >
+              <X size={11} />
+            </button>
+          ) : null}
+        </div>
+
         <div className="flex items-center justify-between px-2 pb-1.5">
           <SectionLabel>{t("Projects")}</SectionLabel>
-          <button
-            type="button"
-            onClick={onOpenProject}
-            className="rounded p-1 text-faint transition-colors hover:bg-surface-2 hover:text-subtle"
-            aria-label={t("Open a project folder")}
-            title={t("Open a project folder")}
-          >
-            <Plus size={13} />
-          </button>
+          <div className="flex items-center gap-0.5">
+            {selecting ? (
+              <>
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={() => {
+                      setSelecting(false);
+                      setSelectedChats(new Set());
+                    }}
+                    className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
+                    aria-label={t("Cancel selection")}
+                  >
+                    <X size={12} />
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Cancel selection")}</TooltipContent>
+                </Tooltip>
+                <button
+                  type="button"
+                  disabled={selectedChats.size === 0}
+                  onClick={() => onDeleteSessions([...selectedChats])}
+                  aria-label={t("Delete selected chats")}
+                  className="flex h-6 items-center gap-1 rounded-md px-1.5 text-micro text-danger hover:bg-danger/10 disabled:opacity-40"
+                >
+                  <Trash2 size={11} />
+                  {t("Delete")}
+                  {selectedChats.size > 0 ? ` ${selectedChats.size}` : ""}
+                </button>
+              </>
+            ) : (
+              <>
+                <Tooltip>
+                  <TooltipTrigger
+                    onClick={onOpenProject}
+                    className="rounded p-1 text-faint transition-colors hover:bg-surface-2 hover:text-subtle"
+                    aria-label={t("Open a project folder")}
+                  >
+                    <Plus size={13} />
+                  </TooltipTrigger>
+                  <TooltipContent>{t("Open a project folder")}</TooltipContent>
+                </Tooltip>
+                {hasChats ? (
+                  <Tooltip>
+                    <TooltipTrigger
+                      onClick={() => {
+                        setSelectedChats(new Set());
+                        setSelecting(true);
+                      }}
+                      className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
+                      aria-label={t("Select chats")}
+                    >
+                      <ListChecks size={12} />
+                    </TooltipTrigger>
+                    <TooltipContent>{t("Select chats")}</TooltipContent>
+                  </Tooltip>
+                ) : null}
+              </>
+            )}
+          </div>
         </div>
+
         {projects.length === 0 ? (
           <button
             type="button"
@@ -115,156 +321,100 @@ export function Sidebar({
             <Folder size={14} />
             {t("Open a project folder")}
           </button>
+        ) : visibleNodes.length === 0 ? (
+          <div className="rounded-lg px-2 py-2 text-label leading-4 text-faint">
+            {t("No projects or chats match.")}
+          </div>
         ) : (
           <ul className="space-y-0.5">
-            {projects.map((ws) => {
-              const active = selected?.path === ws.path;
+            {visibleNodes.map(({ project, chats }) => {
+              const active = selected?.path === project.path;
+              const isOpen = term ? true : expanded.has(project.path);
               return (
-                <li key={ws.path}>
-                  <button
-                    type="button"
-                    onClick={() => onSelect(ws)}
+                <li key={project.path}>
+                  <div
                     className={cn(
-                      "group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors",
-                      active
-                        ? "bg-surface-3/80 text-fg"
-                        : "text-subtle hover:bg-surface-2 hover:text-fg",
+                      "group flex items-center gap-0.5 rounded-lg pr-1 transition-colors",
+                      active ? "bg-surface-3/80 text-fg" : "hover:bg-surface-2",
                     )}
                   >
-                    <Folder
-                      size={14}
-                      className={cn("mt-0.5 shrink-0", active ? "text-brand-ink" : "text-faint")}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-label font-medium">{ws.name}</span>
-                      <span className="mt-0.5 block truncate text-micro text-faint">
-                        {relativeTime(ws.lastOpened)}
+                    {term ? (
+                      <span
+                        className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint/60"
+                        aria-hidden="true"
+                      >
+                        <ChevronDown size={12} />
                       </span>
-                    </span>
-                  </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(project.path)}
+                        aria-label={isOpen ? t("Collapse project") : t("Expand project")}
+                        className="flex size-6 shrink-0 items-center justify-center rounded-md text-faint hover:text-fg"
+                      >
+                        {isOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSelect(project);
+                        if (!isOpen) toggleExpanded(project.path);
+                      }}
+                      className="flex min-w-0 flex-1 items-center gap-2 py-1.5 text-left"
+                    >
+                      <Folder
+                        size={14}
+                        className={cn("shrink-0", active ? "text-brand-ink" : "text-faint")}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-label font-medium">
+                          {project.name}
+                        </span>
+                        <span className="mt-0.5 block truncate text-micro text-faint">
+                          {relativeTime(project.lastOpened)}
+                        </span>
+                      </span>
+                    </button>
+                  </div>
+                  {isOpen ? (
+                    <div className="ml-3 border-l border-border/70 pl-1.5">
+                      {chats.length === 0 ? (
+                        <p className="px-2 py-1.5 text-micro leading-4 text-faint">
+                          {t("No chats yet. Start one above.")}
+                        </p>
+                      ) : (
+                        <ul className="space-y-0.5 py-0.5">
+                          {chats.map((chat) => (
+                            <ChatRow
+                              key={chat.key}
+                              id={chat.path}
+                              title={chat.title}
+                              meta={chat.meta}
+                              leading={chat.leading}
+                              active={chat.active}
+                              selecting={selecting}
+                              selected={Boolean(chat.path && selectedChats.has(chat.path))}
+                              onOpen={() =>
+                                chat.liveKey
+                                  ? onSelectOpen(chat.liveKey)
+                                  : chat.summary
+                                    ? onOpenSummary(chat.summary)
+                                    : undefined
+                              }
+                              onToggle={() => toggleSelected(chat.path)}
+                              onDelete={() => chat.path && onDeleteSession(chat.path)}
+                            />
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ) : null}
                 </li>
               );
             })}
           </ul>
         )}
-
-        <div className="mt-5 px-2">
-          <div className="flex items-center justify-between pb-1.5">
-            <SectionLabel>{t("Chats")}</SectionLabel>
-            {hasChats ? (
-              <div className="flex items-center gap-0.5">
-                {selecting ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelecting(false);
-                        setSelectedChats(new Set());
-                      }}
-                      className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
-                      aria-label={t("Cancel selection")}
-                      title={t("Cancel selection")}
-                    >
-                      <X size={12} />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={selectedChats.size === 0}
-                      onClick={() => onDeleteSessions([...selectedChats])}
-                      aria-label={t("Delete selected chats")}
-                      title={t("Delete selected chats")}
-                      className="flex h-6 items-center gap-1 rounded-md px-1.5 text-micro text-danger hover:bg-danger/10 disabled:opacity-40"
-                    >
-                      <Trash2 size={11} />
-                      {t("Delete")}
-                      {selectedChats.size > 0 ? ` ${selectedChats.size}` : ""}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedChats(new Set());
-                      setSelecting(true);
-                    }}
-                    className="flex size-6 items-center justify-center rounded-md text-faint hover:bg-surface-2 hover:text-subtle"
-                    aria-label={t("Select chats")}
-                    title={t("Select chats")}
-                  >
-                    <ListChecks size={12} />
-                  </button>
-                )}
-              </div>
-            ) : null}
-          </div>
-          {openSessions.length === 0 && recentSessions.length === 0 ? (
-            <div className="rounded-lg px-2 py-2 text-label leading-4 text-faint">
-              {selected
-                ? t("No chats yet. Start one above.")
-                : t("Open a project to see its chats.")}
-            </div>
-          ) : (
-            <ul className="space-y-0.5">
-              {openSessions.map((s) => (
-                <ChatRow
-                  key={s.key}
-                  id={s.path}
-                  title={s.name || t("New chat")}
-                  meta={
-                    s.dialogs.length > 0
-                      ? t("Needs input")
-                      : s.streaming
-                        ? t("Working")
-                        : s.status === "loading"
-                          ? t("Starting pi…")
-                          : s.status === "error" || s.status === "exited"
-                            ? t("Stopped")
-                            : t("Open")
-                  }
-                  leading={
-                    <span
-                      className={cn(
-                        "size-1.5 shrink-0 rounded-full",
-                        s.dialogs.length > 0
-                          ? "bg-warning pulse-soft"
-                          : s.status === "error" || s.status === "exited"
-                            ? "bg-danger"
-                            : s.streaming
-                              ? "bg-brand pulse-soft"
-                              : s.status === "loading"
-                                ? "bg-warning pulse-soft"
-                                : "bg-success/70",
-                      )}
-                    />
-                  }
-                  active={activeKey === s.key}
-                  selecting={selecting}
-                  selected={Boolean(s.path && selectedChats.has(s.path))}
-                  onOpen={() => onSelectOpen(s.key)}
-                  onToggle={() => toggleSelected(s.path)}
-                  onDelete={() => s.path && onDeleteSession(s.path)}
-                />
-              ))}
-              {recentSessions
-                .filter((r) => !openSessions.some((s) => s.path === r.path))
-                .map((r) => (
-                  <ChatRow
-                    key={r.path}
-                    id={r.path}
-                    title={r.title}
-                    meta={relativeTime(r.updatedAt)}
-                    leading={<MessageSquare size={12} className="shrink-0 text-faint" />}
-                    active={false}
-                    selecting={selecting}
-                    selected={selectedChats.has(r.path)}
-                    onOpen={() => onOpenSummary(r)}
-                    onToggle={() => toggleSelected(r.path)}
-                    onDelete={() => onDeleteSession(r.path)}
-                  />
-                ))}
-            </ul>
-          )}
-        </div>
       </div>
 
       <div className="no-drag border-t border-border/70 px-2 py-2">
@@ -329,7 +479,6 @@ function ChatRow({
           onCheckedChange={onToggle}
           className="ml-1"
           ariaLabel={t("Select {name}", { name: title })}
-          title={t("Select {name}", { name: title })}
         />
       ) : null}
       <button
@@ -337,7 +486,7 @@ function ChatRow({
         onClick={selecting ? onToggle : onOpen}
         disabled={selecting && !id}
         className={cn(
-          "flex min-w-0 flex-1 items-start gap-2 rounded-lg px-2.5 py-2 text-left transition-colors disabled:opacity-50",
+          "flex min-w-0 flex-1 items-start gap-2 rounded-lg px-2.5 py-1.5 text-left transition-colors disabled:opacity-50",
           active
             ? "bg-surface-3/80 text-fg"
             : selected
@@ -359,15 +508,16 @@ function ChatRow({
         </span>
       </button>
       {!selecting && id ? (
-        <button
-          type="button"
-          onClick={onDelete}
-          className="mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-faint opacity-60 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-          aria-label={t("Delete {name}", { name: title })}
-          title={t("Delete chat")}
-        >
-          <Trash2 size={11} />
-        </button>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={onDelete}
+            className="mr-1 flex size-6 shrink-0 items-center justify-center rounded-md text-faint opacity-60 transition-opacity hover:bg-danger/10 hover:text-danger focus-visible:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+            aria-label={t("Delete {name}", { name: title })}
+          >
+            <Trash2 size={11} />
+          </TooltipTrigger>
+          <TooltipContent>{t("Delete chat")}</TooltipContent>
+        </Tooltip>
       ) : null}
     </li>
   );

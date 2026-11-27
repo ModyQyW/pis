@@ -72,7 +72,7 @@ export function App() {
   const [boot, setBoot] = useState<Bootstrap | null>(null);
   const [fatal, setFatal] = useState<string | null>(null);
   const [selected, setSelected] = useState<Workspace | null>(null);
-  const [recentSessions, setRecentSessions] = useState<Summary[]>([]);
+  const [projectSessions, setProjectSessions] = useState<Record<string, Summary[]>>({});
   const [draft, setDraft] = useState("");
   const [theme, setTheme] = useState<Theme>("system");
   const [colorPalette, setColorPalette] = useState<Palette>("amber");
@@ -123,6 +123,20 @@ export function App() {
           })
     );
   }, [active?.cwd, boot?.recents, selected]);
+  useEffect(() => {
+    const cwd = active?.cwd;
+    if (!cwd) return;
+    setSelected((current) => {
+      if (current?.path === cwd) return current;
+      return (
+        boot?.recents.find((project) => project.path === cwd) ?? {
+          path: cwd,
+          name: cwd.split("/").pop() ?? cwd,
+          lastOpened: new Date().toISOString(),
+        }
+      );
+    });
+  }, [active?.cwd, boot?.recents]);
   const openSessions = useMemo(() => Object.values(sessions), [sessions]);
   const items = useMemo(
     () => (active ? buildTranscript(active.entries, active.live, active.runs) : []),
@@ -291,25 +305,43 @@ export function App() {
     document.documentElement.dataset.palette = colorPalette;
   }, [colorPalette, boot]);
 
-  const refreshSessions = useCallback(async () => {
-    const path = selected?.path;
-    const request = ++sessionRequest.current;
-    if (!path) {
-      setRecentSessions([]);
+  const refreshProjectSessions = useCallback(async () => {
+    const paths = new Set((boot?.recents ?? []).map((project) => project.path));
+    if (selected?.path) paths.add(selected.path);
+    if (paths.size === 0) {
+      setProjectSessions({});
       return;
     }
-    try {
-      const list = await api.listSessions(path, 80);
-      if (request === sessionRequest.current) setRecentSessions(list);
-    } catch {
-      if (request === sessionRequest.current) setRecentSessions([]);
-    }
-  }, [selected]);
+    const request = ++sessionRequest.current;
+    const entries = await Promise.all(
+      [...paths].map(async (path) => {
+        try {
+          return [path, await api.listSessions(path, 20)] as const;
+        } catch {
+          return [path, []] as const;
+        }
+      }),
+    );
+    if (request === sessionRequest.current) setProjectSessions(Object.fromEntries(entries));
+  }, [boot?.recents, selected?.path]);
+
+  const openSessionPaths = useMemo(
+    () =>
+      Object.values(sessions)
+        .map((session) => session.path)
+        .filter((path): path is string => Boolean(path))
+        .sort((a, b) => a.localeCompare(b))
+        .join("\n"),
+    [sessions],
+  );
 
   useEffect(() => {
-    setRecentSessions([]);
-    void refreshSessions();
-  }, [refreshSessions]);
+    void refreshProjectSessions();
+  }, [refreshProjectSessions]);
+
+  useEffect(() => {
+    if (openSessionPaths) void refreshProjectSessions();
+  }, [openSessionPaths, refreshProjectSessions]);
 
   const ensureTrust = useCallback(async (ws: Workspace | null) => {
     if (!ws) return { decided: true, trusted: false };
@@ -360,7 +392,7 @@ export function App() {
           cwd: summary.cwd,
           trusted: choice.trusted,
         });
-        void refreshSessions();
+        void refreshProjectSessions();
       } catch {
         try {
           localStorage.removeItem("pis:last-session");
@@ -369,7 +401,7 @@ export function App() {
         }
       }
     })();
-  }, [boot, ensureTrust, refreshSessions]);
+  }, [boot, ensureTrust, refreshProjectSessions]);
 
   const settleTrust = useCallback((choice: { decided: boolean; trusted: boolean }) => {
     const resolve = trustResolver.current;
@@ -412,8 +444,8 @@ export function App() {
     if (!choice.decided) return;
     setDraft("");
     await useChat.getState().startNew({ cwd: selected.path, trusted: choice.trusted });
-    void refreshSessions();
-  }, [boot, selected, ensureTrust, refreshSessions]);
+    void refreshProjectSessions();
+  }, [boot, selected, ensureTrust, refreshProjectSessions]);
 
   const handleOpenProject = useCallback(async () => {
     try {
@@ -488,8 +520,8 @@ export function App() {
     if (!key) return;
     setDraft("");
     await useChat.getState().send(key, text);
-    void refreshSessions();
-  }, [active, boot, draft, selected, ensureTrust, refreshSessions]);
+    void refreshProjectSessions();
+  }, [active, boot, draft, selected, ensureTrust, refreshProjectSessions]);
 
   const stop = useCallback(() => {
     const key = useChat.getState().activeKey;
@@ -516,11 +548,11 @@ export function App() {
     try {
       await useChat.getState().clone(key);
       toast.success(t("Branch cloned"));
-      void refreshSessions();
+      void refreshProjectSessions();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : String(err));
     }
-  }, [refreshSessions]);
+  }, [refreshProjectSessions]);
 
   const handleNavigate = useCallback(async (entryId: string, summarize: boolean) => {
     const key = useChat.getState().activeKey;
@@ -541,12 +573,12 @@ export function App() {
       try {
         await useChat.getState().fork(key, entryId);
         toast.success(t("Forked into a new session"));
-        void refreshSessions();
+        void refreshProjectSessions();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
       }
     },
-    [refreshSessions],
+    [refreshProjectSessions],
   );
 
   const handleRename = useCallback(
@@ -556,12 +588,12 @@ export function App() {
       try {
         await useChat.getState().rename(key, name);
         toast.success(t("Session renamed"));
-        void refreshSessions();
+        void refreshProjectSessions();
       } catch (err) {
         toast.error(err instanceof Error ? err.message : String(err));
       }
     },
-    [refreshSessions],
+    [refreshProjectSessions],
   );
 
   const handleExport = useCallback(async () => {
@@ -996,7 +1028,7 @@ export function App() {
                 closeNarrowSidebar();
                 setSettingsOpen(true);
               }}
-              recentSessions={recentSessions}
+              projectSessions={projectSessions}
               openSessions={openSessions}
               activeKey={activeKey}
               onOpenSummary={(summary) => {
@@ -1245,6 +1277,10 @@ export function App() {
           setPiConfigOpen(false);
           setMCPOpen(true);
         }}
+        onLogin={() => {
+          setPiConfigOpen(false);
+          setLoginOpen(true);
+        }}
       />
       <MCPDialog open={mcpOpen} onOpenChange={setMCPOpen} workspace={displayWorkspace?.path} />
       <WorktreeDialog
@@ -1339,7 +1375,7 @@ export function App() {
           } finally {
             setDeleting(false);
             setDeleteTargets([]);
-            void refreshSessions();
+            void refreshProjectSessions();
           }
         }}
       />
