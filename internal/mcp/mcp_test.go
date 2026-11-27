@@ -155,3 +155,32 @@ func write(t *testing.T, path, content string) {
 		t.Fatal(err)
 	}
 }
+
+func TestListWithoutWorkspaceReturnsUserServers(t *testing.T) {
+	agentDir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
+	write(t, filepath.Join(agentDir, "mcp.json"), `{"mcpServers":{"docs":{"url":"https://example.com/mcp"}}}`)
+	servers, err := List("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(servers) != 1 || servers[0].Name != "docs" || servers[0].Source != "user" {
+		t.Fatalf("servers = %#v", servers)
+	}
+}
+
+func TestListWithoutWorkspaceIgnoresLaunchProject(t *testing.T) {
+	agentDir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
+	write(t, filepath.Join(agentDir, "mcp.json"), `{"mcpServers":{"docs":{"url":"https://example.com/mcp"}}}`)
+	cwd := t.TempDir()
+	write(t, filepath.Join(cwd, ".pi", "mcp.json"), `{"mcpServers":{"project":{"command":"tool"}}}`)
+	t.Chdir(cwd)
+	servers, err := List("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(servers) != 1 || servers[0].Name != "docs" || servers[0].Source != "user" {
+		t.Fatalf("servers = %#v", servers)
+	}
+}

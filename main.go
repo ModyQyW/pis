@@ -21,6 +21,7 @@ import (
 	"pis/internal/gitx"
 	"pis/internal/guard"
 	"pis/internal/mcp"
+	"pis/internal/piconf"
 	"pis/internal/sessions"
 	"pis/internal/settings"
 )
@@ -69,6 +70,7 @@ func main() {
 	mygo.BindAs("Files", files.New())
 	mygo.BindAs("Git", gitx.New())
 	mygo.BindAs("MCP", mcp.New())
+	mygo.BindAs("PiConfig", piconf.New(store))
 	authMgr := auth.New(mgr.Executable, func(o auth.Output) { AuthOutput.Broadcast(o) }, func(e auth.Exit) { AuthExit.Broadcast(e) })
 	mygo.BindAs("Auth", authMgr)
 

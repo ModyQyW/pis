@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 
+	"pis/internal/jsonx"
 	"pis/internal/sessions"
 )
 
@@ -77,6 +78,9 @@ func Paths(workspace string) (user, project string, err error) {
 	if agentDir == "" {
 		return "", "", errors.New("pi agent directory is unavailable")
 	}
+	if strings.TrimSpace(workspace) == "" {
+		return filepath.Join(agentDir, "mcp.json"), "", nil
+	}
 	abs, err := filepath.Abs(workspace)
 	if err != nil {
 		return "", "", err
@@ -86,19 +90,26 @@ func Paths(workspace string) (user, project string, err error) {
 
 // List merges user and project entries. A project entry replaces a user entry
 // with the same name, except that an override without command/url/type keeps
-// the user entry's transport fields.
+// the user entry's transport fields. An empty workspace lists user entries
+// only.
 func List(workspace string) ([]Server, error) {
 	userPath, projectPath, err := Paths(workspace)
 	if err != nil {
 		return nil, err
 	}
+	if strings.TrimSpace(workspace) == "" {
+		projectPath = ""
+	}
 	user, err := readConfig(userPath)
 	if err != nil {
 		return nil, err
 	}
-	project, err := readConfig(projectPath)
-	if err != nil {
-		return nil, err
+	project := configFile{doc: map[string]json.RawMessage{}, Servers: map[string]json.RawMessage{}}
+	if projectPath != "" {
+		project, err = readConfig(projectPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 	merged := map[string]Server{}
 	for name, raw := range user.Servers {
@@ -225,12 +236,12 @@ func targetPath(workspace string, local bool) (string, error) {
 
 func readConfig(path string) (configFile, error) {
 	cfg := configFile{doc: map[string]json.RawMessage{}, Servers: map[string]json.RawMessage{}}
-	data, err := os.ReadFile(path)
-	if errors.Is(err, os.ErrNotExist) {
-		return cfg, nil
-	}
+	data, exists, err := jsonx.ReadFile(path, 4<<20)
 	if err != nil {
 		return cfg, err
+	}
+	if !exists {
+		return cfg, nil
 	}
 	if err := json.Unmarshal(data, &cfg.doc); err != nil {
 		return cfg, fmt.Errorf("%s: %w", path, err)

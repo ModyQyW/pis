@@ -87,6 +87,9 @@ type Settings struct {
 	UIFontSize    int                      `json:"uiFontSize"`
 	SendOnEnter   bool                     `json:"sendOnEnter"`
 	Language      string                   `json:"language"`
+	// PiConfigHash records the pi configuration the user confirmed. An empty
+	// value means pi's configuration was not reviewed yet.
+	PiConfigHash string `json:"piConfigHash,omitempty"`
 }
 
 // Permissions configures the bundled bridge guard.

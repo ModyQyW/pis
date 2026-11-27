@@ -290,6 +290,7 @@ type Preferences struct {
 	Policy        *string `json:"policy,omitempty"`
 	GuardDisabled *bool   `json:"guardDisabled,omitempty"`
 	GuardForce    *bool   `json:"guardForce,omitempty"`
+	PiConfigHash  *string `json:"piConfigHash,omitempty"`
 }
 
 // SetPreferences applies non-nil preference fields.
@@ -336,6 +337,9 @@ func (s *Service) SetPreferences(p Preferences) error {
 		}
 		if p.GuardForce != nil {
 			c.Permissions.Force = *p.GuardForce
+		}
+		if p.PiConfigHash != nil {
+			c.PiConfigHash = *p.PiConfigHash
 		}
 		return nil
 	})
@@ -384,13 +388,14 @@ func (s *Service) Notify(id, title, body string) error {
 	}).Show()
 }
 
-// Reveal opens a path with the default application. It does not interpret
-// it as a command.
+// Reveal shows a path in the file manager. It never opens the file with its
+// default application, which could execute a script or app bundle.
 func (s *Service) Reveal(path string) error {
 	if path == "" {
 		return errors.New("empty path")
 	}
-	return mygo.Shell.OpenPath(path)
+	mygo.Shell.ShowItemInFolder(path)
+	return nil
 }
 
 // OpenExternal opens an http(s) URL in the browser.

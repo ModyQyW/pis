@@ -23,6 +23,13 @@ export interface AuthInfo {
   provider: string;
 }
 
+/** AvailableModel is one row from `pi --list-models`. */
+export interface AvailableModel {
+  provider: string;
+  id: string;
+  context?: string;
+}
+
 /** Bootstrap is the initial state of the app. */
 export interface Bootstrap {
   appName: string;
@@ -34,6 +41,13 @@ export interface Bootstrap {
   recents: Workspace[];
   pi: PiStatus;
   guard: GuardStatus;
+}
+
+/** Defaults are pi's startup model choices. */
+export interface Defaults {
+  provider?: string;
+  model?: string;
+  thinking?: string;
 }
 
 /**
@@ -167,6 +181,13 @@ export interface Output {
   data: string;
 }
 
+/** Package is one configured pi package source. */
+export interface Package {
+  source: string;
+  project: boolean;
+  active: boolean;
+}
+
 export type Palette = string;
 
 export type PermissionPolicy = string;
@@ -208,6 +229,7 @@ export interface Preferences {
   policy?: string;
   guardDisabled?: boolean;
   guardForce?: boolean;
+  piConfigHash?: string;
 }
 
 /** PromptRequest sends a message. */
@@ -224,10 +246,64 @@ export interface PromptResult {
   disposition: string;
 }
 
+/**
+ * Provider is one entry in models.json. APIKeySet reports a stored key; the
+ * key itself is never sent to the page.
+ */
+export interface Provider {
+  id: string;
+  name?: string;
+  api?: string;
+  baseUrl?: string;
+  apiKeySet: boolean;
+  apiKeyEnv?: boolean;
+  models: ProviderModel[];
+}
+
+/**
+ * ProviderInput is a create or edit request. An empty APIKey keeps the stored
+ * key; ClearAPIKey removes it.
+ */
+export interface ProviderInput {
+  id: string;
+  create: boolean;
+  name: string;
+  api: string;
+  baseUrl: string;
+  apiKey: string;
+  clearKey: boolean;
+  models: ProviderModel[];
+}
+
+/** ProviderModel is one model under a configured provider. */
+export interface ProviderModel {
+  id: string;
+  name?: string;
+  contextWindow?: number;
+  maxTokens?: number;
+  reasoning: boolean;
+}
+
 export interface Recent {
   path: string;
   name: string;
   lastOpened: string;
+}
+
+/** Resource is a skill or extension pi can load. */
+export interface Resource {
+  name: string;
+  description?: string;
+  path: string;
+  /** user | project | agents | configured */
+  source: string;
+  project?: boolean;
+  active: boolean;
+  /**
+   * Ref is the exact settings.json entry that created a configured resource.
+   * Path may be resolved; removing must target Ref.
+   */
+  ref?: string;
 }
 
 export interface SearchHit {
@@ -286,6 +362,26 @@ export interface Settings {
   uiFontSize: number;
   sendOnEnter: boolean;
   language: string;
+  piConfigHash?: string;
+}
+
+/** Snapshot is the configuration shown in the page. */
+export interface Snapshot {
+  agentDir: string;
+  defaults: Defaults;
+  providers: Provider[];
+  skills: Resource[];
+  extensions: Resource[];
+  packages: Package[];
+  mcp: Server[];
+  trusted: boolean;
+  /**
+   * ProjectDefaults is set when a trusted project overrides the startup
+   * model. Defaults stay the user defaults that the dialog edits.
+   */
+  projectDefaults?: Defaults;
+  fingerprint: string;
+  warnings?: string[];
 }
 
 /** StartRequest opens a new session or resumes an existing one. */
@@ -410,8 +506,8 @@ export const Desktop = {
   /** RemoveRecent forgets a workspace without deleting any files. */
   removeRecent: bind<[string], void>("Desktop.RemoveRecent", (path: string) => [path]),
   /**
-   * Reveal opens a path with the default application. It does not interpret
-   * it as a command.
+   * Reveal shows a path in the file manager. It never opens the file with its
+   * default application, which could execute a script or app bundle.
    */
   reveal: bind<[string], void>("Desktop.Reveal", (path: string) => [path]),
   /** SetPiPath stores an explicit executable and rechecks it. */
@@ -556,6 +652,38 @@ export const MCP = {
   list: bind<[string], Server[]>("MCP.List", (workspace: string) => [workspace]),
   remove: bind<[string, string, boolean], void>("MCP.Remove", (workspace: string, name: string, local: boolean) => [workspace, name, local]),
   setEnabled: bind<[string, string, boolean, boolean], void>("MCP.SetEnabled", (workspace: string, name: string, enabled: boolean, local: boolean) => [workspace, name, enabled, local]),
+} as const;
+
+/** Service is the bound pi configuration API. */
+export const PiConfig = {
+  /** AddPackage adds a package source to pi's user settings. */
+  addPackage: bind<[string], void>("PiConfig.AddPackage", (source: string) => [source]),
+  /** AddPath adds a skill or extension path to pi's user settings. */
+  addPath: bind<[string, string], void>("PiConfig.AddPath", (kind: string, path: string) => [kind, path]),
+  /**
+   * Inspect reads pi's user configuration and the workspace's project
+   * configuration. Before project trust, project-configured paths are listed
+   * without reading them; Active reports whether pi would load a resource.
+   */
+  inspect: bind<[string], Snapshot>("PiConfig.Inspect", (workspace: string) => [workspace]),
+  /**
+   * Models lists the models pi can use. It runs the installed pi, so the list
+   * includes built-in, configured, and signed-in providers.
+   */
+  models: bind<[], AvailableModel[]>("PiConfig.Models", () => []),
+  /** RemovePackage removes a package source from pi's user settings. */
+  removePackage: bind<[string], void>("PiConfig.RemovePackage", (source: string) => [source]),
+  /** RemovePath removes a configured skill or extension path from user settings. */
+  removePath: bind<[string, string], void>("PiConfig.RemovePath", (kind: string, path: string) => [kind, path]),
+  /** RemoveProvider deletes a provider from models.json. */
+  removeProvider: bind<[string], void>("PiConfig.RemoveProvider", (id: string) => [id]),
+  /** SaveProvider creates or updates a provider in models.json. */
+  saveProvider: bind<[ProviderInput], void>("PiConfig.SaveProvider", (in_: ProviderInput) => [in_]),
+  /**
+   * SetDefaults writes pi's startup model choices. Empty values remove the key
+   * so pi falls back to its automatic choice.
+   */
+  setDefaults: bind<[string, string, string], void>("PiConfig.SetDefaults", (provider: string, model: string, thinking: string) => [provider, model, thinking]),
 } as const;
 
 /** Manager owns at most one login terminal at a time. */
