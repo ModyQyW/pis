@@ -2,6 +2,14 @@
 
 English | [简体中文](CHANGELOG.zh.md)
 
+## 0.0.8 (2026-11-27)
+
+- Add the Pi configuration dialog: review pi's default model, custom providers, skills, extensions, packages, and MCP servers, and confirm the list when it changes.
+- Configure startup defaults, compatible providers and their models, skill and extension paths, and package sources in the GUI. Writes go to pi's `settings.json` and `models.json` only when you save; unknown fields survive, and stored API keys are never returned to the page.
+- Show user MCP servers without a project, mark project servers as not loaded until trust, and include user MCP changes in the confirmation fingerprint.
+- Accept pi's JSONC in `models.json` and warn before a save writes plain JSON.
+- Add a Skills user guide and list the extensions with specific PiS support.
+
 ## 0.0.7 (2026-11-26)
 
 - Add four color palettes (Amber, Graphite, Teal, and Ink) with separate light and dark tuning and a palette picker in Settings.
