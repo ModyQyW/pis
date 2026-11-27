@@ -1,12 +1,14 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ArrowDown, Loader2 } from "lucide-react";
+import { ArrowDown, Check, CircleAlert, Copy, GitFork, Loader2 } from "lucide-react";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
 import { Button } from "@/components/ui/button";
-import { Marker, MarkerContent } from "@/components/ui/marker";
+import { Marker, MarkerContent, MarkerIcon } from "@/components/ui/marker";
 import { Message, MessageContent, MessageFooter } from "@/components/ui/message";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { ChatSession } from "../store/chat";
+import { messageTime } from "../lib/format";
 import { t } from "../lib/i18n";
 import type { ChatItem } from "../lib/transcript";
 import { AssistantMessage } from "./AssistantMessage";
@@ -138,18 +140,19 @@ export function SessionTranscript({
         </div>
       </div>
       {!atBottom ? (
-        <button
-          type="button"
-          onClick={() => {
-            updateStick(true);
-            virtualizer.scrollToEnd({ behavior: "smooth" });
-          }}
-          className="absolute bottom-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-surface text-subtle shadow-sm hover:text-fg"
-          aria-label={t("Scroll to latest")}
-          title={t("Scroll to latest")}
-        >
-          <ArrowDown size={13} />
-        </button>
+        <Tooltip>
+          <TooltipTrigger
+            onClick={() => {
+              updateStick(true);
+              virtualizer.scrollToEnd({ behavior: "smooth" });
+            }}
+            className="absolute bottom-3 left-1/2 flex size-7 -translate-x-1/2 items-center justify-center rounded-full border border-border bg-surface text-subtle shadow-sm hover:text-fg"
+            aria-label={t("Scroll to latest")}
+          >
+            <ArrowDown size={13} />
+          </TooltipTrigger>
+          <TooltipContent>{t("Scroll to latest")}</TooltipContent>
+        </Tooltip>
       ) : null}
     </div>
   );
@@ -205,6 +208,46 @@ function TranscriptRow({ item, onFork }: { item: ChatItem; onFork?: (entryId: st
           <MarkerContent className="text-label leading-5">{item.text}</MarkerContent>
         </Marker>
       );
+    case "notification": {
+      const failed = item.status === "failed" || item.status === "killed";
+      return (
+        <Marker className="my-3 items-start">
+          <MarkerIcon className={`mt-0.5 ${failed ? "text-danger" : "text-success"}`}>
+            {failed ? <CircleAlert size={13} /> : <Check size={13} />}
+          </MarkerIcon>
+          <MarkerContent className="flex flex-col gap-0.5">
+            <span className="text-label leading-5">
+              {t("Background task")}
+              {item.name ? ` “${item.name}”` : ""}
+              {item.status ? ` · ${statusLabel(item.status)}` : ""}
+            </span>
+            {item.error || item.exitCode != null ? (
+              <span className={`text-micro ${failed ? "text-danger" : "text-faint"}`}>
+                {item.error ??
+                  t("exit {code}", {
+                    code: item.exitCode ?? 0,
+                  })}
+              </span>
+            ) : null}
+          </MarkerContent>
+        </Marker>
+      );
+    }
+  }
+}
+
+function statusLabel(status: string): string {
+  switch (status) {
+    case "completed":
+      return t("Completed");
+    case "failed":
+      return t("Failed");
+    case "killed":
+      return t("Killed");
+    case "running":
+      return t("Running");
+    default:
+      return status;
   }
 }
 
@@ -215,6 +258,7 @@ function UserMessage({
   item: Extract<ChatItem, { kind: "user" }>;
   onFork?: (entryId: string) => void;
 }) {
+  const time = messageTime(item.timestamp);
   return (
     <Message align="end" className="pb-2 pt-5">
       <MessageContent className="items-end gap-1">
@@ -235,18 +279,27 @@ function UserMessage({
             ) : null}
           </BubbleContent>
         </Bubble>
-        <MessageFooter className="gap-0.5 opacity-0 transition-opacity group-hover/message:opacity-100">
-          <Button
-            variant="ghost"
-            size="xs"
-            onClick={() => void navigator.clipboard.writeText(item.text)}
-          >
-            {t("Copy")}
-          </Button>
-          {onFork ? (
-            <Button variant="ghost" size="xs" onClick={() => onFork(item.id)}>
-              {t("Fork from here")}
+        <MessageFooter className="gap-1">
+          <span className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover/message:opacity-100">
+            <Button
+              variant="ghost"
+              size="xs"
+              onClick={() => void navigator.clipboard.writeText(item.text)}
+            >
+              <Copy size={11} />
+              {t("Copy")}
             </Button>
+            {onFork ? (
+              <Button variant="ghost" size="xs" onClick={() => onFork(item.id)}>
+                <GitFork size={11} />
+                {t("Fork from here")}
+              </Button>
+            ) : null}
+          </span>
+          {time ? (
+            <time dateTime={item.timestamp} className="text-micro tabular-nums text-faint">
+              {time}
+            </time>
           ) : null}
         </MessageFooter>
       </MessageContent>

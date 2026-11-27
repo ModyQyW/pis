@@ -61,7 +61,17 @@ export type ChatItem =
       usage?: Usage;
       durationMs?: number;
       error?: string;
+      stopReason?: string;
+      timestamp?: string;
       live?: boolean;
+    }
+  | {
+      kind: "notification";
+      id: string;
+      name?: string;
+      status?: string;
+      error?: string;
+      exitCode?: number;
     }
   | {
       kind: "tool";
@@ -207,6 +217,8 @@ export function buildTranscript(
               usage: normalizeUsage(msg.usage),
               durationMs: msg.durationMs,
               error: msg.stopReason === "error" ? msg.errorMessage : undefined,
+              stopReason: msg.stopReason,
+              timestamp: entry.timestamp,
             });
           }
         } else if (msg.role === "toolResult") {
@@ -254,7 +266,15 @@ export function buildTranscript(
             ? (raw as AgentMessage)
             : ({ role: "custom", content: raw ?? "" } as AgentMessage);
         const text = contentText(messageContent(msg));
-        if (text) items.push({ kind: "note", id: entry.id, text });
+        if (entry.customType === "background-task-notification") {
+          items.push({
+            kind: "notification",
+            id: entry.id,
+            ...backgroundNotification(text, entry.data),
+          });
+        } else if (text) {
+          items.push({ kind: "note", id: entry.id, text });
+        }
         break;
       }
       default:
@@ -316,6 +336,50 @@ export function toolTarget(name: string, args: Record<string, unknown>): string 
       return first ?? "";
     }
   }
+}
+
+function recordValue(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function stringField(data: Record<string, unknown> | null, key: string): string {
+  const value = data?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function xmlTag(text: string, name: string): string {
+  const match = new RegExp(`<${name}>([\\s\\S]*?)</${name}>`).exec(text);
+  if (!match?.[1]) return "";
+  return match[1]
+    .trim()
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
+function backgroundNotification(
+  content: string,
+  details: unknown,
+): {
+  name?: string;
+  status?: string;
+  error?: string;
+  exitCode?: number;
+} {
+  const data = recordValue(details);
+  const rawExit = data?.["exitCode"];
+  const exitText = xmlTag(content, "exit-code");
+  const exitCode = typeof rawExit === "number" ? rawExit : exitText ? Number(exitText) : undefined;
+  return {
+    name: stringField(data, "name") || xmlTag(content, "task-name") || undefined,
+    status: stringField(data, "status") || xmlTag(content, "status") || undefined,
+    error: stringField(data, "error") || xmlTag(content, "error") || undefined,
+    exitCode: exitCode != null && Number.isFinite(exitCode) ? exitCode : undefined,
+  };
 }
 
 /** A compact label for usage in the header. */

@@ -1,6 +1,7 @@
 import {
   Check,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   CircleAlert,
   FileText,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "../lib/cn";
 import { t } from "../lib/i18n";
 import { parseAnswers, parseQuestions, type Question } from "../lib/questions";
@@ -43,31 +45,22 @@ export function ToolCard({ tool }: { tool: ToolBlock }) {
         type="button"
         onClick={() => hasBody && setOpen((v) => !v)}
         className={cn(
-          "flex w-full items-start gap-2 px-2.5 py-2 text-left transition-colors",
+          "flex w-full items-center gap-2 px-2.5 py-2 text-left transition-colors",
           hasBody && "hover:bg-surface-2/60",
         )}
       >
-        <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border border-border bg-canvas text-subtle">
+        <span className="flex size-5 shrink-0 items-center justify-center rounded-md border border-border bg-canvas text-subtle">
           <Icon size={11} />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex min-w-0 items-center gap-2">
-            <span className="shrink-0 whitespace-nowrap text-label font-medium">
-              {t(labelFor(tool.name))}
-            </span>
-            {target ? (
-              <span className="min-w-0 truncate font-mono text-micro text-subtle" title={target}>
-                {target}
-              </span>
-            ) : null}
+        <span className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="shrink-0 whitespace-nowrap text-label font-medium">
+            {t(labelFor(tool.name))}
           </span>
-          {!open && output && !diff ? (
-            <span className="mt-0.5 line-clamp-1 block font-mono text-micro text-faint">
-              {output.split("\n")[0]}
-            </span>
+          {target ? (
+            <span className="min-w-0 truncate font-mono text-micro text-subtle">{target}</span>
           ) : null}
         </span>
-        <span className="mt-0.5 flex shrink-0 items-center gap-1.5 text-micro text-faint">
+        <span className="flex shrink-0 items-center gap-1.5 text-micro text-faint">
           {running ? (
             <span className="size-2.5 animate-spin rounded-full border border-border-strong border-t-brand" />
           ) : failed ? (
@@ -140,6 +133,11 @@ export function StandaloneTool({ tool }: { tool: ToolBlock }) {
 
 function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Question[] }) {
   const answers = parseAnswers(tool.result?.details);
+  const [page, setPage] = useState(0);
+  const index = Math.min(page, questions.length - 1);
+  const question = questions[index];
+  if (!question) return null;
+  const answer = answers.find((item) => item.questionIndex === index)?.answer;
   return (
     <div className="my-1.5 overflow-hidden rounded-lg border border-brand/25 bg-surface/70">
       <div className="flex items-center gap-2 border-b border-border/70 bg-brand-soft/30 px-2.5 py-2">
@@ -151,58 +149,74 @@ function QuestionCard({ tool, questions }: { tool: ToolBlock; questions: Questio
           {tool.result ? t("Answered") : t("Waiting for answer")}
         </span>
       </div>
-      <div className="space-y-2.5 px-2.5 py-2">
-        {questions.map((question, index) => {
-          const answer = answers.find((item) => item.questionIndex === index)?.answer;
-          return (
-            <div key={`${question.question}-${index}`}>
-              {question.header ? (
-                <div className="text-micro font-medium uppercase tracking-label text-faint">
-                  {question.header}
-                </div>
-              ) : null}
-              <div className="mt-0.5 text-label leading-5 text-subtle">{question.question}</div>
-              {question.options.length ? (
-                <ul className="mt-1.5 space-y-1">
-                  {question.options.map((option) => {
-                    const selected = answer === option.label;
-                    return (
-                      <li
-                        key={option.label}
-                        className={cn(
-                          "flex items-start gap-2 rounded-md border px-2 py-1.5 text-micro leading-4",
-                          selected
-                            ? "border-brand/40 bg-brand-soft/50 text-fg"
-                            : "border-border/70 text-subtle",
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "mt-0.5 flex size-3 shrink-0 items-center justify-center rounded-full border",
-                            selected
-                              ? "border-brand bg-brand text-brand-fg"
-                              : "border-border-strong",
-                          )}
-                        >
-                          {selected ? <Check size={8} /> : null}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block">{option.label}</span>
-                          {option.description ? (
-                            <span className="mt-0.5 block text-micro text-faint">
-                              {option.description}
-                            </span>
-                          ) : null}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : null}
-            </div>
-          );
-        })}
+      <div className="px-2.5 py-2">
+        {question.header ? (
+          <div className="text-micro font-medium uppercase tracking-label text-faint">
+            {question.header}
+          </div>
+        ) : null}
+        <div className="mt-0.5 text-label leading-5 text-subtle">{question.question}</div>
+        {question.options.length ? (
+          <ul className="mt-1.5 space-y-1">
+            {question.options.map((option) => {
+              const selected = answer === option.label;
+              return (
+                <li
+                  key={option.label}
+                  className={cn(
+                    "flex items-start gap-2 rounded-md border px-2 py-1.5 text-micro leading-4",
+                    selected
+                      ? "border-brand/40 bg-brand-soft/50 text-fg"
+                      : "border-border/70 text-subtle",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "mt-0.5 flex size-3 shrink-0 items-center justify-center rounded-full border",
+                      selected ? "border-brand bg-brand text-brand-fg" : "border-border-strong",
+                    )}
+                  >
+                    {selected ? <Check size={8} /> : null}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block">{option.label}</span>
+                    {option.description ? (
+                      <span className="mt-0.5 block text-micro text-faint">
+                        {option.description}
+                      </span>
+                    ) : null}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        ) : null}
       </div>
+      {questions.length > 1 ? (
+        <div className="flex items-center justify-between border-t border-border/70 px-1.5 py-1">
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label={t("Previous question")}
+            disabled={index === 0}
+            onClick={() => setPage(index - 1)}
+          >
+            <ChevronLeft size={12} />
+          </Button>
+          <span className="text-micro tabular-nums text-faint">
+            {index + 1} / {questions.length}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label={t("Next question")}
+            disabled={index === questions.length - 1}
+            onClick={() => setPage(index + 1)}
+          >
+            <ChevronRight size={12} />
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

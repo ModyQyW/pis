@@ -1,4 +1,4 @@
-import { Brain } from "lucide-react";
+import { Brain, CircleDollarSign, CircleSlash, Cpu, Hash, Timer } from "lucide-react";
 import { lazy, Suspense, useState } from "react";
 
 import { Bubble, BubbleContent } from "@/components/ui/bubble";
@@ -13,6 +13,7 @@ import {
   TraceLine,
   TraceTitle,
 } from "@/components/ui/trace";
+import { messageTime } from "../lib/format";
 import type { ChatItem } from "../lib/transcript";
 import { t } from "../lib/i18n";
 import { ToolCard } from "./ToolCard";
@@ -22,11 +23,31 @@ const Markdown = lazy(() => import("./Markdown").then((m) => ({ default: m.Markd
 type AssistantItem = Extract<ChatItem, { kind: "assistant" }>;
 
 export function AssistantMessage({ item }: { item: AssistantItem }) {
+  // Text in a message that also calls tools is a preamble, not the answer.
+  // Fold it into that segment's thinking row so the final output stands alone.
+  const foldsSteps =
+    item.blocks.some((block) => block.kind === "tool") &&
+    item.blocks.some((block) => block.kind === "thinking" && block.text);
+  const stepText = foldsSteps
+    ? item.blocks
+        .filter((block) => block.kind === "text")
+        .map((block) => block.text)
+        .join("\n\n")
+    : "";
+  const thinkingIndex = item.blocks.findIndex((block) => block.kind === "thinking" && block.text);
+  const time = messageTime(item.timestamp);
+  const stopLabel =
+    item.stopReason === "aborted"
+      ? t("Stopped by you")
+      : item.stopReason === "length"
+        ? t("Stopped at the token limit")
+        : "";
   return (
     <Message className="py-3">
       <MessageContent className="gap-1">
         {item.blocks.map((block, i) => {
           if (block.kind === "text") {
+            if (foldsSteps) return null;
             return (
               <Suspense
                 key={i}
@@ -45,6 +66,7 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
               <ThinkingBlock
                 key={i}
                 text={block.text}
+                detail={i === thinkingIndex ? stepText : undefined}
                 redacted={block.redacted}
                 durationMs={item.durationMs}
               />
@@ -67,12 +89,38 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
             <BubbleContent>{item.error}</BubbleContent>
           </Bubble>
         ) : null}
-        {item.usage ? (
-          <MessageFooter className="mt-1 gap-2 text-micro tabular-nums text-faint opacity-0 transition-opacity group-hover/message:opacity-100">
-            {item.model ? <span>{item.model}</span> : null}
-            <span>{Math.round((item.usage.totalTokens ?? 0) / 1000)}k tokens</span>
-            <span>${(item.usage.cost?.total ?? 0).toFixed(3)}</span>
-            {item.durationMs ? <span>{(item.durationMs / 1000).toFixed(1)}s</span> : null}
+        {stopLabel ? (
+          <div className="flex items-center gap-1.5 text-micro text-faint">
+            <CircleSlash size={11} />
+            <span>{stopLabel}</span>
+          </div>
+        ) : null}
+        {time || item.usage ? (
+          <MessageFooter className="mt-1 gap-2 text-micro tabular-nums text-faint">
+            {time ? <time dateTime={item.timestamp}>{time}</time> : null}
+            {item.usage ? (
+              <span className="flex items-center gap-2 opacity-0 transition-opacity group-hover/message:opacity-100">
+                {item.model ? (
+                  <span className="flex items-center gap-1">
+                    <Cpu size={10} />
+                    {item.model}
+                  </span>
+                ) : null}
+                <span className="flex items-center gap-1">
+                  <Hash size={10} />
+                  {Math.round((item.usage.totalTokens ?? 0) / 1000)}k tokens
+                </span>
+                <span className="flex items-center gap-1">
+                  <CircleDollarSign size={10} />${(item.usage.cost?.total ?? 0).toFixed(3)}
+                </span>
+                {item.durationMs ? (
+                  <span className="flex items-center gap-1">
+                    <Timer size={10} />
+                    {(item.durationMs / 1000).toFixed(1)}s
+                  </span>
+                ) : null}
+              </span>
+            ) : null}
           </MessageFooter>
         ) : null}
       </MessageContent>
@@ -82,15 +130,17 @@ export function AssistantMessage({ item }: { item: AssistantItem }) {
 
 function ThinkingBlock({
   text,
+  detail,
   redacted,
   durationMs,
 }: {
   text: string;
+  detail?: string;
   redacted?: boolean;
   durationMs?: number;
 }) {
   const [open, setOpen] = useState(false);
-  if (!text) return null;
+  if (!text && !detail) return null;
   return (
     <Trace className="my-0.5">
       <TraceCollapsible open={open} onOpenChange={setOpen}>
@@ -109,6 +159,9 @@ function ThinkingBlock({
         </TraceCollapsibleTrigger>
         <TraceCollapsibleContent className="whitespace-pre-wrap pt-1 text-label leading-5">
           {text}
+          {detail ? (
+            <div className="mt-2 border-t border-border/60 pt-2 text-subtle">{detail}</div>
+          ) : null}
         </TraceCollapsibleContent>
       </TraceCollapsible>
     </Trace>

@@ -66,6 +66,46 @@ describe("buildTranscript", () => {
     expect(items.map((i) => i.kind)).toEqual(["compaction", "assistant"]);
   });
 
+  it("renders background task notifications instead of raw XML", () => {
+    const raw = [
+      "<background-task-notification>",
+      "<task-name>Build</task-name>",
+      "<status>failed</status>",
+      "<exit-code>1</exit-code>",
+      "<error>Exited with code 1</error>",
+      "</background-task-notification>",
+    ].join("");
+    const items = buildTranscript(
+      [
+        {
+          id: "n1",
+          type: "custom_message",
+          customType: "background-task-notification",
+          message: raw,
+          data: { name: "Build", status: "failed", exitCode: 1, error: "Exited with code 1" },
+        },
+        {
+          id: "n2",
+          type: "custom_message",
+          customType: "background-task-notification",
+          message:
+            "<background-task-notification><task-name>Docs &amp; site</task-name><status>killed</status></background-task-notification>",
+        },
+      ],
+      null,
+    );
+    expect(items).toMatchObject([
+      {
+        kind: "notification",
+        name: "Build",
+        status: "failed",
+        exitCode: 1,
+        error: "Exited with code 1",
+      },
+      { kind: "notification", name: "Docs & site", status: "killed" },
+    ]);
+  });
+
   it("renders pi's custom_message content as a note", () => {
     const items = buildTranscript(
       [

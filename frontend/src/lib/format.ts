@@ -18,6 +18,18 @@ export function relativeTime(iso: string): string {
   });
 }
 
+/** Wall-clock time shown under a message. */
+export function messageTime(iso?: string): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (!Number.isFinite(date.getTime())) return "";
+  return date.toLocaleTimeString(getLocale() === "zh" ? "zh-CN" : "en", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
 /** Truncates a middle path for narrow rows. */
 export function shortPath(path: string, max = 46): string {
   if (path.length <= max) return path;
