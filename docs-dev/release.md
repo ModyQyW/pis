@@ -4,8 +4,8 @@
 
 ## Current state
 
-- The current tag is `v0.0.8`.
-- `0.0.8` is the public release and the latest release.
+- The current tag is `v0.0.9`.
+- `0.0.9` is the public release and the latest release.
 - macOS uses an ad-hoc signature. The Windows installer is unsigned. Linux uses tar, deb, rpm, and `install.sh`.
 
 Before a release, confirm the state with `git tag` and `gh release list`.
@@ -65,7 +65,7 @@ The script asks for a version. Press Enter to accept the suggested patch version
 Non-interactive:
 
 ```sh
-PIS_VERSION=0.0.8 ./scripts/release.sh
+PIS_VERSION=0.0.9 ./scripts/release.sh
 ```
 
 The script:
@@ -97,7 +97,7 @@ Filter rules:
 
 If the target version section already exists, the script keeps the manual text.
 
-At publish time, the script prepends the download header in `scripts/release-notes-header.md`, then extracts the matching CHANGELOG section to a temporary file. The header links each download row to its release asset. It passes that file to `gh release edit --notes-file`. The assembled notes file does not enter Git; the header template does.
+At publish time, the script prepends the download header in `scripts/release-notes-header.md`, then extracts the matching CHANGELOG section to a temporary file. The header links each download row to its release asset. Link text uses `PISVERSION`; URLs use `__VERSION__`. `release.sh` replaces both tokens. Double underscores in link text become Markdown emphasis, so do not use them there. It passes that file to `gh release edit --notes-file`. The assembled notes file does not enter Git; the header template does.
 
 The Chinese CHANGELOG is `CHANGELOG.zh.md`. Add the same version section before you run the script. Keep that edit uncommitted; the script commits it with the English section. It stops if the Chinese section is missing.
 

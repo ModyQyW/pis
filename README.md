@@ -25,8 +25,8 @@ V1 is implemented and packaged for macOS arm64 validation; the release workflow
 builds macOS, Windows, and Linux artifacts for both amd64 and arm64. Core sessions,
 streaming Markdown, extensions, approvals, plan mode, changes, MCP
 configuration, worktrees, session search, and the desktop shell work.
-Current public release: **[0.0.8](https://github.com/ModyQyW/pis/releases/tag/v0.0.8)**
-(arm64 DMG 7.3 MB). The update feed resolves to `0.0.8`. The release and
+Current public release: **[0.0.9](https://github.com/ModyQyW/pis/releases/tag/v0.0.9)**
+(arm64 DMG 7.3 MB). The update feed resolves to `0.0.9`. The release and
 update feed are public. macOS is ad-hoc signed, so Gatekeeper requires a
 one-time approval. English is the default. Chinese is available in Settings.
 See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and

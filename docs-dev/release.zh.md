@@ -4,8 +4,8 @@
 
 ## 当前状态
 
-- 当前 tag 为 `v0.0.8`。
-- `0.0.8` 是公开 Release，也是 latest。
+- 当前 tag 为 `v0.0.9`。
+- `0.0.9` 是公开 Release，也是 latest。
 - macOS 使用 ad-hoc 签名。Windows 安装器未签名。Linux 使用 tar、deb、rpm 和 `install.sh`。
 
 发布前用 `git tag` 和 `gh release list` 确认当前状态。
@@ -65,7 +65,7 @@ git log --oneline -5
 非交互环境：
 
 ```sh
-PIS_VERSION=0.0.8 ./scripts/release.sh
+PIS_VERSION=0.0.9 ./scripts/release.sh
 ```
 
 脚本执行顺序：
@@ -97,7 +97,7 @@ CHANGELOG 是唯一的发布记录。脚本把上一个 `v*` tag 到 `HEAD` 的�
 
 目标版本的 CHANGELOG 小节已存在时，脚本保留手写内容。
 
-发布时，脚本先把 `scripts/release-notes-header.md` 中的下载指引放在最前，再把对应 CHANGELOG 小节提取到临时文件。下载表格的每一项链接到 Release 资产。脚本用 `gh release edit --notes-file` 写入 Release。组装后的 notes 文件不进入仓库，header 模板会提交。
+发布时，脚本先把 `scripts/release-notes-header.md` 中的下载指引放在最前，再把对应 CHANGELOG 小节提取到临时文件。下载表格的每一项链接到 Release 资产。链接文字使用 `PISVERSION`，URL 使用 `__VERSION__`。`release.sh` 替换这两个标记。链接文字中的双下划线会变成 Markdown 强调，不得在那里使用。脚本用 `gh release edit --notes-file` 写入 Release。组装后的 notes 文件不进入仓库，header 模板会提交。
 
 中文 CHANGELOG 是 `CHANGELOG.zh.md`。运行脚本前，先在中文文件加入同一个版本小节。这一处改动可以保持未提交；脚本会和英文小节一起提交。中文小节缺失时，脚本停止。
 
