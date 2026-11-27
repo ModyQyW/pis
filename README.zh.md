@@ -11,7 +11,7 @@ PiS 是基于 [mygo](https://mygo.run)、以 [pi](https://pi.dev) 为引擎的�
 
 ![PiS 空状态](docs-user/public/images/empty.png)
 
-PiS 是围绕 pi 的小型原生外壳，并提供完整的 Web UI。它通过 RPC 运行你安装的 pi，因此模型、凭据、会话、技能、提示模板、包和扩展都来自你已有的 pi。PiS 不捆绑 pi，不替换 pi 的数据，也不安装第二套 agent runtime。
+PiS 是围绕 pi 的小型原生外壳，并提供完整的 Web UI。它通过 RPC 运行你安装的 pi，因此模型、凭据、会话、技能、提示模板、包和扩展都来自你已有的 pi。PiS 不捆绑 pi，不保留第二份配置，也不安装第二套 agent runtime。只有你在应用中保存更改后，PiS 才写入 pi 的 `settings.json`、`models.json` 和 `mcp.json`。
 
 ## 状态（2026-11-26）
 
@@ -32,11 +32,12 @@ V1 已完成，并针对 macOS arm64 打包验证。Release workflow 为 macOS�
 - **审批**：可选 Smart / Ask all / Allow all 策略，支持一次和会话内授权，不自动拒绝。检测到 `cc-safety-net` 等 guard 时，PiS 的内置 guard 默认关闭，除非在设置中启用。
 - **计划模式**：只读探索和计划。常见修改类工具和 shell 命令会被阻止。它是工作流保护，不是沙箱。
 - **更改与文件**：Git 分支和状态、逐文件统一 diff、复制 patch、逐文件还原到 HEAD 并确认、显示文件、文件列表和只读预览。
+- **pi 配置**：查看 pi 加载的默认值、自定义提供商和模型、技能、扩展、包和 MCP 服务器，并在配置变化时确认。可以修改启动默认值、兼容提供商及其模型、技能和扩展路径、包来源。只有你保存时，写入才进入 pi 自己的文件；已保存的 API 密钥不会读回。
 - **MCP 与工作树**：管理用户级和项目级 MCP 条目（添加、启用、删除；高级字段留在 `mcp.json`），以及列出、创建、打开和移除 Git 工作树。移除有未提交文件的工作树会被拒绝；强制移除需要第二次确认。
 - **会话搜索和计划**：命令面板全文搜索会话分支；Plan 和 Agents 标签读取 pi 的 todo 状态和子代理活动；`ask_user_question` 显示为内联卡片，并标出已选答案。
 - **通知和语言**：后台运行结束时发送原生通知，设置中有测试按钮，界面支持英文和中文。
 - **发布流程**：GitHub CI 覆盖 Go、前端、交叉构建和打包；版本化 Release workflow；可选签名和 notarization；mygo updater 窗口；更新来自公开 GitHub Releases。
-- **提供商**：应用内 pty 终端运行 `pi auth login`。应用不保存或记录凭据。
+- **提供商**：应用内 pty 终端运行 `pi auth login`。应用不保存或记录凭据。自定义提供商密钥通过「pi 配置」对话框写入 pi 的 `models.json`，不会返回界面。
 - **原生外壳**：隐藏式 inset 标题栏、原生菜单、macOS 外观、运行中会话退出保护、单个小二进制。
 
 更多截图：[聊天](docs-user/public/images/chat.png)、

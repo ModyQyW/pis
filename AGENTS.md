@@ -1,6 +1,6 @@
 # AGENTS.md
 
-PiS is a desktop shell for [pi](https://pi.dev): a Go app built on [mygo](https://mygo.run) hosts a React UI and runs the user's installed `pi` over JSONL RPC. PiS does not bundle pi, store credentials, or keep a second session store.
+PiS is a desktop shell for [pi](https://pi.dev): a Go app built on [mygo](https://mygo.run) hosts a React UI and runs the user's installed `pi` over JSONL RPC. PiS does not bundle pi, store credentials, or keep a second session or configuration store.
 
 This file is the agent entry point. The engineering record is in [`docs-dev/`](docs-dev/): [architecture](docs-dev/architecture.md), [development](docs-dev/development.md), [testing](docs-dev/testing.md), [UX](docs-dev/ux.md), [design system](docs-dev/design-system.md), and [release](docs-dev/release.md). The user guide is [`docs-user/`](docs-user/). Format: <https://agents.md/>.
 
@@ -10,6 +10,7 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 | -------------------------------------------- | ----------------------------------------------- |
 | Session and pi process model                 | `internal/agent`, `docs-dev/architecture.md`    |
 | Bridge extension and approvals               | `internal/bridge`, `docs-dev/features.md`       |
+| Pi configuration reads and writes            | `internal/piconf`, `docs-dev/features.md`       |
 | UI, tokens, and dialogs                      | `docs-dev/ux.md`, `docs-dev/design-system.md`   |
 | Test layers and manual QA                    | `docs-dev/testing.md`                           |
 | Accepted tradeoffs and past mistakes         | `docs-dev/decisions.md`, `docs-dev/pitfalls.md` |
@@ -36,7 +37,7 @@ This file is the agent entry point. The engineering record is in [`docs-dev/`](d
 
 - `main.go` binds services with `mygo.BindAs`; `frontend/src/mygo.ts` mirrors that surface. Every exported Go method is callable by the renderer, so keep the IPC surface small and validate inputs at the boundary.
 - `internal/agent` starts one `pi --mode rpc` child per open session. `internal/bridge` is a bundled pi extension for session tree, plan mode, and approvals.
-- PiS reads pi session JSONL. It writes `mcp.json` only after a user action, atomically. It never writes pi `trust.json`, `auth.json`, model configuration, or session content. Do not add credential storage or logging.
+- PiS reads pi session JSONL. It writes pi's `mcp.json`, `settings.json`, and `models.json` only after an explicit user action in the app, atomically and while preserving unknown fields. It never writes pi `trust.json`, `auth.json`, or session content. Do not add credential storage or logging; a custom provider key goes to pi's `models.json` and is never returned to the page or logs.
 - pi must be `>= 1.6 < 2`; the app checks this and shows a warning otherwise.
 - Project trust gates project-local pi resources. PiS stores its own trust decision and never writes pi's trust file.
 - Smart approvals and plan mode are guardrails, not a sandbox; do not describe them as one.

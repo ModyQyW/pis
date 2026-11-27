@@ -1,6 +1,22 @@
 # Models and sign-in
 
-PiS uses pi models and credentials. It does not store API keys or manage accounts.
+PiS uses pi models and credentials. It does not keep its own copy of them.
+
+## Review pi's configuration
+
+PiS reads pi's configuration at launch. When the configuration changed since
+you last confirmed it, the Pi configuration dialog opens. It lists:
+
+- The default provider, model, and thinking level from `settings.json`.
+- Custom providers and models from `models.json`.
+- Skills, extensions, and packages.
+- MCP servers from `mcp.json`.
+
+Click Use this configuration to record the review. You can also open the
+dialog from Settings → Pi resources → Models, providers, skills….
+
+PiS writes pi's files only when you save in the dialog. It never writes
+pi's `auth.json`, `trust.json`, or session files.
 
 ## Sign in to a provider
 
@@ -42,6 +58,36 @@ Notes:
 - If you are not sure of the provider ID, read the [pi provider documentation](https://pi.dev/docs/latest/providers).
 
 After sign-in, PiS refreshes the model list.
+
+## Configure defaults and custom providers
+
+Open Settings → Pi resources → Models, providers, skills….
+
+Defaults:
+
+- Default provider and model: the startup choice for pi and new sessions.
+- Thinking level: the startup level. Automatic uses pi's own choice.
+- Empty values remove the setting, so pi chooses automatically.
+
+Models and providers:
+
+- The dialog lists the providers in pi's `models.json`.
+- Add provider creates a provider with a base URL, API type, key, and models.
+- Each model has an ID, optional name, context window, maximum output, and a
+  reasoning flag.
+- The model picker switches one session. The default affects new sessions.
+
+Available model names come from `pi --list-models`. Built-in providers use pi
+sign-in; `models.json` adds compatible endpoints and model overrides.
+
+When you save a custom provider key, the key is written to pi's `models.json`.
+PiS never reads it back, and the field stays blank on the next edit. `$NAME`
+uses an environment variable when pi starts. Advanced fields such as `compat`,
+`headers`, `cost`, and `modelOverrides` stay editable in `models.json`.
+
+pi accepts `//` comments and trailing commas in `models.json`. PiS reads them.
+When you save from PiS, the file becomes plain JSON and the comments are
+removed. The dialog shows a warning when this will happen.
 
 ## Model picker
 
@@ -104,7 +150,9 @@ If models are still missing, check pi model configuration and sign-in state. See
 ## Credential safety
 
 - Credentials are in the pi directory.
-- PiS does not read credential content.
+- PiS does not read pi's `auth.json`.
+- A custom provider key that you save goes to pi's `models.json`. PiS does not
+  show it again and does not store it in its own settings.
 - PiS does not write credentials to logs, diagnostics, or session files.
 - Do not save API keys in project files.
 - Do not post screenshots or logs with secrets to a public issue.

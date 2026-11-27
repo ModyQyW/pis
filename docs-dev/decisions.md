@@ -439,3 +439,40 @@ behaviors here before changing the renderer.
 **Alternatives.** Block remote images (breaks common screenshots and provider
 URLs); proxy every image (new service and attack surface); render images as
 links (extra click for every diagram).
+
+---
+
+## ADR-020 — Write pi's configuration from the GUI
+
+**Context.** PiS inherited models, providers, skills, extensions, packages, and
+MCP servers by running pi, but the user could only see the parts already shown
+in a session. The only way to change defaults, add a compatible provider, or
+review discovered resources was to edit pi's JSON files or run pi's terminal
+`config` UI. The previous boundary said PiS never writes pi's model
+configuration. Users asked for the same configuration workflow in the app.
+
+**Decision.** Let PiS read pi's user configuration and write `settings.json`
+and `models.json` only after an explicit save in the Pi configuration dialog.
+`mcp.json` keeps its existing flow. Writes are atomic, keep fields PiS does not
+edit, and run only on user actions. Defaults, custom providers and models,
+skill and extension paths, and package sources are editable. Package sources
+are declarations; pi installs them at session start. Stored provider keys are
+written to `models.json` and never returned to the page; `Inspect` reports only
+whether a key exists. PiS still never writes `trust.json`, `auth.json`, or
+session content.
+
+A fingerprint of the user-level configuration drives a confirmation banner.
+Saving a change records the new fingerprint, so the banner does not repeat
+until an external edit changes the configuration.
+
+**Consequences.** The write boundary is wider than before and must stay
+explicit: every new write needs a user action, a copy-safe merge, and a test.
+Project-local declarations are listed but not read, edited, or walked from
+PiS before project trust; they still load only after trust. A custom provider key passes through the
+renderer once when the user types it. That is unavoidable for a GUI form; the
+key is never stored in PiS settings, returned by `Inspect`, or logged.
+
+**Alternatives.** Stay read-only and deep-link to the files (rejected: no GUI
+configuration); embed pi's terminal `config` UI (rejected: interactive TUI
+inside a webview adds a terminal emulator for one screen); let users edit JSON
+in the app (rejected: validation and scoped writes are harder to get right).

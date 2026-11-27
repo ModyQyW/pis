@@ -75,9 +75,32 @@ The composer shows the current key hint at the bottom right.
 
 Sign in to a provider… opens the pi sign-in terminal.
 
-MCP servers… opens the MCP configuration dialog.
+PiS uses the pi credential store. It does not keep a second copy of the
+credentials and does not log the sign-in terminal output. A custom provider
+key that you save in Pi resources goes to pi's `models.json`; PiS does not
+read it back. See [Models and sign-in](/guide/models).
 
-PiS uses the pi credential store. It does not save API keys and does not log the sign-in terminal output.
+## Pi resources
+
+Models, providers, skills… opens the Pi configuration dialog. It reads pi's
+own files and shows:
+
+- Default provider, model, and thinking level.
+- Custom providers and models from `models.json`.
+- Skills that pi discovers and the paths configured in `settings.json`.
+- Extension files, configured paths, and package sources.
+- MCP servers from `mcp.json`.
+
+PiS writes pi's `settings.json` and `models.json` only when you save a change
+in this dialog. It preserves fields it does not edit. If a trusted project sets
+its own startup model, the dialog shows a note; the project value wins for new
+sessions in that project. MCP servers… opens the MCP dialog; see
+[MCP servers](/guide/mcp).
+
+When pi's configuration changed since your last confirmation, the dialog
+opens at launch. Review the list and click Use this configuration.
+
+PiS does not write pi's `auth.json`, `trust.json`, or session files.
 
 ## pi executable
 
@@ -173,7 +196,7 @@ pi data is in the pi directory:
 ~/.pi/agent/
 ```
 
-PiS does not copy or rewrite pi sessions, credentials, models, or extension configuration.
+PiS does not copy pi's sessions or credentials. It writes pi's `settings.json`, `models.json`, and `mcp.json` only when you save a change in the app.
 
 PiS local state also includes:
 

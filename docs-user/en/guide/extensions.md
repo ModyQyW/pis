@@ -13,9 +13,35 @@ Common pi locations:
 
 You can also install extensions with pi package management. See the pi documentation for the install method.
 
-A project extension triggers project trust before it loads. Load only code you have checked.
+A project extension triggers project trust before it loads. Load only code you have checked. Before trust, the Pi configuration dialog lists project-configured paths but does not read them.
 
 Extensions have the same system permissions as pi. Read the source or the release notes before you install one.
+
+## Review and add extensions
+
+Open Settings → Pi resources → Models, providers, skills…. The dialog lists:
+
+- Extension files in pi's user folder. After you trust a project, its
+  extension files are listed too. pi discovers `.ts` and `.js` files and
+  package directories with `index.ts`, `index.js`, or a `package.json`
+  `pi.extensions` entry.
+- Paths configured in `settings.json`.
+- Package sources from `settings.json`.
+
+pi's built-in extensions (`builtin:...`) are not listed as files.
+
+You can:
+
+- Add an extension file or folder path. PiS writes the `extensions` list in
+  pi's user `settings.json`.
+- Add a package source. PiS writes the `packages` list. pi installs the
+  package at the next session start.
+- Remove a path or package source that you configured.
+- Show an item in the file manager.
+
+PiS does not delete extension files. It cannot disable an auto-discovered
+extension from this dialog; delete or move that file instead. For package
+resources, use `pi config` in a terminal.
 
 ## Load extensions
 
@@ -24,6 +50,26 @@ pi loads extensions when a session starts.
 After you change an extension, close the session and open it again. The specific load behavior depends on the extension documentation.
 
 PiS does not install extensions and does not keep a second extension list.
+
+## Extensions with specific support
+
+PiS has specific display code for these extension APIs. Other extensions use
+the generic tool card and RPC dialog path.
+
+| Extension | What PiS shows | Limit |
+|---|---|---|
+| `pi-subagents` | Agents tab and subagent cards, from `subagent` tool calls and results | The optional host component protocol is not implemented |
+| `@juicesharp/rpiv-ask-user-question` | Inline question card with options and selected answers | Uses the tool's RPC fallback |
+| `@juicesharp/rpiv-todo` | Plan tab reads `rpiv-todo-state` custom entries | Read-only view |
+| `cc-safety-net`, `@juicesharp/rpiv-permissions` | Detected as an existing guard; PiS approvals stay off by default | Their rules run inside pi and are not shown in PiS |
+| `pi-lens`, `pi-web-access`, `pi-open-artifact`, and other tools | Generic tool cards; statuses, widgets, and dialogs from RPC | No custom `ctx.ui.custom()` components |
+
+The bundled `pis-bridge` adds only `pis-*` commands: session tree, plan mode,
+and approvals. It does not take a common command name.
+
+This table lists the integrations that PiS handles by name. It is not a
+compatibility guarantee for every extension version. Read the release notes
+when an extension changes its RPC interface.
 
 ## Extension interface
 

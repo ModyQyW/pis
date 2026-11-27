@@ -15,7 +15,9 @@ A desktop coding agent built on [mygo](https://mygo.run) with
 PiS is a small native shell around a rich web UI. It runs your installed
 pi over RPC, so your existing models, credentials, sessions, skills, prompt
 templates, packages, and extensions are the ones it uses. It does not bundle
-pi, replace pi's data, or install a second agent runtime.
+pi, keep a second configuration, or install a second agent runtime. It writes
+pi's `settings.json`, `models.json`, and `mcp.json` only after you save a change
+in the app.
 
 ## Status (2026-11-26)
 
@@ -57,6 +59,11 @@ See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
 - **Changes and files**: Git branch/status, per-file unified diff, copy patch,
   per-file revert-to-HEAD with confirmation, reveal, file list and read-only
   preview.
+- **Pi configuration**: review the defaults, custom providers and models,
+  skills, extensions, packages, and MCP servers pi loads, and confirm them when
+  they change. Edit startup defaults, compatible providers and their models,
+  skill and extension paths, and package sources. Writes go to pi's own files
+  only when you save; stored API keys are never read back.
 - **MCP and worktrees**: manage user/project MCP entries (add, enable, remove;
   advanced fields stay in `mcp.json`), and list/create/open/remove Git
   worktrees. Removal refuses a worktree with uncommitted files; forcing asks a
@@ -72,7 +79,8 @@ See [`docs-dev/testing.md`](docs-dev/testing.md) for evidence and
   versioned release workflow, optional signing/notarization, and the mygo
   updater window. Updates use the public GitHub Releases feed.
 - **Providers**: in-app pty terminal running `pi auth login`; no credential
-  storage or logging by the app.
+  storage or logging by the app. Custom provider keys go to pi's `models.json`
+  through the Pi configuration dialog and are never returned to the UI.
 - **Native shell**: hidden inset title bar, native menus, macOS appearance,
   quit guard for running sessions, single small binary.
 

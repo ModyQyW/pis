@@ -118,6 +118,20 @@ Tests: `internal/bridge/bridge.test.ts`.
 
 Tests: `internal/gitx/integration_test.go`, `internal/files/files_test.go`.
 
+## Pi configuration
+
+`internal/piconf` reads pi's user configuration and lists it in the Pi configuration dialog.
+
+- `Inspect` reads `settings.json` defaults and resources, `models.json` providers (including JSONC comments and trailing commas), discovered skill folders, extension folders that pi would load, package sources, and merged MCP servers. User MCP servers are read without a workspace; project servers carry the trust state.
+- Before trust, project-configured paths are listed without reading them. After trust, discovered project resources are listed with the active state; project defaults are reported separately so the user defaults stay editable.
+- A fingerprint of the user-level configuration drives the confirmation banner.
+- `Models` runs `pi --list-models` and parses the provider and model columns for the default-model picker.
+- `SetDefaults`, `SaveProvider`, `RemoveProvider`, `AddPath`, `RemovePath`, `AddPackage`, and `RemovePackage` write pi's `settings.json` or `models.json` atomically. Settings writes take pi's `settings.json.lock`; unknown fields, legacy `skills` object fields, and per-model fields are preserved.
+- `Inspect` returns only `apiKeySet` and `apiKeyEnv`; a stored key never reaches the page. A saved key goes to `models.json`, and the input stays blank on the next edit.
+- Package declarations are written, not installed. pi installs them at session start.
+
+Tests: `internal/piconf/piconf_test.go`.
+
 ## MCP
 
 `internal/mcp` reads the user and project `mcp.json` files.

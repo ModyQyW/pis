@@ -12,6 +12,7 @@
   { "type": "file", "name": "approvals", "label": "Trust, approvals, and plan mode" },
   { "type": "file", "name": "models", "label": "Models and sign-in" },
   { "type": "file", "name": "mcp", "label": "MCP servers" },
+  { "type": "file", "name": "skills", "label": "Skills" },
   { "type": "file", "name": "extensions", "label": "Extensions" },
   { "type": "section-header", "label": "Settings and help" },
   { "type": "file", "name": "settings", "label": "Settings" },

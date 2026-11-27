@@ -24,7 +24,7 @@ bun run check:web
 |---|---|---|
 | Frontend unit | `bun run test` | Session state, transcript, i18n, questions, todos, subagents |
 | bridge | `bun run test:bridge` | Approval rules, plan mode, path checks |
-| Go unit | `go test ./internal/... .` | Settings, trust, sessions, MCP, files, Git, auth, process |
+| Go unit | `go test ./internal/... .` | Settings, trust, sessions, MCP, pi configuration, files, Git, auth, process |
 | Real pi | `PIS_INTEGRATION=1 ...` | RPC start, state, commands, real session |
 | Manual QA | `bun run dev` | Interface, tools, approvals, layout, and cross-platform behavior |
 
@@ -86,6 +86,7 @@ Coverage:
 - `files`: file ranking and symlink boundaries.
 - `gitx`: status parsing, rename stats, diff, revert, worktree lifecycle, dirty worktree removal.
 - `mcp`: merge, override, add, enable, remove, unknown field preservation, duplicate name rejection.
+- `piconf`: pi settings and provider reads, key redaction, atomic writes, unknown field preservation, skill discovery, corrupt-file write refusal.
 - `piinfo`: version parsing, supported range, path discovery.
 - `sessions`: active branch, nested subagent exclusion, search, summary cache refresh.
 - `settings`: defaults, damaged file, migration, validation, snapshot isolation.
@@ -127,6 +128,7 @@ Use real pi and a real project. Check:
 - Plan mode: read-only tools and change blocking.
 - Project trust: deny, allow, restart session.
 - Changes panel: diff, copy patch, revert, file preview.
+- Pi configuration: the confirmation banner appears on a changed configuration; defaults, provider, skill path, and package changes write pi's files; stored keys stay hidden.
 - MCP: add, enable, remove, reload session.
 - Worktrees: create, open, remove, dirty worktree second confirmation.
 - Extension dialogs, statuses, and widgets.

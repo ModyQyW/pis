@@ -118,6 +118,20 @@ Markdown 按需加载。`Markdown.tsx` 配置 Streamdown 的 code、math、CJK �
 
 测试：`internal/gitx/integration_test.go`、`internal/files/files_test.go`。
 
+## pi 配置
+
+`internal/piconf` 读取 pi 的用户配置，并在「pi 配置」对话框中列出。
+
+- `Inspect` 读取 `settings.json` 的默认值和资源、`models.json` 的提供商（包括 JSONC 注释和尾随逗号）、发现的技能文件夹、pi 会加载的扩展文件夹、包来源和合并后的 MCP 服务器。没有项目时也读取用户级 MCP 服务器；项目级服务器带有信任状态。
+- 信任前只列出项目配置的路径，不读取内容。信任后列出发现的项目级资源，并显示 `internal/trust` 的活动状态；项目默认值单独显示，用户默认值仍可编辑。
+- 用户级配置的指纹控制确认提示。
+- `Models` 运行 `pi --list-models`，解析提供商和模型列，供默认模型选择器使用。
+- `SetDefaults`、`SaveProvider`、`RemoveProvider`、`AddPath`、`RemovePath`、`AddPackage` 和 `RemovePackage` 原子写入 pi 的 `settings.json` 或 `models.json`。设置写入使用 pi 的 `settings.json.lock`；未知字段、旧版 `skills` 对象字段和模型字段会保留。
+- `Inspect` 只返回 `apiKeySet` 和 `apiKeyEnv`；已保存的密钥不会发送到页面。保存的密钥写入 `models.json`，下次编辑时输入框为空。
+- 只写入包声明，不安装包。pi 在会话启动时安装。
+
+测试：`internal/piconf/piconf_test.go`。
+
 ## MCP
 
 `internal/mcp` 读取用户和项目 `mcp.json`。

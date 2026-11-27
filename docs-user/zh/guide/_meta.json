@@ -12,6 +12,7 @@
   { "type": "file", "name": "approvals", "label": "信任、审批与计划模式" },
   { "type": "file", "name": "models", "label": "模型与登录" },
   { "type": "file", "name": "mcp", "label": "MCP 服务器" },
+  { "type": "file", "name": "skills", "label": "技能" },
   { "type": "file", "name": "extensions", "label": "扩展" },
   { "type": "section-header", "label": "设置与帮助" },
   { "type": "file", "name": "settings", "label": "设置" },

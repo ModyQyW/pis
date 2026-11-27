@@ -134,7 +134,19 @@ If PiS cannot find pi, or the version is not compatible, the Settings page shows
 
 You can also enter the absolute path of pi, then click Use path. PiS then uses only that path. If the path does not run, PiS does not switch to another installation.
 
-### 4. Sign in to a provider
+### 4. Review pi's configuration
+
+When pi's configuration differs from the last confirmation, the Pi
+configuration dialog opens.
+
+It lists the default model, custom providers, skills, extensions, packages,
+and MCP servers that pi will load. Click Use this configuration, or change an
+item first. See [Settings](/guide/settings) and [Models and sign-in](/guide/models).
+
+PiS writes pi's files only when you save in this dialog. It never writes
+pi's credentials or trust file.
+
+### 5. Sign in to a provider
 
 If no model is available, the chat area shows a prompt.
 
@@ -150,7 +162,7 @@ The sign-in runs in the terminal inside the app. You can use account sign-in or 
 
 pi stores the credentials. PiS does not log the terminal output, and it does not write credentials to diagnostics.
 
-### 5. Send the first message
+### 6. Send the first message
 
 Describe the goal in the composer, then press Enter.
 
@@ -170,8 +182,9 @@ Run these checks after installation:
 2. A short message returns a streaming answer.
 3. A tool card expands and shows output.
 4. Settings shows a compatible pi version.
-5. The light and dark themes switch.
-6. Closing a running session shows the quit guard.
+5. Pi resources lists the skills, providers, and packages from pi.
+6. The light and dark themes switch.
+7. Closing a running session shows the quit guard.
 
 ## Next
 

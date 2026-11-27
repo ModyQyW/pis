@@ -31,6 +31,7 @@ flowchart LR
 | `internal/files` | 文件列表、搜索、只读预览 |
 | `internal/gitx` | Git 状态、diff、还原、工作树 |
 | `internal/mcp` | `mcp.json` 读取和原子写入 |
+| `internal/piconf` | pi 设置、提供商、技能、扩展和包的读取与原子写入 |
 | `internal/trust` | 项目信任资源和 pi 信任记录读取 |
 | `internal/settings` | 应用设置和 schema 迁移 |
 | `internal/piinfo` | pi 路径发现和版本检查 |
@@ -182,9 +183,9 @@ PiS 拥有：
 - 内置 bridge 扩展。
 - 本地草稿和最后会话键。
 
-PiS 只在用户操作下写 `mcp.json`。删除会话时，PiS 把文件移到系统废纸篓。
+PiS 只在应用中的明确用户操作下写入 pi 的 `mcp.json`、`settings.json` 和 `models.json`。写入是原子的，并保留 PiS 未编辑的字段。删除会话时，PiS 把文件移到系统废纸篓。
 
-PiS 不写 pi 的 `trust.json`、`auth.json`、模型配置或会话内容。
+PiS 不写 pi 的 `trust.json`、`auth.json` 或会话内容。自定义提供商密钥写入 `models.json`；`PiConfig.Inspect` 只报告是否已保存密钥。
 
 ## 信任
 

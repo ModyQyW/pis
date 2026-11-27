@@ -2,7 +2,7 @@
 
 PiS keeps application data separate from pi data.
 
-PiS reads pi sessions and configuration. It does not rewrite pi credentials, models, or session files.
+PiS reads pi sessions and configuration. It does not rewrite pi credentials or session files. It writes pi's `settings.json`, `models.json`, and `mcp.json` only when you save a change in the app.
 
 ## Application data
 

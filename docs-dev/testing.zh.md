@@ -24,7 +24,7 @@ bun run check:web
 |---|---|---|
 | 前端单元 | `bun run test` | 会话状态、transcript、i18n、问题卡片、待办、子代理 |
 | bridge | `bun run test:bridge` | 审批规则、计划模式、路径检查 |
-| Go 单元 | `go test ./internal/... .` | 设置、信任、会话、MCP、文件、Git、认证、进程 |
+| Go 单元 | `go test ./internal/... .` | 设置、信任、会话、MCP、pi 配置、文件、Git、认证、进程 |
 | 真实 pi | `PIS_INTEGRATION=1 ...` | RPC 启动、状态、命令、真实会话 |
 | 手工 QA | `bun run dev` | 界面、工具、审批、布局和跨平台行为 |
 
@@ -86,6 +86,7 @@ go test ./internal/...
 - `files`：文件排序、符号链接边界。
 - `gitx`：状态解析、重命名统计、diff、还原、工作树生命周期、脏工作树移除。
 - `mcp`：合并、覆盖、添加、启用、删除、未知字段保留、重名拒绝。
+- `piconf`：pi 设置和提供商读取、密钥脱敏、原子写入、未知字段保留、技能发现、损坏文件的写入拒绝。
 - `piinfo`：版本解析、支持范围、路径发现。
 - `sessions`：活动分支、嵌套子代理排除、搜索、摘要缓存刷新。
 - `settings`：默认值、损坏文件、迁移、校验、快照隔离。
@@ -127,6 +128,7 @@ PIS_WORKSPACE=/path/to/project go test ./internal/sessions -run TestListRealWork
 - 计划模式：只读工具和修改拦截。
 - 项目信任：拒绝、允许、重启会话。
 - 更改面板：diff、复制 patch、还原、文件预览。
+- pi 配置：配置变化时出现确认提示；默认值、提供商、技能路径和包更改写入 pi 的文件；已保存密钥保持隐藏。
 - MCP：添加、启用、删除、重载会话。
 - 工作树：创建、打开、移除、脏工作树二次确认。
 - 扩展对话框、状态和 widget。

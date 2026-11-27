@@ -68,6 +68,7 @@ internal/
   gitx/                Git status, diff, worktrees
   guard/               other guard extension detection
   mcp/                 mcp.json management
+  piconf/              pi settings, models, skills, and packages
   piinfo/              pi discovery and version checks
   sessions/            session JSONL reads
   settings/            app settings

@@ -68,6 +68,7 @@ internal/
   gitx/                Git 状态、diff、工作树
   guard/               其他 guard 扩展检测
   mcp/                 mcp.json 管理
+  piconf/              pi 设置、模型、技能和包
   piinfo/              pi 检测和版本检查
   sessions/            会话 JSONL 读取
   settings/            应用设置
